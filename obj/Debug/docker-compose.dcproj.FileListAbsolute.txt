@@ -34,3 +34,4 @@ C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\MimeKit.dll
 C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\MailKit.dll
 C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\BouncyCastle.Crypto.dll
 C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\EmailService.pdb
+C:\Users\MohamedKhan\source\repos\AtoCash\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
