@@ -39,10 +39,10 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new ReponseStatus { Status = "Success", Message = "New Role Created" });
+                return Ok(new RespStatus { Status = "Success", Message = "New Role Created" });
             }
 
-            ReponseStatus respStatus = new ReponseStatus();
+            RespStatus respStatus = new RespStatus();
 
             foreach (IdentityError error in result.Errors)
             {
@@ -87,10 +87,10 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new ReponseStatus { Status = "Success", Message = "Role Deleted" });
+                return Ok(new RespStatus { Status = "Success", Message = "Role Deleted" });
             }
 
-            ReponseStatus respStatus = new ReponseStatus();
+            RespStatus respStatus = new RespStatus();
 
             foreach (IdentityError error in result.Errors)
             {
@@ -111,10 +111,10 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new ReponseStatus { Status = "Success", Message = "User Deleted" });
+                return Ok(new RespStatus { Status = "Success", Message = "User Deleted" });
             }
 
-            ReponseStatus respStatus = new ReponseStatus();
+            RespStatus respStatus = new RespStatus();
 
             foreach (IdentityError error in result.Errors)
             {
@@ -140,10 +140,10 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new ReponseStatus { Status = "Success", Message = "Role Updated" });
+                return Ok(new RespStatus { Status = "Success", Message = "Role Updated" });
             }
 
-            ReponseStatus respStatus = new ReponseStatus();
+            RespStatus respStatus = new RespStatus();
 
             foreach (IdentityError error in result.Errors)
             {
@@ -167,10 +167,10 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new ReponseStatus { Status = "Success", Message = "User Updated" });
+                return Ok(new RespStatus { Status = "Success", Message = "User Updated" });
             }
 
-            ReponseStatus respStatus = new ReponseStatus();
+            RespStatus respStatus = new RespStatus();
 
             foreach (IdentityError error in result.Errors)
             {
@@ -196,7 +196,7 @@ namespace AtoCash.Authentication
 
             if (await userManager.IsInRoleAsync(user, role.Name))
             {
-                return BadRequest(new ReponseStatus { Status = "Failure", Message = "User already has the Role" });
+                return BadRequest(new RespStatus { Status = "Failure", Message = "User already has the Role" });
             }
 
 
@@ -204,10 +204,10 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new ReponseStatus { Status = "Success", Message = role.Name + " assigned to User" });
+                return Ok(new RespStatus { Status = "Success", Message = role.Name + " assigned to User" });
             }
 
-            ReponseStatus respStatus = new ReponseStatus();
+            RespStatus respStatus = new RespStatus();
 
             foreach (IdentityError error in result.Errors)
             {

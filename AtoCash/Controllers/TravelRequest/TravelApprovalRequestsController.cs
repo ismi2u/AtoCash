@@ -40,6 +40,8 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.EmployeeId = travelrequest.EmployeeId;
                 travelApprovalRequestDTO.TravelStartDate = travelrequest.TravelStartDate;
                 travelApprovalRequestDTO.TravelEndDate = travelrequest.TravelEndDate;
+                travelApprovalRequestDTO.TravelPurpose = travelrequest.TravelPurpose;
+                travelApprovalRequestDTO.CurrentStatus = travelrequest.CurrentStatus;
 
                 ListTravelRequestDTO.Add(travelApprovalRequestDTO);
 
@@ -60,18 +62,15 @@ namespace AtoCash.Controllers
             travelApprovalRequestDTO.EmployeeId = travelrequest.EmployeeId;
             travelApprovalRequestDTO.TravelStartDate = travelrequest.TravelStartDate;
             travelApprovalRequestDTO.TravelEndDate = travelrequest.TravelEndDate;
+            travelApprovalRequestDTO.TravelPurpose = travelrequest.TravelPurpose;
+            travelApprovalRequestDTO.ReqRaisedDate = travelrequest.ReqRaisedDate;
+            travelApprovalRequestDTO.CurrentStatus = travelrequest.CurrentStatus;
+
 
             if (travelrequest == null)
             {
                 return NotFound();
             }
-
-            travelApprovalRequestDTO.Id = travelrequest.Id;
-            travelApprovalRequestDTO.EmployeeId = travelrequest.EmployeeId;
-            travelApprovalRequestDTO.TravelStartDate = travelrequest.TravelStartDate;
-            travelApprovalRequestDTO.TravelEndDate = travelrequest.TravelEndDate;
-
-
             return travelApprovalRequestDTO;
         }
 
@@ -91,6 +90,9 @@ namespace AtoCash.Controllers
             travelApprovalRequest.EmployeeId = travelApprovalRequestDto.EmployeeId;
             travelApprovalRequest.TravelStartDate = travelApprovalRequestDto.TravelStartDate;
             travelApprovalRequest.TravelEndDate = travelApprovalRequestDto.TravelEndDate;
+            travelApprovalRequest.TravelPurpose = travelApprovalRequestDto.TravelPurpose;
+            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate;
+            travelApprovalRequest.CurrentStatus = travelApprovalRequestDto.CurrentStatus;
 
             _context.TravelApprovalRequests.Update(travelApprovalRequest);
             //_context.Entry(projectDto).State = EntityState.Modified;
@@ -132,10 +134,13 @@ namespace AtoCash.Controllers
 
             TravelApprovalRequest travelApprovalRequest = new TravelApprovalRequest();
 
-            travelApprovalRequest.Id = travelApprovalRequestDto.Id;
             travelApprovalRequest.EmployeeId = travelApprovalRequestDto.EmployeeId;
             travelApprovalRequest.TravelStartDate = travelApprovalRequestDto.TravelStartDate;
             travelApprovalRequest.TravelEndDate = travelApprovalRequestDto.TravelEndDate;
+            travelApprovalRequest.TravelPurpose = travelApprovalRequestDto.TravelPurpose;
+            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate;
+            travelApprovalRequest.CurrentStatus = travelApprovalRequestDto.CurrentStatus;
+            travelApprovalRequest.DepartmentId =  _context.Employees.Find(travelApprovalRequestDto.EmployeeId).DepartmentId;
             travelApprovalRequest.ProjectId = travelApprovalRequestDto.ProjectId;
             travelApprovalRequest.SubProjectId = travelApprovalRequestDto.SubProjectId;
             travelApprovalRequest.WorkTaskId = travelApprovalRequestDto.WorkTaskId;
@@ -192,7 +197,7 @@ namespace AtoCash.Controllers
                     ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
                 });
 
-                //##### 5. Send email to the Approver
+                //##### 3. Send email to the Approver
                 //Multiple instance for Department
                 //####################################
 
@@ -217,7 +222,7 @@ namespace AtoCash.Controllers
         {
             //Add oned entry to the TravelApprovalRequestTracker for PROJECT based Request
             //Here Department ID will be null
-
+            //###### 2. add entry in TravelApprovalStatus tracker
             int costCentre = _context.Projects.Find(travelApprovalRequestDto.ProjectId).CostCentreId;
 
             int projManagerid = _context.ProjectManagements.Find(travelApprovalRequestDto.ProjectId).EmployeeId;
@@ -236,7 +241,7 @@ namespace AtoCash.Controllers
                 ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
             });
 
-            //##### 5. Send email to the Approver
+            //##### 3. Send email to the Approver
             //Single instance for Project
             //####################################
 

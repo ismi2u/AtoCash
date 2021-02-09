@@ -32,10 +32,18 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(150)")]
         public string TravelPurpose { get; set; }
 
+        [Required]
+        public DateTime ReqRaisedDate { get; set; }
 
+        [Required]
+        public string CurrentStatus { get; set; }
         /// <summary>
         /// foreignkeys
         /// </summary>
+
+        [ForeignKey("DepartmentId")]
+        public virtual Department Department { get; set; }
+        public int? DepartmentId { get; set; }
 
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }

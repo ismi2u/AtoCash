@@ -29,11 +29,15 @@ namespace AtoCash.Models
         [Required]
         public DateTime CashReqDate { get; set; }
 
-        
+
         /// <summary>
         /// //////////////////
         /// </summary>
         //Foreign Key Relationsions
+
+        [ForeignKey("DepartmentId")]
+        public virtual Department Department { get; set; }
+        public int? DepartmentId { get; set; }
 
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }

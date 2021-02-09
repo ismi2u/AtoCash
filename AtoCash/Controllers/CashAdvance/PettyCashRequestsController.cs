@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using EmailService;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
@@ -133,7 +134,7 @@ namespace AtoCash.Controllers
 
             decimal empCurAvailBal = getEmpCurrentAvailablePettyCashBalance(pettyCashRequestDto);
 
-            if (pettyCashRequestDto.PettyClaimAmount <= empCurAvailBal && pettyCashRequestDto.PettyClaimAmount >= 0)
+            if (pettyCashRequestDto.PettyClaimAmount <= empCurAvailBal && pettyCashRequestDto.PettyClaimAmount > 0)
             {
                 await Task.Run(() => ProcessPettyCashRequestClaim(pettyCashRequestDto, empCurAvailBal));
 
@@ -142,7 +143,7 @@ namespace AtoCash.Controllers
             }
             else
             {
-                return Ok("{ Employee cannot draw more than the Allocated Limit}");
+                return BadRequest(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
             }
 
 
@@ -232,20 +233,54 @@ namespace AtoCash.Controllers
 
 
         /// <summary>
-        /// This is the option 1
+        /// This is the option 1 : : PROJECT BASED CASH ADVANCE REQUEST
         /// </summary>
         /// <param name="pettyCashRequestDto"></param>
         /// <param name="empCurAvailBal"></param>
         private async Task ProjectCashRequest(PettyCashRequestDTO pettyCashRequestDto, decimal empCurAvailBal)
         {
 
-            //get costcentID based on project
-
+            //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
+            #region
             int costCentre = _context.Projects.Find(pettyCashRequestDto.ProjectId).CostCentreId;
 
             int projManagerid = _context.ProjectManagements.Find(pettyCashRequestDto.ProjectId).EmployeeId;
 
             var approver = _context.Employees.Find(projManagerid);
+            ////
+            int empid = pettyCashRequestDto.EmployeeId;
+            decimal empReqAmount = pettyCashRequestDto.PettyClaimAmount;
+            int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
+
+
+
+            var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == empid).FirstOrDefault();
+            curPettyCashBal.Id = curPettyCashBal.Id;
+            curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount;
+            curPettyCashBal.EmployeeId = empid;
+            _context.Update(curPettyCashBal);
+            await _context.SaveChangesAsync();
+            #endregion
+
+            //##### 2. Adding entry to PettyCashRequest table for record
+            #region
+            var pcrq = new PettyCashRequest()
+            {
+                EmployeeId = empid,
+                PettyClaimAmount = empReqAmount,
+                CashReqDate = DateTime.Now,
+                DepartmentId = pettyCashRequestDto.DepartmentId,
+                ProjectId = pettyCashRequestDto.ProjectId,
+                SubProjectId = pettyCashRequestDto.SubProjectId,
+                WorkTaskId = pettyCashRequestDto.WorkTaskId
+            };
+            _context.PettyCashRequests.Add(pcrq);
+            await _context.SaveChangesAsync();
+            #endregion
+
+            //##### 3. Add an entry to ClaimApproval Status tracker
+            //get costcentreID based on project
+            #region
 
             _context.ClaimApprovalStatusTrackers.Add(new ClaimApprovalStatusTracker
             {
@@ -262,40 +297,58 @@ namespace AtoCash.Controllers
             });
 
             await _context.SaveChangesAsync();
+            #endregion
 
 
-
-            //##### 5. Send email to the user
-            //##
-            //##
-            //##   SEND EMAIL HERE
-            ///
-            //##
+            //##### 4. Send email to the user
             //####################################
-
+            #region
             var approverMailAddress = approver.Email;
             string subject = "Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
             Employee emp = await _context.Employees.FindAsync(pettyCashRequestDto.EmployeeId);
             var pettycashreq = _context.PettyCashRequests.Find(pettyCashRequestDto.Id);
-            string content = "Petty Cash Approval sought by " + emp.FirstName + "/nCash Request for the amount of " + pettycashreq.PettyClaimAmount + "/ntowards "  + pettycashreq.PettyClaimRequestDesc;
+            string content = "Petty Cash Approval sought by " + emp.FirstName + "/nCash Request for the amount of " + pettycashreq.PettyClaimAmount + "/ntowards " + pettycashreq.PettyClaimRequestDesc;
             var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
 
-           await _emailSender.SendEmailAsync(messagemail);
+            await _emailSender.SendEmailAsync(messagemail);
+            #endregion
+
+
+            //##### 5. Adding a entry in DisbursementsAndClaimsMaster table for records
+            #region
+            _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
+            {
+                EmployeeId = pettyCashRequestDto.EmployeeId,
+                PettyCashRequestId = pettyCashRequestDto.Id,
+                ExpenseReimburseReqId = null,
+                AdvanceOrReimburseId = (int)ClaimType.CashAdvance,
+                DepartmentId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId,
+                ProjectId = pettyCashRequestDto.ProjectId,
+                SubProjectId = pettyCashRequestDto.SubProjectId,
+                WorkTaskId = pettyCashRequestDto.WorkTaskId,
+                RecordDate = DateTime.Now,
+                Amount = pettyCashRequestDto.PettyClaimAmount,
+                CostCentreId = _context.Departments.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId).CostCentreId,
+                ApprovalStatusId = (int)ApprovalStatus.Pending
+            });
+            await _context.SaveChangesAsync();
+            #endregion
         }
 
         /// <summary>
-        /// This is option 2
+        /// This is option 2 : DEPARTMENT BASED CASH ADVANCE REQUEST
         /// </summary>
         /// <param name="pettyCashRequestDto"></param>
         /// <param name="empCurAvailBal"></param>
         private async Task DepartmentCashRequest(PettyCashRequestDTO pettyCashRequestDto, decimal empCurAvailBal)
         {
+            //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
             #region
             int empid = pettyCashRequestDto.EmployeeId;
             decimal empReqAmount = pettyCashRequestDto.PettyClaimAmount;
             int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
 
-            //### 1. Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
+           
 
             var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == empid).FirstOrDefault();
             curPettyCashBal.Id = curPettyCashBal.Id;
@@ -306,10 +359,8 @@ namespace AtoCash.Controllers
 
             #endregion
 
-
-            #region
             //##### 2. Adding entry to PettyCashRequest table for record
-
+            #region
             var pcrq = new PettyCashRequest()
             {
                 EmployeeId = empid,
@@ -325,32 +376,9 @@ namespace AtoCash.Controllers
             await _context.SaveChangesAsync();
             #endregion
 
+            //##### STEP 3. ClaimsApprovalTracker to be updated for all the allowed Approvers
+            //##### STEP 4. Send email to all the allowed Approvers
             #region
-            //##### 3. Adding a entry in DisbursementsAndClaimsMaster table for records
-
-
-            _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
-            {
-                EmployeeId = empid,
-                PettyCashRequestId = pcrq.Id,
-                ExpenseReimburseReqId = null,
-                AdvanceOrReimburseId = (int)ClaimType.CashAdvance,
-                ProjectId = pettyCashRequestDto.ProjectId,
-                SubProjectId = pettyCashRequestDto.SubProjectId,
-                WorkTaskId = pettyCashRequestDto.WorkTaskId,
-                RecordDate = DateTime.Now,
-                Amount = empReqAmount,
-                CostCentreId = _context.Departments.Find(_context.Employees.Find(empid).DepartmentId).CostCentreId,
-                ApprovalStatusId = (int)ApprovalStatus.Pending
-            });
-            await _context.SaveChangesAsync();
-
-            #endregion
-
-            #region
-
-            //##### 4. ClaimsApprovalTracker to be updated for all the allowed Approvers
-
             var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).ToList().OrderBy(a => a.ApprovalLevel);
 
             foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
@@ -370,14 +398,11 @@ namespace AtoCash.Controllers
                     FinalApprovedDate = null,
                     ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
                 });
-
-
                 await _context.SaveChangesAsync();
 
-                #endregion
-                //##### 5. Send email to the Approver
-                //####################################
 
+                //##### 4. Send email to the Approver
+                //####################################
                 var approverMailAddress = approver.Email;
                 string subject = "Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
                 Employee emp = await _context.Employees.FindAsync(pettyCashRequestDto.EmployeeId);
@@ -388,6 +413,27 @@ namespace AtoCash.Controllers
                 await _emailSender.SendEmailAsync(messagemail);
 
             }
+            #endregion
+
+            //##### STEP 5. Adding a SINGLE entry in DisbursementsAndClaimsMaster table for records
+            #region
+            _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
+            {
+                EmployeeId = empid,
+                PettyCashRequestId = pcrq.Id,
+                ExpenseReimburseReqId = null,
+                AdvanceOrReimburseId = (int)ClaimType.CashAdvance,
+                DepartmentId = _context.Employees.Find(empid).DepartmentId,
+                ProjectId = pettyCashRequestDto.ProjectId,
+                SubProjectId = pettyCashRequestDto.SubProjectId,
+                WorkTaskId = pettyCashRequestDto.WorkTaskId,
+                RecordDate = DateTime.Now,
+                Amount = empReqAmount,
+                CostCentreId = _context.Departments.Find(_context.Employees.Find(empid).DepartmentId).CostCentreId,
+                ApprovalStatusId = (int)ApprovalStatus.Pending
+            });
+            await _context.SaveChangesAsync();
+            #endregion
 
         }
 

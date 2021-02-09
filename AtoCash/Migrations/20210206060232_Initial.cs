@@ -566,6 +566,7 @@ namespace AtoCash.Migrations
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     TravelStartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TravelEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     SubProjectId = table.Column<int>(type: "int", nullable: true),
                     WorkTaskId = table.Column<int>(type: "int", nullable: true)
@@ -579,6 +580,12 @@ namespace AtoCash.Migrations
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TravelApprovalRequests_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TravelApprovalRequests_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -672,6 +679,7 @@ namespace AtoCash.Migrations
                     PettyCashRequestId = table.Column<int>(type: "int", nullable: true),
                     ExpenseReimburseReqId = table.Column<int>(type: "int", nullable: true),
                     AdvanceOrReimburseId = table.Column<int>(type: "int", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     SubProjectId = table.Column<int>(type: "int", nullable: true),
                     WorkTaskId = table.Column<int>(type: "int", nullable: true),
@@ -717,6 +725,12 @@ namespace AtoCash.Migrations
                         name: "FK_DisbursementsAndClaimsMasters_PettyCashRequests_PettyCashRequestId",
                         column: x => x.PettyCashRequestId,
                         principalTable: "PettyCashRequests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_DisbursementsAndClaimsMasters_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(

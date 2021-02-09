@@ -40,7 +40,7 @@ namespace AtoCash.Authentication
 
             if (useremail != null)
             {
-                return NotFound(new ReponseStatus { Status = "Failure", Message = "Email is already taken" });
+                return NotFound(new RespStatus { Status = "Failure", Message = "Email is already taken" });
             }
 
             MailAddress mailAddress = new MailAddress(model.Email);
@@ -48,7 +48,7 @@ namespace AtoCash.Authentication
             //MODIFY HOST DOMAIN NAME HERE => CURRENTLY only GMAIL and MAILINATOR
             if ( (mailAddress.Host.ToUpper() != "MAILINATOR.COM") && mailAddress.Host.ToUpper() != "GMAIL.COM")
             {
-                return NotFound(new ReponseStatus { Status = "Failure", Message = "Use company mail address!" });
+                return NotFound(new RespStatus { Status = "Failure", Message = "Use company mail address!" });
             }
             //Creating a IdentityUser object
             var user = new ApplicationUser { UserName= model.Username, Email = model.Email, PasswordHash = model.Password };
@@ -57,10 +57,10 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new ReponseStatus { Status = "Success", Message = "User Registered Successfully" });
+                return Ok(new RespStatus { Status = "Success", Message = "User Registered Successfully" });
             }
 
-            ReponseStatus respStatus = new ReponseStatus();
+            RespStatus respStatus = new RespStatus();
 
             foreach (IdentityError error in result.Errors)
             {
@@ -118,7 +118,7 @@ namespace AtoCash.Authentication
                 return Ok( new { Token = tokenString });
             }
 
-            return Unauthorized(new ReponseStatus { Status = "Failure", Message = "Username or Password Incorrect" });
+            return Unauthorized(new RespStatus { Status = "Failure", Message = "Username or Password Incorrect" });
         }
 
 

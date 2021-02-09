@@ -34,6 +34,11 @@ namespace AtoCash.Models
         public virtual AdvanceOrReimburse AdvanceOrReimburse { get; set; }
         public int AdvanceOrReimburseId { get; set; }
 
+        [ForeignKey("DepartmentId")]
+        public virtual Department Department { get; set; }
+        public int? DepartmentId { get; set; }
+
+
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }
         public int? ProjectId { get; set; }

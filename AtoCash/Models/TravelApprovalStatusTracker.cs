@@ -25,6 +25,10 @@ namespace AtoCash.Models
         public int TravelApprovalRequestId { get; set; }
 
 
+        public DateTime TravelStartDate { get; set; }
+
+        public DateTime TravelEndDate { get; set; }
+
         //Approver Department
         [Required]
         [ForeignKey("DepartmentId")]
