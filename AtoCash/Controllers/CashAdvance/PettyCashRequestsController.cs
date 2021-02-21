@@ -35,16 +35,17 @@ namespace AtoCash.Controllers
 
             foreach (PettyCashRequest pettyCashRequest in pettyCashRequests)
             {
-                PettyCashRequestDTO pettyCashRequestsDTO = new PettyCashRequestDTO();
-
-                pettyCashRequestsDTO.Id = pettyCashRequest.Id;
-                pettyCashRequestsDTO.EmployeeId = pettyCashRequest.EmployeeId;
-                pettyCashRequestsDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
-                pettyCashRequestsDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
-                pettyCashRequestsDTO.CashReqDate = pettyCashRequest.CashReqDate;
-                pettyCashRequestsDTO.ProjectId = pettyCashRequest.ProjectId;
-                pettyCashRequestsDTO.SubProjectId = pettyCashRequest.SubProjectId;
-                pettyCashRequestsDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
+                PettyCashRequestDTO pettyCashRequestsDTO = new PettyCashRequestDTO
+                {
+                    Id = pettyCashRequest.Id,
+                    EmployeeId = pettyCashRequest.EmployeeId,
+                    PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
+                    PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
+                    CashReqDate = pettyCashRequest.CashReqDate,
+                    ProjectId = pettyCashRequest.ProjectId,
+                    SubProjectId = pettyCashRequest.SubProjectId,
+                    WorkTaskId = pettyCashRequest.WorkTaskId
+                };
 
                 ListPettyCashRequestDTO.Add(pettyCashRequestsDTO);
 
@@ -132,7 +133,7 @@ namespace AtoCash.Controllers
                Check Eligibility for Cash Disbursement
              .==========================================*/
 
-            decimal empCurAvailBal = getEmpCurrentAvailablePettyCashBalance(pettyCashRequestDto);
+            decimal empCurAvailBal = GetEmpCurrentAvailablePettyCashBalance(pettyCashRequestDto);
 
             if (pettyCashRequestDto.PettyClaimAmount <= empCurAvailBal && pettyCashRequestDto.PettyClaimAmount > 0)
             {
@@ -187,7 +188,7 @@ namespace AtoCash.Controllers
 
         }
 
-        private decimal getEmpCurrentAvailablePettyCashBalance(PettyCashRequestDTO pettyCashRequest)
+        private decimal GetEmpCurrentAvailablePettyCashBalance(PettyCashRequestDTO pettyCashRequest)
         {
             //If Employee has no previous record of requesting the Cash so add a new record with full balance to amount to "EmpCurrentPettyCashBalance"
             //<<<-----------
@@ -321,7 +322,7 @@ namespace AtoCash.Controllers
                 EmployeeId = pettyCashRequestDto.EmployeeId,
                 PettyCashRequestId = pettyCashRequestDto.Id,
                 ExpenseReimburseReqId = null,
-                AdvanceOrReimburseId = (int)ClaimType.CashAdvance,
+                RequestTypeId = (int)ClaimType.CashAdvance,
                 DepartmentId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId,
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
@@ -422,7 +423,7 @@ namespace AtoCash.Controllers
                 EmployeeId = empid,
                 PettyCashRequestId = pcrq.Id,
                 ExpenseReimburseReqId = null,
-                AdvanceOrReimburseId = (int)ClaimType.CashAdvance,
+                RequestTypeId = (int)ClaimType.CashAdvance,
                 DepartmentId = _context.Employees.Find(empid).DepartmentId,
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,

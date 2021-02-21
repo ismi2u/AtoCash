@@ -4,7 +4,7 @@ networks:
 services:
   atocash:
     build:
-      context: C:\Users\MohamedKhan\Source\Repos\AtoCashAuth
+      context: C:\Users\MohamedKhan\source\repos\AtoCash
       dockerfile: AtoCash/Dockerfile
     command: tail -f /dev/null
     container_name: appserver

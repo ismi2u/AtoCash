@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class SubProjectsController : ControllerBase
@@ -22,6 +22,51 @@ namespace AtoCash.Controllers
         {
             _context = context;
         }
+
+        [HttpGet]
+        [ActionName("SubProjectsForDropdown")]
+        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsForDropDown()
+        {
+            List<SubProjectVM> ListSubProjectVM = new List<SubProjectVM>();
+
+            var subProjects = await _context.SubProjects.ToListAsync();
+            foreach (SubProject subProject in subProjects)
+            {
+                SubProjectVM subProjectVM = new SubProjectVM
+                {
+                    Id = subProject.Id,
+                    SubProjectName = subProject.SubProjectName
+                };
+
+                ListSubProjectVM.Add(subProjectVM);
+            }
+
+            return ListSubProjectVM;
+
+        }
+
+        [HttpGet]
+        [ActionName("SubProjectsByProjectForDropdown")]
+        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsByProjectForDropdown(int Id)
+        {
+            List<SubProjectVM> ListSubProjectVM = new List<SubProjectVM>();
+
+            var subProjects = await _context.SubProjects.Where(s => s.ProjectId==Id).ToListAsync();
+            foreach (SubProject subProject in subProjects)
+            {
+                SubProjectVM subProjectVM = new SubProjectVM
+                {
+                    Id = subProject.Id,
+                    SubProjectName = subProject.SubProjectName
+                };
+
+                ListSubProjectVM.Add(subProjectVM);
+            }
+
+            return ListSubProjectVM;
+
+        }
+
 
         // GET: api/SubProjects
         [HttpGet]

@@ -39,26 +39,27 @@ namespace AtoCash.Controllers
 
             foreach (ExpenseReimburseRequest expenseReimburseRequest in expenseReimburseRequests)
             {
-                ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new ExpenseReimburseRequestDTO();
+                ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new ExpenseReimburseRequestDTO
+                {
+                    Id = expenseReimburseRequest.Id,
+                    EmployeeId = expenseReimburseRequest.EmployeeId,
+                    ExpenseReimbClaimAmount = expenseReimburseRequest.ExpenseReimbClaimAmount,
 
-                expenseReimburseRequestDTO.Id = expenseReimburseRequest.Id;
-                expenseReimburseRequestDTO.EmployeeId = expenseReimburseRequest.EmployeeId;
-                expenseReimburseRequestDTO.ExpenseReimbClaimAmount = expenseReimburseRequest.ExpenseReimbClaimAmount;
-
-                //collect the saved images and conver to IformFile and send to User.
-                ///
-
-
-                //expenseReimburseRequestDTO.Documents = expenseReimburseRequest.Documents;
+                    //collect the saved images and conver to IformFile and send to User.
+                    ///
 
 
-                ////
-                expenseReimburseRequestDTO.ExpReimReqDate = expenseReimburseRequest.ExpReimReqDate;
-                expenseReimburseRequestDTO.ExpenseTypeId = expenseReimburseRequest.ExpenseTypeId;
-                expenseReimburseRequestDTO.ProjectId = expenseReimburseRequest.ProjectId;
-                expenseReimburseRequestDTO.SubProjectId = expenseReimburseRequest.SubProjectId;
-                expenseReimburseRequestDTO.WorkTaskId = expenseReimburseRequest.WorkTaskId;
-    
+                    //expenseReimburseRequestDTO.Documents = expenseReimburseRequest.Documents;
+
+
+                    ////
+                    ExpReimReqDate = expenseReimburseRequest.ExpReimReqDate,
+                    ExpenseTypeId = expenseReimburseRequest.ExpenseTypeId,
+                    ProjectId = expenseReimburseRequest.ProjectId,
+                    SubProjectId = expenseReimburseRequest.SubProjectId,
+                    WorkTaskId = expenseReimburseRequest.WorkTaskId
+                };
+
 
                 ListExpenseReimburseRequestDTO.Add(expenseReimburseRequestDTO);
 
@@ -190,7 +191,7 @@ namespace AtoCash.Controllers
                         PettyCashRequestId = null,
                         ExpenseReimburseReqId = expenseReimburseRequest.Id,
 
-                        AdvanceOrReimburseId = (int)AdvanceOrReimburse.ExpenseReim,
+                        RequestTypeId = (int)RequestType.ExpenseReim,
                         ProjectId = null,
                         SubProjectId = null,
                         WorkTaskId = null,
@@ -209,7 +210,7 @@ namespace AtoCash.Controllers
                         EmployeeId = expenseReimburseRequestDto.EmployeeId,
                         PettyCashRequestId = null,
                         ExpenseReimburseReqId = expenseReimburseRequest.Id,
-                        AdvanceOrReimburseId = (int)AdvanceOrReimburse.ExpenseReim,
+                        RequestTypeId = (int)RequestType.ExpenseReim,
                         ProjectId = expenseReimburseRequest.ProjectId,
                         SubProjectId = expenseReimburseRequest.SubProjectId,
                         WorkTaskId = expenseReimburseRequest.WorkTaskId,
@@ -264,11 +265,9 @@ namespace AtoCash.Controllers
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
 
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await document.CopyToAsync(stream);
-                        stream.Flush();
-                    }
+                    using var stream = new FileStream(filePath, FileMode.Create);
+                    await document.CopyToAsync(stream);
+                    stream.Flush();
                 }
 
             }
@@ -303,7 +302,7 @@ namespace AtoCash.Controllers
 
 
 
-        private enum AdvanceOrReimburse
+        private enum RequestType
         {
             CashAdvance = 1,
             ExpenseReim

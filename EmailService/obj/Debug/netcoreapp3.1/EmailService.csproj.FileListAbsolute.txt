@@ -15,3 +15,12 @@ C:\Users\MohamedKhan\Source\Repos\AtoCashAuth\EmailService\obj\Debug\netcoreapp3
 C:\Users\MohamedKhan\Source\Repos\AtoCashAuth\EmailService\obj\Debug\netcoreapp3.1\EmailService.csproj.CoreCompileInputs.cache
 C:\Users\MohamedKhan\Source\Repos\AtoCashAuth\EmailService\obj\Debug\netcoreapp3.1\EmailService.dll
 C:\Users\MohamedKhan\Source\Repos\AtoCashAuth\EmailService\obj\Debug\netcoreapp3.1\EmailService.pdb
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\bin\Debug\netcoreapp3.1\EmailService.deps.json
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\bin\Debug\netcoreapp3.1\EmailService.dll
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\bin\Debug\netcoreapp3.1\EmailService.pdb
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\obj\Debug\netcoreapp3.1\EmailService.AssemblyInfoInputs.cache
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\obj\Debug\netcoreapp3.1\EmailService.AssemblyInfo.cs
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\obj\Debug\netcoreapp3.1\EmailService.csproj.CoreCompileInputs.cache
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\obj\Debug\netcoreapp3.1\EmailService.dll
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\obj\Debug\netcoreapp3.1\EmailService.pdb
+C:\Users\MohamedKhan\source\repos\AtoCash\EmailService\obj\Debug\netcoreapp3.1\EmailService.csprojAssemblyReference.cache

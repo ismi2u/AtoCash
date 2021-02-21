@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace AtoCash.Authentication
 {
@@ -15,20 +16,25 @@ namespace AtoCash.Authentication
     {
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             this.roleManager = roleManager;
 
             this.userManager = userManager;
+
+            this.signInManager = signInManager;
         }
 
 
         [HttpPost]
         [ActionName("CreateRole")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        //[Authorize(Roles = "AtominosAdmin, Admin, User, Manager, Finmanager")]
         public async Task<IActionResult> CreateRole([FromBody] RoleModel model)
         {
+            
+
 
             IdentityRole identityRole = new IdentityRole()
             {
@@ -187,7 +193,7 @@ namespace AtoCash.Authentication
         ///
         [HttpPost]
         [ActionName("AssignRole")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        //[Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> AssignRole([FromBody] UserToRoleModel model)
         {
             var user = await userManager.FindByIdAsync(model.UserId);

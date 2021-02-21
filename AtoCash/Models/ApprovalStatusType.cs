@@ -21,5 +21,10 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(100)")]
         public string StatusDesc { get; set; }
 
+
+        //Pending = 0,
+        //Approved = 1,
+        //Rejected = 2
+
     }
 }

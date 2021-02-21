@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class JobRolesController : ControllerBase
@@ -21,6 +21,28 @@ namespace AtoCash.Controllers
         public JobRolesController(AtoCashDbContext context)
         {
             _context = context;
+        }
+
+        [HttpGet]
+        [ActionName("JobRolesForDropdown")]
+        public async Task<ActionResult<IEnumerable<JobRoleVM>>> GetJobRolesForDropDown()
+        {
+            List<JobRoleVM> ListJobRoleVM = new List<JobRoleVM>();
+
+            var jobRoles = await _context.JobRoles.ToListAsync();
+            foreach (JobRole jobRole in jobRoles)
+            {
+                JobRoleVM jobRoleVM = new JobRoleVM
+                {
+                    Id = jobRole.Id,
+                    RoleCode = jobRole.RoleCode
+                };
+
+                ListJobRoleVM.Add(jobRoleVM);
+            }
+
+            return ListJobRoleVM;
+
         }
 
         // GET: api/Roles

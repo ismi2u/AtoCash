@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class WorkTasksController : ControllerBase
@@ -23,6 +23,51 @@ namespace AtoCash.Controllers
             _context = context;
         }
 
+
+        [HttpGet]
+        [ActionName("WorkTasksForDropdown")]
+        public async Task<ActionResult<IEnumerable<WorkTaskVM>>> GetWorkTasksForDropDown()
+        {
+            List<WorkTaskVM> ListWorkTaskVM = new List<WorkTaskVM>();
+
+            var workTasks = await _context.WorkTasks.ToListAsync();
+            foreach (WorkTask workTask in workTasks)
+            {
+                WorkTaskVM workTaskVM = new WorkTaskVM
+                {
+                    Id = workTask.Id,
+                    TaskName = workTask.TaskName
+                };
+
+                ListWorkTaskVM.Add(workTaskVM);
+            }
+
+            return ListWorkTaskVM;
+
+        }
+
+        [HttpGet]
+        [ActionName("WorkTasksBySubProjectForDropdown")]
+        public async Task<ActionResult<IEnumerable<WorkTaskVM>>> GetWorkTasksBySubProjectForDropdown(int Id)
+        {
+            List<WorkTaskVM> ListWorkTaskVM = new List<WorkTaskVM>();
+
+            var workTasks = await _context.WorkTasks.Where(w => w.SubProjectId == Id).ToListAsync();
+            foreach (WorkTask workTask in workTasks)
+            {
+                WorkTaskVM workTaskVM = new WorkTaskVM
+                {
+                    Id = workTask.Id,
+                    TaskName = workTask.TaskName
+                };
+
+                ListWorkTaskVM.Add(workTaskVM);
+            }
+
+            return ListWorkTaskVM;
+
+
+        }
         // GET: api/WorkTasks
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WorkTaskDTO>>> GetWorkTasks()
@@ -120,7 +165,7 @@ namespace AtoCash.Controllers
 
             return CreatedAtAction("GetWorkTask", new { id = workTask.Id }, workTask);
 
-            
+
         }
 
         // DELETE: api/WorkTasks/5

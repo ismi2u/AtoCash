@@ -10,7 +10,7 @@ namespace AtoCash.Models
     public class CashAdvanceSearchModel
     {
         public int? EmpId { get; set; }
-        public int? AdvanceOrReimburseId { get; set; }
+        public int? RequestTypeId { get; set; }
         public int? DepartmentId { get; set; }
         public int? ProjectId{ get; set; }
         public int? SubProjectId { get; set; }

@@ -3,6 +3,7 @@ using AtoCash.Data;
 using AtoCash.Models;
 using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace AtoCash.Controllers
 {
@@ -22,17 +24,48 @@ namespace AtoCash.Controllers
     {
         private readonly AtoCashDbContext _context;
 
+    
+
         public ReportsController(AtoCashDbContext context)
         {
+            //var user = System.Threading.Thread.CurrentPrincipal;
+
+            //var TheUser = User.Identity.IsAuthenticated ? UserRepository.GetUser(user.Identity.Name) : null;
+
+            //ViewData["TheUser"] = TheUser;
             _context = context;
+            //Get Logged in User's EmpId.
+          //var   LoggedInEmpid = User.Identities.First().Claims.ToList().Where(x => x.Type == "EmployeeId").Select(c => c.Value);
+
+
+            
         }
+
+        /*get current logged -in user details.
+
+            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
+            var test = currentUser.Identities.First().Claims.ToList();
+            //var id = userManager.GetUserId(User);
+            var tets = User.Identities.First().Claims.ToList().Select(x => x.Type == "EmployeeId");
+
+            var skj = User.Identities.First().Claims.ToList().Where(x => x.Type == "EmployeeId");
+
+            var identity = (ClaimsIdentity)User.Identity;
+            IEnumerable<Claim> claims = identity.Claims; */
+
+        //int empid = (int) User.Identities.First().Claims.ToList().Where(x => x.Type == "EmployeeId").Select(c => c.Value);
 
         [HttpPost]
         [ActionName("CashReimburseReportByEmployee")]
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "AtominosAdmin, Admin, User")]
         public async Task<IActionResult> GetCashAdvanceReportRequestByEmployee(CashAdvanceSearchModel searchModel)
         {
-            int? empid = searchModel.EmpId;
+           //if (!LoggedInEmpid == searchModel.EmpId)
+           // {
+           //     return BadRequest(new RespStatus() { Status = "Failure", Message = "Employee reports only!" });
+           // }
+
+          int?  empid = searchModel.EmpId;
 
             if (empid != null)
             {
@@ -48,8 +81,8 @@ namespace AtoCash.Controllers
                     //if (!string.IsNullOrEmpty(searchModel.Name))
                     //    result = result.Where(x => x.Name.Contains(searchModel.Name));
 
-                    if (searchModel.AdvanceOrReimburseId.HasValue)
-                        result = result.Where(x => x.AdvanceOrReimburseId == searchModel.AdvanceOrReimburseId);
+                    if (searchModel.RequestTypeId.HasValue)
+                        result = result.Where(x => x.RequestTypeId == searchModel.RequestTypeId);
                     if (searchModel.DepartmentId.HasValue)
                         result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
                     if (searchModel.ProjectId.HasValue)
@@ -75,7 +108,7 @@ namespace AtoCash.Controllers
                         {
                     new DataColumn("EmployeeName", typeof(string)),
                     new DataColumn("PettyCashRequestId", typeof(int)),
-                    new DataColumn("AdvanceOrReimburse",typeof(string)),
+                    new DataColumn("RequestType",typeof(string)),
                     new DataColumn("ProjectName",typeof(string)),
                     new DataColumn("SubProject", typeof(string)),
                     new DataColumn("WorkTask",typeof(string)),
@@ -90,7 +123,7 @@ namespace AtoCash.Controllers
                         dt.Rows.Add(
                             empFullName,
                             empCashAdvance.PettyCashRequestId,
-                            empCashAdvance.AdvanceOrReimburse.ClaimType,
+                            empCashAdvance.RequestType.RequestName,
                             empCashAdvance.Project.ProjectName,
                             empCashAdvance.SubProject.SubProjectName,
                             empCashAdvance.WorkTask.TaskName,
@@ -112,7 +145,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("CashReimburseReportByAdmin")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> GetCashAdvanceReportReqestByAdmin(CashAdvanceSearchModel searchModel)
         {
             int? empId = searchModel.EmpId;
@@ -129,8 +162,8 @@ namespace AtoCash.Controllers
                 //    result = result.Where(x => x.Name.Contains(searchModel.Name));
                 if (searchModel.EmpId.HasValue)
                     result = result.Where(x => x.EmployeeId == empId);
-                if (searchModel.AdvanceOrReimburseId.HasValue)
-                    result = result.Where(x => x.AdvanceOrReimburseId == searchModel.AdvanceOrReimburseId);
+                if (searchModel.RequestTypeId.HasValue)
+                    result = result.Where(x => x.RequestTypeId == searchModel.RequestTypeId);
                 if (searchModel.DepartmentId.HasValue)
                     result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
                 if (searchModel.ProjectId.HasValue)
@@ -155,7 +188,7 @@ namespace AtoCash.Controllers
                     {
                     new DataColumn("EmployeeName", typeof(string)),
                     new DataColumn("PettyCashRequestId", typeof(int)),
-                    new DataColumn("AdvanceOrReimburse",typeof(string)),
+                    new DataColumn("RequestType",typeof(string)),
                     new DataColumn("ProjectName",typeof(string)),
                     new DataColumn("SubProject", typeof(string)),
                     new DataColumn("WorkTask",typeof(string)),
@@ -170,7 +203,7 @@ namespace AtoCash.Controllers
                     dt.Rows.Add(
                         empFullName,
                         empCashAdvance.PettyCashRequestId,
-                        empCashAdvance.AdvanceOrReimburse.ClaimType,
+                        empCashAdvance.RequestType.RequestName,
                         empCashAdvance.Project.ProjectName,
                         empCashAdvance.SubProject.SubProjectName,
                         empCashAdvance.WorkTask.TaskName,
@@ -191,11 +224,18 @@ namespace AtoCash.Controllers
         }
 
 
+
+
         [HttpPost]
         [ActionName("TravelRequestReportByEmployee")]
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "AtominosAdmin, Admin, User")]
         public async Task<IActionResult> GetTravelRequestReportByEmployee(TravelRequestSearchModel searchModel)
         {
+            //if (!LoggedInEmpid == searchModel.EmpId)
+            //{
+            //    return BadRequest(new RespStatus() { Status = "Failure", Message = "Employee reports only!" });
+            //}
+
             int? empid = searchModel.EmpId;
 
             if (empid != null)
@@ -269,7 +309,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("TravelRequestReportByAdmin")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> GetTravelRequestReportByAdmin(TravelRequestSearchModel searchModel)
         {
             int? empId = searchModel.EmpId;
@@ -351,18 +391,14 @@ namespace AtoCash.Controllers
         {
             // Creating the Excel workbook 
             // Add the datatable to the Excel workbook
-            using (XLWorkbook wb = new XLWorkbook())
-            {
-                wb.Worksheets.Add(dt, reporttype);
-                string xlfileName = reporttype + "_" + DateTime.Now.ToShortDateString().Replace("/", string.Empty) + ".xlsx";
+            using XLWorkbook wb = new XLWorkbook();
+            wb.Worksheets.Add(dt, reporttype);
+            string xlfileName = reporttype + "_" + DateTime.Now.ToShortDateString().Replace("/", string.Empty) + ".xlsx";
 
-                using (MemoryStream stream = new MemoryStream())
-                {
-                    wb.SaveAs(stream);
+            using MemoryStream stream = new MemoryStream();
+            wb.SaveAs(stream);
 
-                    return File(stream.ToArray(), "Application/Ms-Excel", xlfileName);
-                }
-            }
+            return File(stream.ToArray(), "Application/Ms-Excel", xlfileName);
         }
 
 

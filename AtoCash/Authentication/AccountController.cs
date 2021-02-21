@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AtoCash.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,19 +22,33 @@ namespace AtoCash.Authentication
 
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly AtoCashDbContext context;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AtoCashDbContext context)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.context = context;
         }
         // GET: api/<AccountController>
         [HttpPost]
         [ActionName("Register")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        //[Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
+            //check if employee-id is already registered
+
+            var empid = model.EmployeeId;
+
+            bool empIdExists = context.Users.Where(x => x.EmployeeId == model.EmployeeId).Any();
+
+            if (empIdExists)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Id is already taken" });
+            }
+
+
             //check if email is already in use if yes.. throw error
 
             var useremail = await userManager.FindByEmailAsync(model.Email);
@@ -51,7 +66,11 @@ namespace AtoCash.Authentication
                 return NotFound(new RespStatus { Status = "Failure", Message = "Use company mail address!" });
             }
             //Creating a IdentityUser object
-            var user = new ApplicationUser { UserName= model.Username, Email = model.Email, PasswordHash = model.Password };
+            var user = new ApplicationUser { 
+                EmployeeId = model.EmployeeId,
+                UserName= model.Username, 
+                Email = model.Email, 
+                PasswordHash = model.Password };
 
              IdentityResult result = await userManager.CreateAsync(user, model.Password);
 
@@ -82,7 +101,8 @@ namespace AtoCash.Authentication
             var user = await userManager.FindByEmailAsync(model.Email);
 
             var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
-            
+
+           
             //if signin successful send message
             if (result.Succeeded)
             {
@@ -95,7 +115,9 @@ namespace AtoCash.Authentication
                 //add claims
                 var claims = new List<Claim> {
                 new Claim(ClaimTypes.Name, modeluser.UserName),
-                 new Claim(ClaimTypes.Email, model.Email)
+                 new Claim(ClaimTypes.Email, model.Email),
+                 new Claim("EmployeeId", user.EmployeeId.ToString())
+
                 };
                 //add all roles belonging to the user
                  foreach (var role in userroles) 

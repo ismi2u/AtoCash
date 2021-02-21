@@ -38,7 +38,7 @@ namespace AtoCash.Controllers
                 approvalRoleMapDTO.Id = approvalRoleMap.Id;
                 approvalRoleMapDTO.ApprovalGroupId = approvalRoleMap.ApprovalGroupId;
                 approvalRoleMapDTO.RoleId = approvalRoleMap.RoleId;
-                approvalRoleMapDTO.ApprovalLevel = approvalRoleMap.ApprovalLevel;
+                approvalRoleMapDTO.ApprovalLevelId = approvalRoleMap.ApprovalLevelId;
 
                 ListApprovalRoleMapDTO.Add(approvalRoleMapDTO);
 
@@ -63,7 +63,7 @@ namespace AtoCash.Controllers
             approvalRoleMapDTO.Id = approvalRoleMap.Id;
             approvalRoleMapDTO.ApprovalGroupId = approvalRoleMap.ApprovalGroupId;
             approvalRoleMapDTO.RoleId = approvalRoleMap.RoleId;
-            approvalRoleMapDTO.ApprovalLevel = approvalRoleMap.ApprovalLevel;
+            approvalRoleMapDTO.ApprovalLevelId = approvalRoleMap.ApprovalLevelId;
 
             return approvalRoleMapDTO;
         }
@@ -84,7 +84,7 @@ namespace AtoCash.Controllers
             approvalRoleMap.Id = approvalRoleMapDto.Id;
             approvalRoleMap.ApprovalGroupId = approvalRoleMapDto.ApprovalGroupId;
             approvalRoleMap.RoleId = approvalRoleMapDto.RoleId;
-            approvalRoleMap.ApprovalLevel = approvalRoleMapDto.ApprovalLevel;
+            approvalRoleMap.ApprovalLevelId = approvalRoleMapDto.ApprovalLevelId;
 
             _context.ApprovalRoleMaps.Update(approvalRoleMap);
             //_context.Entry(projectDto).State = EntityState.Modified;
@@ -118,7 +118,7 @@ namespace AtoCash.Controllers
             approvalRoleMap.Id = approvalRoleMapDto.Id;
             approvalRoleMap.ApprovalGroupId = approvalRoleMapDto.ApprovalGroupId;
             approvalRoleMap.RoleId = approvalRoleMapDto.RoleId;
-            approvalRoleMap.ApprovalLevel = approvalRoleMapDto.ApprovalLevel;
+            approvalRoleMap.ApprovalLevelId = approvalRoleMapDto.ApprovalLevelId;
 
             _context.ApprovalRoleMaps.Add(approvalRoleMap);
             await _context.SaveChangesAsync();

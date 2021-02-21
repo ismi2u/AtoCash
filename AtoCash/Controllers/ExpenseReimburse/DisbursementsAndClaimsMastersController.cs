@@ -31,20 +31,21 @@ namespace AtoCash.Controllers
 
             foreach (DisbursementsAndClaimsMaster disbursementsAndClaimsMaster in disbursementsAndClaimsMasters)
             {
-                DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDTO = new DisbursementsAndClaimsMasterDTO();
-
-                disbursementsAndClaimsMasterDTO.Id = disbursementsAndClaimsMaster.Id;
-                disbursementsAndClaimsMasterDTO.EmployeeId = disbursementsAndClaimsMaster.EmployeeId;
-                disbursementsAndClaimsMasterDTO.PettyCashRequestId = disbursementsAndClaimsMaster.PettyCashRequestId;
-                disbursementsAndClaimsMasterDTO.ExpenseReimburseReqId = disbursementsAndClaimsMaster.ExpenseReimburseReqId;
-                disbursementsAndClaimsMasterDTO.AdvanceOrReimburseId = disbursementsAndClaimsMaster.AdvanceOrReimburseId;
-                disbursementsAndClaimsMasterDTO.ProjectId = disbursementsAndClaimsMaster.ProjectId;
-                disbursementsAndClaimsMasterDTO.SubProjectId = disbursementsAndClaimsMaster.SubProjectId;
-                disbursementsAndClaimsMasterDTO.WorkTaskId = disbursementsAndClaimsMaster.WorkTaskId;
-                disbursementsAndClaimsMasterDTO.RecordDate = disbursementsAndClaimsMaster.RecordDate;
-                disbursementsAndClaimsMasterDTO.Amount = disbursementsAndClaimsMaster.Amount;
-                disbursementsAndClaimsMasterDTO.CostCentreId = disbursementsAndClaimsMaster.CostCentreId;
-                disbursementsAndClaimsMasterDTO.ApprovalStatusId = disbursementsAndClaimsMaster.ApprovalStatusId;
+                DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDTO = new DisbursementsAndClaimsMasterDTO
+                {
+                    Id = disbursementsAndClaimsMaster.Id,
+                    EmployeeId = disbursementsAndClaimsMaster.EmployeeId,
+                    PettyCashRequestId = disbursementsAndClaimsMaster.PettyCashRequestId,
+                    ExpenseReimburseReqId = disbursementsAndClaimsMaster.ExpenseReimburseReqId,
+                    RequestTypeId = disbursementsAndClaimsMaster.RequestTypeId,
+                    ProjectId = disbursementsAndClaimsMaster.ProjectId,
+                    SubProjectId = disbursementsAndClaimsMaster.SubProjectId,
+                    WorkTaskId = disbursementsAndClaimsMaster.WorkTaskId,
+                    RecordDate = disbursementsAndClaimsMaster.RecordDate,
+                    Amount = disbursementsAndClaimsMaster.Amount,
+                    CostCentreId = disbursementsAndClaimsMaster.CostCentreId,
+                    ApprovalStatusId = disbursementsAndClaimsMaster.ApprovalStatusId
+                };
 
                 ListDisbursementsAndClaimsMasterDTO.Add(disbursementsAndClaimsMasterDTO);
 
@@ -71,7 +72,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMasterDTO.EmployeeId = disbursementsAndClaimsMaster.EmployeeId;
             disbursementsAndClaimsMasterDTO.PettyCashRequestId = disbursementsAndClaimsMaster.PettyCashRequestId;
             disbursementsAndClaimsMasterDTO.ExpenseReimburseReqId = disbursementsAndClaimsMaster.ExpenseReimburseReqId;
-            disbursementsAndClaimsMasterDTO.AdvanceOrReimburseId = disbursementsAndClaimsMaster.AdvanceOrReimburseId;
+            disbursementsAndClaimsMasterDTO.RequestTypeId = disbursementsAndClaimsMaster.RequestTypeId;
             disbursementsAndClaimsMasterDTO.ProjectId = disbursementsAndClaimsMaster.ProjectId;
             disbursementsAndClaimsMasterDTO.SubProjectId = disbursementsAndClaimsMaster.SubProjectId;
             disbursementsAndClaimsMasterDTO.WorkTaskId = disbursementsAndClaimsMaster.WorkTaskId;
@@ -99,7 +100,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.EmployeeId = disbursementsAndClaimsMasterDto.EmployeeId;
             disbursementsAndClaimsMaster.PettyCashRequestId = disbursementsAndClaimsMasterDto.PettyCashRequestId;
             disbursementsAndClaimsMaster.ExpenseReimburseReqId = disbursementsAndClaimsMasterDto.ExpenseReimburseReqId;
-            disbursementsAndClaimsMaster.AdvanceOrReimburseId = disbursementsAndClaimsMasterDto.AdvanceOrReimburseId;
+            disbursementsAndClaimsMaster.RequestTypeId = disbursementsAndClaimsMasterDto.RequestTypeId;
             disbursementsAndClaimsMaster.ProjectId = disbursementsAndClaimsMasterDto.ProjectId;
             disbursementsAndClaimsMaster.SubProjectId = disbursementsAndClaimsMasterDto.SubProjectId;
             disbursementsAndClaimsMaster.WorkTaskId = disbursementsAndClaimsMasterDto.WorkTaskId;
@@ -135,19 +136,20 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<DisbursementsAndClaimsMaster>> PostDisbursementsAndClaimsMaster(DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDto)
         {
-            DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new DisbursementsAndClaimsMaster();
-
-            disbursementsAndClaimsMaster.EmployeeId = disbursementsAndClaimsMasterDto.EmployeeId;
-            disbursementsAndClaimsMaster.PettyCashRequestId = disbursementsAndClaimsMasterDto.PettyCashRequestId;
-            disbursementsAndClaimsMaster.ExpenseReimburseReqId = disbursementsAndClaimsMasterDto.ExpenseReimburseReqId;
-            disbursementsAndClaimsMaster.AdvanceOrReimburseId = disbursementsAndClaimsMasterDto.AdvanceOrReimburseId;
-            disbursementsAndClaimsMaster.ProjectId = disbursementsAndClaimsMasterDto.ProjectId;
-            disbursementsAndClaimsMaster.SubProjectId = disbursementsAndClaimsMasterDto.SubProjectId;
-            disbursementsAndClaimsMaster.WorkTaskId = disbursementsAndClaimsMasterDto.WorkTaskId;
-            disbursementsAndClaimsMaster.RecordDate = disbursementsAndClaimsMasterDto.RecordDate;
-            disbursementsAndClaimsMaster.Amount = disbursementsAndClaimsMasterDto.Amount;
-            disbursementsAndClaimsMaster.CostCentreId = disbursementsAndClaimsMasterDto.CostCentreId;
-            disbursementsAndClaimsMaster.ApprovalStatusId = disbursementsAndClaimsMasterDto.ApprovalStatusId;
+            DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new DisbursementsAndClaimsMaster
+            {
+                EmployeeId = disbursementsAndClaimsMasterDto.EmployeeId,
+                PettyCashRequestId = disbursementsAndClaimsMasterDto.PettyCashRequestId,
+                ExpenseReimburseReqId = disbursementsAndClaimsMasterDto.ExpenseReimburseReqId,
+                RequestTypeId = disbursementsAndClaimsMasterDto.RequestTypeId,
+                ProjectId = disbursementsAndClaimsMasterDto.ProjectId,
+                SubProjectId = disbursementsAndClaimsMasterDto.SubProjectId,
+                WorkTaskId = disbursementsAndClaimsMasterDto.WorkTaskId,
+                RecordDate = disbursementsAndClaimsMasterDto.RecordDate,
+                Amount = disbursementsAndClaimsMasterDto.Amount,
+                CostCentreId = disbursementsAndClaimsMasterDto.CostCentreId,
+                ApprovalStatusId = disbursementsAndClaimsMasterDto.ApprovalStatusId
+            };
 
 
             _context.DisbursementsAndClaimsMasters.Add(disbursementsAndClaimsMaster);

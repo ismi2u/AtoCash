@@ -223,7 +223,7 @@ namespace AtoCash.Controllers
             //Add oned entry to the TravelApprovalRequestTracker for PROJECT based Request
             //Here Department ID will be null
             //###### 2. add entry in TravelApprovalStatus tracker
-            int costCentre = _context.Projects.Find(travelApprovalRequestDto.ProjectId).CostCentreId;
+            //int costCentre = _context.Projects.Find(travelApprovalRequestDto.ProjectId).CostCentreId;
 
             int projManagerid = _context.ProjectManagements.Find(travelApprovalRequestDto.ProjectId).EmployeeId;
 
@@ -248,7 +248,7 @@ namespace AtoCash.Controllers
             var approverMailAddress = approver.Email;
             string subject = "Expense Claim Approval Request " + travelApprovalRequestDto.Id.ToString();
             Employee emp = _context.Employees.Find(travelApprovalRequestDto.EmployeeId);
-            var expenseReimClaimReq = _context.ExpenseReimburseRequests.Find(travelApprovalRequestDto.Id);
+            //var expenseReimClaimReq = _context.ExpenseReimburseRequests.Find(travelApprovalRequestDto.Id);
             string content = "Travel Request Approval sought by " + emp.FirstName + "/nfor the purpose of " + travelApprovalRequestDto.TravelPurpose;
             var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
 

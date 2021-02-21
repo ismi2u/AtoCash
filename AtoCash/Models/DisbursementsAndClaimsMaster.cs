@@ -30,9 +30,9 @@ namespace AtoCash.Models
         public int? ExpenseReimburseReqId { get; set; }
 
         [Required]
-        [ForeignKey("AdvanceOrReimburseId")]
-        public virtual AdvanceOrReimburse AdvanceOrReimburse { get; set; }
-        public int AdvanceOrReimburseId { get; set; }
+        [ForeignKey("RequestTypeId")]
+        public virtual RequestType RequestType { get; set; }
+        public int RequestTypeId { get; set; }
 
         [ForeignKey("DepartmentId")]
         public virtual Department Department { get; set; }

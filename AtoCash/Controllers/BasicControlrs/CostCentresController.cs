@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class CostCentresController : ControllerBase
@@ -21,6 +21,28 @@ namespace AtoCash.Controllers
         public CostCentresController(AtoCashDbContext context)
         {
             _context = context;
+        }
+
+        [HttpGet]
+        [ActionName("CostCentresForDropdown")]
+        public async Task<ActionResult<IEnumerable<CostCentreVM>>> GetCostCentresForDropDown()
+        {
+            List<CostCentreVM> ListCostCentreVM = new List<CostCentreVM>();
+
+            var costCentres = await _context.CostCentres.ToListAsync();
+            foreach (CostCentre costCentre in costCentres)
+            {
+                CostCentreVM costCentreVM = new CostCentreVM
+                {
+                    Id = costCentre.Id,
+                    CostCentreCode = costCentre.CostCentreCode
+                };
+
+                ListCostCentreVM.Add(costCentreVM);
+            }
+
+            return ListCostCentreVM;
+
         }
 
         // GET: api/CostCentres

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class ProjectsController : ControllerBase
@@ -21,6 +21,29 @@ namespace AtoCash.Controllers
         public ProjectsController(AtoCashDbContext context)
         {
             _context = context;
+        }
+
+
+        [HttpGet]
+        [ActionName("ProjectsForDropdown")]
+        public async Task<ActionResult<IEnumerable<ProjectVM>>> GetProjectsForDropDown()
+        {
+            List<ProjectVM> ListProjectVM = new List<ProjectVM>();
+
+            var projects = await _context.Projects.ToListAsync();
+            foreach (Project project in projects)
+            {
+                ProjectVM projectVM = new ProjectVM
+                {
+                    Id = project.Id,
+                    ProjectName = project.ProjectName
+                };
+
+                ListProjectVM.Add(projectVM);
+            }
+
+            return ListProjectVM;
+
         }
 
         // GET: api/Projects
@@ -33,11 +56,13 @@ namespace AtoCash.Controllers
 
             foreach (Project proj in projects)
             {
-                ProjectDTO projectDTO = new ProjectDTO();
-                projectDTO.Id = proj.Id;
-                projectDTO.ProjectName = proj.ProjectName;
-                projectDTO.CostCentreId = proj.CostCentreId;
-                projectDTO.ProjectDesc = proj.ProjectDesc;
+                ProjectDTO projectDTO = new ProjectDTO
+                {
+                    Id = proj.Id,
+                    ProjectName = proj.ProjectName,
+                    CostCentreId = proj.CostCentreId,
+                    ProjectDesc = proj.ProjectDesc
+                };
 
                 ListProjectDTO.Add(projectDTO);
 
@@ -50,7 +75,7 @@ namespace AtoCash.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ProjectDTO>> GetProject(int id)
         {
-           
+
             ProjectDTO projectDTO = new ProjectDTO();
 
             var proj = await _context.Projects.FindAsync(id);
@@ -78,7 +103,7 @@ namespace AtoCash.Controllers
                 return BadRequest();
             }
 
-           var proj = await  _context.Projects.FindAsync(id);
+            var proj = await _context.Projects.FindAsync(id);
 
             proj.Id = projectDto.Id;
             proj.ProjectName = projectDto.ProjectName;
@@ -112,11 +137,12 @@ namespace AtoCash.Controllers
         public async Task<ActionResult<Project>> PostProject(ProjectDTO projectDto)
         {
 
-            Project proj = new Project();
-
-            proj.ProjectName = projectDto.ProjectName;
-            proj.CostCentreId = projectDto.CostCentreId;
-            proj.ProjectDesc = projectDto.ProjectDesc;
+            Project proj = new Project
+            {
+                ProjectName = projectDto.ProjectName,
+                CostCentreId = projectDto.CostCentreId,
+                ProjectDesc = projectDto.ProjectDesc
+            };
 
             _context.Projects.Add(proj);
             await _context.SaveChangesAsync();

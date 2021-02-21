@@ -29,7 +29,7 @@ namespace AtoCash.Data
         public DbSet<EmploymentType> EmploymentTypes { get; set; }
         public DbSet<PettyCashRequest> PettyCashRequests { get; set; }
 
-        public DbSet<AdvanceOrReimburse> AdvanceOrReimburseTypes { get; set; }
+        public DbSet<RequestType> RequestTypes { get; set; }
 
         public DbSet<DisbursementsAndClaimsMaster> DisbursementsAndClaimsMasters { get; set; }
 
@@ -50,6 +50,8 @@ namespace AtoCash.Data
         public DbSet<ProjectManagement> ProjectManagements { get; set; }
 
         public DbSet<ExpenseType> ExpenseTypes { get; set; }
+
+        public DbSet<ApprovalLevel> ApprovalLevels { get; set; }
 
         public DbSet<TravelApprovalRequest> TravelApprovalRequests { get; set; }
 

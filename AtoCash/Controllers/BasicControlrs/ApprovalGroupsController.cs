@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class ApprovalGroupsController : ControllerBase
@@ -23,6 +23,28 @@ namespace AtoCash.Controllers
             _context = context;
         }
 
+
+        [HttpGet]
+        [ActionName("ApprovalGroupsForDropdown")]
+        public async Task<ActionResult<IEnumerable<ApprovalGroupVM>>> GetApprovalGroupsForDropDown()
+        {
+            List<ApprovalGroupVM> ListApprovalGroupVM = new List<ApprovalGroupVM>();
+
+            var approvalGroups = await _context.ApprovalGroups.ToListAsync();
+            foreach (ApprovalGroup approvalGroup in approvalGroups)
+            {
+                ApprovalGroupVM approvalGroupVM = new ApprovalGroupVM
+                {
+                    Id = approvalGroup.Id,
+                    ApprovalGroupCode = approvalGroup.ApprovalGroupCode
+                };
+
+                ListApprovalGroupVM.Add(approvalGroupVM);
+            }
+
+            return ListApprovalGroupVM;
+
+        }
         // GET: api/ApprovalGroups
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ApprovalGroup>>> GetApprovalGroups()

@@ -8,5 +8,6 @@ namespace AtoCash.Authentication
 {
     public class ApplicationUser: IdentityUser
     {
+        public int EmployeeId { get; set; }
     }
 }

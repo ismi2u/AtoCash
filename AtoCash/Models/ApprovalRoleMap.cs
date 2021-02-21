@@ -25,6 +25,8 @@ namespace AtoCash.Models
         public int RoleId { get; set; }
 
         [Required]
-        public int ApprovalLevel { get; set; }
+
+        public virtual ApprovalLevel ApprovalLevel { get; set; }
+        public int ApprovalLevelId { get; set; }
     }
 }

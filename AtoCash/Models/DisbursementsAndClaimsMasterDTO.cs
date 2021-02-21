@@ -14,7 +14,7 @@ namespace AtoCash.Models
         public int EmployeeId { get; set; }
         public int? PettyCashRequestId { get; set; }
         public int? ExpenseReimburseReqId { get; set; }
-        public int AdvanceOrReimburseId { get; set; }
+        public int RequestTypeId { get; set; }
         public int? ProjectId { get; set; }
         public int? SubProjectId { get; set; }
         public int? WorkTaskId { get; set; }

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "Admin")]
     public class DepartmentsController : ControllerBase
@@ -21,6 +21,28 @@ namespace AtoCash.Controllers
         public DepartmentsController(AtoCashDbContext context)
         {
             _context = context;
+        }
+
+
+        [HttpGet]
+        [ActionName("DepartmentsForDropdown")]
+        public async Task<ActionResult<IEnumerable<DepartmentVM>>> GetDepartmentsForDropdown()
+        {
+            List<DepartmentVM> ListDepartmentVM = new List<DepartmentVM>();
+
+            var departments = await _context.Departments.ToListAsync();
+            foreach (Department department in departments)
+            {
+                DepartmentVM departmentVM = new DepartmentVM
+                {
+                    Id = department.Id,
+                     DeptName = department.DeptName
+                };
+
+                ListDepartmentVM.Add(departmentVM);
+            }
+            return ListDepartmentVM;
+
         }
 
         // GET: api/Departments
@@ -33,12 +55,13 @@ namespace AtoCash.Controllers
 
             foreach (Department department in departments)
             {
-                DepartmentDTO departmentDTO = new DepartmentDTO();
-
-                departmentDTO.Id = department.Id;
-                departmentDTO.DeptCode = department.DeptCode;
-                departmentDTO.DeptName = department.DeptName;
-                departmentDTO.CostCentreId = department.CostCentreId;
+                DepartmentDTO departmentDTO = new DepartmentDTO
+                {
+                    Id = department.Id,
+                    DeptCode = department.DeptCode,
+                    DeptName = department.DeptName,
+                    CostCentreId = department.CostCentreId
+                };
 
                 ListDepartmentDTO.Add(departmentDTO);
 
@@ -111,11 +134,12 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<Department>> PostDepartment(DepartmentDTO departmentDto)
         {
-            Department department = new Department();
-
-            department.DeptCode = departmentDto.DeptCode;
-            department.DeptName = departmentDto.DeptName;
-            department.CostCentreId = departmentDto.CostCentreId;
+            Department department = new Department
+            {
+                DeptCode = departmentDto.DeptCode,
+                DeptName = departmentDto.DeptName,
+                CostCentreId = departmentDto.CostCentreId
+            };
 
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
