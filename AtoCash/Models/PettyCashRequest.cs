@@ -19,8 +19,8 @@ namespace AtoCash.Models
         public int EmployeeId { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(7,2)")]
-        public decimal PettyClaimAmount { get; set; }
+        
+        public Double PettyClaimAmount { get; set; }
 
         [Required]
         [Column(TypeName = "nvarchar(150)")]

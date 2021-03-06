@@ -14,7 +14,7 @@ namespace AtoCash.Models
         public int Id { get; set; }
 
         public int EmployeeId { get; set; }
-        public decimal ExpenseReimbClaimAmount { get; set; }
+        public Double ExpenseReimbClaimAmount { get; set; }
 
         public List<IFormFile> Documents { get; set; }
 

@@ -19,7 +19,7 @@ namespace AtoCash.Models
         public string ExpenseTypeName { get; set; }
 
         [Required]
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(150)")]
         public string ExpenseTypeDesc { get; set; }
     }
 }

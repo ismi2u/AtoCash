@@ -20,8 +20,7 @@ namespace AtoCash.Models
         public string RoleName { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(7,2)")]
-        public decimal MaxPettyCashAllowed { get; set; }
+        public Double MaxPettyCashAllowed { get; set; }
 
     }
 }

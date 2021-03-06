@@ -16,7 +16,7 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(10)")]
         public string EmpJobTypeCode { get; set; }
         [Required]
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(150)")]
         public string EmpJobTypeDesc { get; set; }
 
     }

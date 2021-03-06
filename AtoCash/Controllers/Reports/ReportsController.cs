@@ -113,7 +113,7 @@ namespace AtoCash.Controllers
                     new DataColumn("SubProject", typeof(string)),
                     new DataColumn("WorkTask",typeof(string)),
                     new DataColumn("RecordDate",typeof(DateTime)),
-                    new DataColumn("Amount", typeof(decimal)),
+                    new DataColumn("Amount", typeof(Double)),
                     new DataColumn("CostCentre", typeof(string)),
                     new DataColumn("ApprovalStatus", typeof(string))
                         });
@@ -193,7 +193,7 @@ namespace AtoCash.Controllers
                     new DataColumn("SubProject", typeof(string)),
                     new DataColumn("WorkTask",typeof(string)),
                     new DataColumn("RecordDate",typeof(DateTime)),
-                    new DataColumn("Amount", typeof(decimal)),
+                    new DataColumn("Amount", typeof(Double)),
                     new DataColumn("CostCentre", typeof(string)),
                     new DataColumn("ApprovalStatus", typeof(string))
                     });

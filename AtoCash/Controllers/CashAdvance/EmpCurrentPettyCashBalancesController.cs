@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "AtominosAdmin, Admin")]
     public class EmpCurrentPettyCashBalancesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;

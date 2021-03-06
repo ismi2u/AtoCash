@@ -9,11 +9,13 @@ using AtoCash.Data;
 using AtoCash.Models;
 using EmailService;
 using AtoCash.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "AtominosAdmin, Admin")]
     public class PettyCashRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -133,7 +135,7 @@ namespace AtoCash.Controllers
                Check Eligibility for Cash Disbursement
              .==========================================*/
 
-            decimal empCurAvailBal = GetEmpCurrentAvailablePettyCashBalance(pettyCashRequestDto);
+            Double empCurAvailBal = GetEmpCurrentAvailablePettyCashBalance(pettyCashRequestDto);
 
             if (pettyCashRequestDto.PettyClaimAmount <= empCurAvailBal && pettyCashRequestDto.PettyClaimAmount > 0)
             {
@@ -188,11 +190,11 @@ namespace AtoCash.Controllers
 
         }
 
-        private decimal GetEmpCurrentAvailablePettyCashBalance(PettyCashRequestDTO pettyCashRequest)
+        private Double GetEmpCurrentAvailablePettyCashBalance(PettyCashRequestDTO pettyCashRequest)
         {
             //If Employee has no previous record of requesting the Cash so add a new record with full balance to amount to "EmpCurrentPettyCashBalance"
             //<<<-----------
-            decimal empPettyCashAmounteligible = _context.JobRoles.Find(_context.Employees.Find(pettyCashRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
+            Double empPettyCashAmounteligible = _context.JobRoles.Find(_context.Employees.Find(pettyCashRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
 
             //Check if employee cash balance is availabel in the EmpCurrentPettyCashBalance table, if NOT then ADD
             if (!_context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Any())
@@ -216,7 +218,7 @@ namespace AtoCash.Controllers
 
 
         //NO HTTPACTION HERE. Void method just to add data to database table
-        private async Task ProcessPettyCashRequestClaim(PettyCashRequestDTO pettyCashRequestDto, decimal empCurAvailBal)
+        private async Task ProcessPettyCashRequestClaim(PettyCashRequestDTO pettyCashRequestDto, Double empCurAvailBal)
         {
 
             if (pettyCashRequestDto.ProjectId == null)
@@ -238,7 +240,7 @@ namespace AtoCash.Controllers
         /// </summary>
         /// <param name="pettyCashRequestDto"></param>
         /// <param name="empCurAvailBal"></param>
-        private async Task ProjectCashRequest(PettyCashRequestDTO pettyCashRequestDto, decimal empCurAvailBal)
+        private async Task ProjectCashRequest(PettyCashRequestDTO pettyCashRequestDto, Double empCurAvailBal)
         {
 
             //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
@@ -250,7 +252,7 @@ namespace AtoCash.Controllers
             var approver = _context.Employees.Find(projManagerid);
             ////
             int empid = pettyCashRequestDto.EmployeeId;
-            decimal empReqAmount = pettyCashRequestDto.PettyClaimAmount;
+            Double empReqAmount = pettyCashRequestDto.PettyClaimAmount;
             int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
 
 
@@ -341,12 +343,12 @@ namespace AtoCash.Controllers
         /// </summary>
         /// <param name="pettyCashRequestDto"></param>
         /// <param name="empCurAvailBal"></param>
-        private async Task DepartmentCashRequest(PettyCashRequestDTO pettyCashRequestDto, decimal empCurAvailBal)
+        private async Task DepartmentCashRequest(PettyCashRequestDTO pettyCashRequestDto, Double empCurAvailBal)
         {
             //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
             #region
             int empid = pettyCashRequestDto.EmployeeId;
-            decimal empReqAmount = pettyCashRequestDto.PettyClaimAmount;
+            Double empReqAmount = pettyCashRequestDto.PettyClaimAmount;
             int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
 
            

@@ -19,8 +19,8 @@ namespace AtoCash.Models
         public int EmployeeId { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(7,2)")]
-        public decimal CurBalance { get; set; }
+        
+        public Double CurBalance { get; set; }
 
         [Required]
         public DateTime UpdatedOn   { get; set; }

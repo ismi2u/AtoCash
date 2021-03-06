@@ -21,8 +21,8 @@ namespace AtoCash.Models
         public int EmployeeId { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(7,2)")]
-        public decimal ExpenseReimbClaimAmount { get; set; }
+        
+        public Double ExpenseReimbClaimAmount { get; set; }
 
         public string Documents { get; set; }
 

@@ -16,7 +16,7 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(10)")]
         public string CostCentreCode { get; set; }
         [Required]
-        [Column(TypeName = "nvarchar(30)")]
+        [Column(TypeName = "nvarchar(150)")]
         public string CostCentreDesc{ get; set; }
 
     }

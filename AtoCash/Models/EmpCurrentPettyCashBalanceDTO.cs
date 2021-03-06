@@ -11,7 +11,7 @@ namespace AtoCash.Models
     {
         public int Id { get; set; }
        public int EmployeeId { get; set; }
-        public decimal CurBalance { get; set; }
+        public Double CurBalance { get; set; }
 
         public DateTime UpdatedOn { get; set; }
 

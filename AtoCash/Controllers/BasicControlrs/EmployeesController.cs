@@ -13,7 +13,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin")]
     public class EmployeesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;

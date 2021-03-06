@@ -12,7 +12,7 @@ namespace AtoCash.Models
 
         public int Id { get; set; }
         public int EmployeeId { get; set; }
-        public decimal PettyClaimAmount { get; set; }
+        public Double PettyClaimAmount { get; set; }
 
         public string PettyClaimRequestDesc { get; set; }
 

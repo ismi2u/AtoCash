@@ -17,8 +17,8 @@ namespace AtoCash.Models
         public int? WorkTaskId { get; set; }
         public DateTime? RecordDateFrom { get; set; }
         public DateTime? RecordDateTo { get; set; }
-        public decimal AmountFrom { get; set; }
-        public decimal AmountTo { get; set; }
+        public Double AmountFrom { get; set; }
+        public Double AmountTo { get; set; }
         public int? CostCentreId { get; set; }
         public int? ApprovalStatusId { get; set; }
 

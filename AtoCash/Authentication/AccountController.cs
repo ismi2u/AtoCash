@@ -34,7 +34,7 @@ namespace AtoCash.Authentication
         // GET: api/<AccountController>
         [HttpPost]
         [ActionName("Register")]
-        //[Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             //check if employee-id is already registered
@@ -100,9 +100,14 @@ namespace AtoCash.Authentication
 
             var user = await userManager.FindByEmailAsync(model.Email);
 
-            var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+            if (user == null)
+            {
+                return Unauthorized(new RespStatus { Status = "Failure", Message = "Username or Password Incorrect" });
+            }
 
-           
+           var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
+            
+
             //if signin successful send message
             if (result.Succeeded)
             {
@@ -112,11 +117,32 @@ namespace AtoCash.Authentication
 
                 var modeluser = await userManager.FindByEmailAsync(model.Email);
                 var userroles = await userManager.GetRolesAsync(modeluser);
+                var empid = user.EmployeeId;
+
+                var employee = await context.Employees.FindAsync(empid);
+
+                string empFirstName ;
+                string empLastName ;
+                string empEmail ;
+
+                if (empid == 0)
+                { 
+                     empFirstName = "Atominos";
+                     empLastName = "Atominos";
+                     empEmail = "atominos@gmail.com";
+                }
+                else
+                {
+                     empFirstName = employee.FirstName;
+                     empLastName = employee.LastName;
+                     empEmail = employee.Email;
+                }
+
                 //add claims
                 var claims = new List<Claim> {
                 new Claim(ClaimTypes.Name, modeluser.UserName),
                  new Claim(ClaimTypes.Email, model.Email),
-                 new Claim("EmployeeId", user.EmployeeId.ToString())
+                 new Claim("EmployeeId", empid.ToString())
 
                 };
                 //add all roles belonging to the user
@@ -136,8 +162,9 @@ namespace AtoCash.Authentication
 
 
                 var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
                 
-                return Ok( new { Token = tokenString });
+                return Ok( new { Token = tokenString, Role = userroles, FirstName = empFirstName, LastName = empLastName, EmpId = empid.ToString(), Email= empEmail });
             }
 
             return Unauthorized(new RespStatus { Status = "Failure", Message = "Username or Password Incorrect" });

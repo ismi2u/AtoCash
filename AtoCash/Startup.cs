@@ -42,7 +42,7 @@ namespace AtoCash
             //    "LocalSQLConnectionString": "server=host.docker.internal,1433; database=AtoCashDB; User=sa; Password=Pa55word2019!123;trusted_connection=false; MultipleActiveResultSets=true"
 
 
-            services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("SQLConnectionString")));
+            services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WithinContainerSQLConnectionString")));
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AtoCashDbContext>();
 
@@ -54,7 +54,7 @@ namespace AtoCash
             {
                 opts.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
+                    ValidateIssuer = false, // setting it to false, as we dont know the users connecting to this server
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
@@ -66,13 +66,15 @@ namespace AtoCash
                 };
             });
 
+            //.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+            //                .WithOrigins("http://localhost")
+            //                .WithOrigins("https://localhost")
             services.AddControllers();
             services.AddCors(options =>
                options.AddPolicy("myCorsPolicy", builder => {
                    builder.AllowAnyOrigin()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
-                           
                    }
                ));
             //email service

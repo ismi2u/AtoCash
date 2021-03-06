@@ -11,11 +11,13 @@ using System.Text;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using EmailService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "AtominosAdmin, Admin")]
     public class ExpenseReimburseRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;

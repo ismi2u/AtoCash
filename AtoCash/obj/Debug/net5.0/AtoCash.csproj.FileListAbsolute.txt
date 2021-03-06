@@ -368,6 +368,9 @@ C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\AtoCash.runti
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\AtoCash.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\ref\AtoCash.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\AtoCash.pdb
+C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\ClosedXML.dll
+C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\DocumentFormat.OpenXml.dll
+C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\ExcelNumberFormat.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\Humanizer.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\MailKit.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
@@ -429,6 +432,7 @@ C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.Compos
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.Configuration.ConfigurationManager.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.Diagnostics.DiagnosticSource.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.IdentityModel.Tokens.Jwt.dll
+C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.IO.Packaging.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.Runtime.Caching.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\cs\Microsoft.CodeAnalysis.resources.dll
@@ -528,7 +532,3 @@ C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\AtoCash.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\ref\AtoCash.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\AtoCash.pdb
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\AtoCash.genruntimeconfig.cache
-C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\ClosedXML.dll
-C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\DocumentFormat.OpenXml.dll
-C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\ExcelNumberFormat.dll
-C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\System.IO.Packaging.dll

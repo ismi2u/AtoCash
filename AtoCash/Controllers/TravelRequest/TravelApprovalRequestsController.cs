@@ -8,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using EmailService;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = "AtominosAdmin, Admin")]
     public class TravelApprovalRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;

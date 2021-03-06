@@ -55,8 +55,8 @@ namespace AtoCash.Models
         public DateTime RecordDate { get; set; }
 
         [Required]
-        [Column(TypeName = "decimal(7,2)")]
-        public decimal Amount { get; set; }
+        
+        public Double Amount { get; set; }
 
 
         [Required]

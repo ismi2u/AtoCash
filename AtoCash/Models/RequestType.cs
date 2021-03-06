@@ -18,7 +18,7 @@ namespace AtoCash.Models
         public string RequestName { get; set; }
 
         [Required]
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "nvarchar(150)")]
         public string RequestTypeDesc { get; set; }
     }
 }
