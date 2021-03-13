@@ -22,6 +22,8 @@ namespace AtoCash.Models
 
         public int RoleId { get; set; }
 
+        public int ApprovalLevelId { get; set; }
+
         public DateTime ReqDate { get; set; }
 
         public DateTime? FinalApprovedDate { get; set; }

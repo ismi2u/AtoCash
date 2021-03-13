@@ -33,12 +33,13 @@ namespace AtoCash.Controllers
 
             foreach (EmpCurrentPettyCashBalance empCurrentPettyCashBalance in empCurrentPettyCashBalances)
             {
-                EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDTO = new EmpCurrentPettyCashBalanceDTO();
-
-                empCurrentPettyCashBalanceDTO.Id = empCurrentPettyCashBalance.Id;
-                empCurrentPettyCashBalanceDTO.EmployeeId = empCurrentPettyCashBalance.EmployeeId;
-                empCurrentPettyCashBalanceDTO.CurBalance = empCurrentPettyCashBalance.CurBalance;
-                empCurrentPettyCashBalanceDTO.UpdatedOn = empCurrentPettyCashBalance.UpdatedOn;
+                EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDTO = new EmpCurrentPettyCashBalanceDTO
+                {
+                    Id = empCurrentPettyCashBalance.Id,
+                    EmployeeId = empCurrentPettyCashBalance.EmployeeId,
+                    CurBalance = empCurrentPettyCashBalance.CurBalance,
+                    UpdatedOn = empCurrentPettyCashBalance.UpdatedOn
+                };
                 ListEmpCurrentPettyCashBalanceDTO.Add(empCurrentPettyCashBalanceDTO);
 
             }
@@ -110,12 +111,13 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<EmpCurrentPettyCashBalance>> PostEmpCurrentPettyCashBalance(EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDto)
         {
-            EmpCurrentPettyCashBalance empCurrentPettyCashBalance = new EmpCurrentPettyCashBalance();
-
-            empCurrentPettyCashBalance.Id = empCurrentPettyCashBalanceDto.Id;
-            empCurrentPettyCashBalance.EmployeeId = empCurrentPettyCashBalanceDto.EmployeeId;
-            empCurrentPettyCashBalance.CurBalance = empCurrentPettyCashBalanceDto.CurBalance;
-            empCurrentPettyCashBalance.UpdatedOn = empCurrentPettyCashBalanceDto.UpdatedOn;
+            EmpCurrentPettyCashBalance empCurrentPettyCashBalance = new EmpCurrentPettyCashBalance
+            {
+                Id = empCurrentPettyCashBalanceDto.Id,
+                EmployeeId = empCurrentPettyCashBalanceDto.EmployeeId,
+                CurBalance = empCurrentPettyCashBalanceDto.CurBalance,
+                UpdatedOn = empCurrentPettyCashBalanceDto.UpdatedOn
+            };
 
             _context.EmpCurrentPettyCashBalances.Add(empCurrentPettyCashBalance);
             await _context.SaveChangesAsync();

@@ -49,6 +49,13 @@ namespace AtoCash.Models
         public virtual JobRole Role { get; set; }
         public int RoleId { get; set; }
 
+        //Approver ApprovalLevel
+        [Required]
+        [ForeignKey("ApprovalLevelId")]
+        public virtual ApprovalLevel ApprovalLevel { get; set; }
+        public int ApprovalLevelId { get; set; }
+
+
         [Required]
         public DateTime ReqDate { get; set; }
 

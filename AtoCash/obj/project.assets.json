@@ -10788,11 +10788,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\AtoCash\\AtoCash.csproj",
+      "projectUniqueName": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\AtoCash\\AtoCash.csproj",
       "projectName": "AtoCash",
-      "projectPath": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\AtoCash\\AtoCash.csproj",
+      "projectPath": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\AtoCash\\AtoCash.csproj",
       "packagesPath": "C:\\Users\\MohamedKhan\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\AtoCash\\obj\\",
+      "outputPath": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\AtoCash\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\MohamedKhan\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -10809,8 +10809,8 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
-            "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\EmailService.csproj": {
-              "projectPath": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\EmailService.csproj"
+            "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\EmailService.csproj": {
+              "projectPath": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\EmailService.csproj"
             }
           }
         }
@@ -10904,7 +10904,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.103\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.104\\RuntimeIdentifierGraph.json"
       }
     }
   }

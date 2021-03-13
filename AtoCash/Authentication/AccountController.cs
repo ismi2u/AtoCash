@@ -1,4 +1,5 @@
 ﻿using AtoCash.Data;
+using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -170,6 +171,69 @@ namespace AtoCash.Authentication
             return Unauthorized(new RespStatus { Status = "Failure", Message = "Username or Password Incorrect" });
         }
 
+
+
+        [HttpPost]
+        [ActionName("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordVM model)
+        {
+            //check if employee-id is already registered
+
+            if (ModelState.IsValid)
+            {
+                var user = await userManager.FindByEmailAsync(model.email);
+
+                if (user != null && await userManager.IsEmailConfirmedAsync(user))
+                {
+                    var token = await userManager.GeneratePasswordResetTokenAsync(user);
+
+                    //var passwordResetlink= Url.Action("ResetPassword", "Account", new { email = model.email, token = token, Request.Scheme });
+
+                    //return Ok(passwordResetLink);
+                    return Ok(new { model.email, token, Request.Scheme });
+                }
+
+                return NotFound();
+            }
+            return BadRequest();
+        }
+
+
+
+
+        [HttpPost]
+        [ActionName("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await userManager.FindByEmailAsync(model.email);
+
+                if (user != null)
+                {
+                    var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                    if (result.Succeeded)
+                    {
+                        return Ok(user);
+                    }
+
+                    List<object> errResp = new List<object>();
+                    foreach (var error in result.Errors)
+                    {
+                        errResp.Add(error.Description);
+                    }
+                    return BadRequest(errResp);
+                }
+
+                return BadRequest(new RespStatus { Status = "Failure", Message = "User is invalid" });
+
+            }
+
+            return BadRequest(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
+
+        }
+
+        ////
 
 
     }

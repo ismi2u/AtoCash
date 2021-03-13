@@ -78,10 +78,12 @@ namespace AtoCash.Controllers
 
             foreach (SubProject SubProj in SubProjects)
             {
-                SubProjectDTO SubProjectDTO = new SubProjectDTO();
-                SubProjectDTO.Id = SubProj.Id;
-                SubProjectDTO.SubProjectName = SubProj.SubProjectName;
-                SubProjectDTO.SubProjectDesc = SubProj.SubProjectDesc;
+                SubProjectDTO SubProjectDTO = new SubProjectDTO
+                {
+                    Id = SubProj.Id,
+                    SubProjectName = SubProj.SubProjectName,
+                    SubProjectDesc = SubProj.SubProjectDesc
+                };
 
                 ListSubProjectDTO.Add(SubProjectDTO);
 
@@ -151,10 +153,11 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<SubProject>> PostSubProject(SubProjectDTO subProjectDto)
         {
-            SubProject SubProj = new SubProject();
-
-            SubProj.SubProjectName = subProjectDto.SubProjectName;
-            SubProj.SubProjectDesc = subProjectDto.SubProjectDesc;
+            SubProject SubProj = new SubProject
+            {
+                SubProjectName = subProjectDto.SubProjectName,
+                SubProjectDesc = subProjectDto.SubProjectDesc
+            };
 
             _context.SubProjects.Add(SubProj);
             await _context.SaveChangesAsync();
