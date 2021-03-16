@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-      [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
     public class WorkTasksController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -43,6 +44,34 @@ namespace AtoCash.Controllers
             }
 
             return ListWorkTaskVM;
+
+        }
+
+
+        [HttpGet("{id}")]
+        [ActionName("GetTasksForSubProjects")]
+        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetTasksForSubProjects(int id)
+        {
+           
+            var listOfTasks = _context.WorkTasks.Where(t => t.SubProjectId == id).ToList();
+
+            List<WorkTaskVM> ListWorkTaskVM = new List<WorkTaskVM>();
+
+            if (listOfTasks != null)
+            {
+                foreach (var item in listOfTasks)
+                {
+                    WorkTaskVM workTaskVM = new WorkTaskVM()
+                    {
+                        Id = item.Id,
+                        TaskName = item.TaskName
+                    };
+                    ListWorkTaskVM.Add(workTaskVM);
+
+                }
+                return Ok(ListWorkTaskVM);
+            }
+            return Ok(new RespStatus { Status = "Success", Message = "No WorkTask Assigned to Employee" });
 
         }
 
@@ -78,11 +107,13 @@ namespace AtoCash.Controllers
 
             foreach (WorkTask worktask in WorkTasks)
             {
-                WorkTaskDTO workTaskDto = new WorkTaskDTO();
-                workTaskDto.Id = worktask.Id;
-                workTaskDto.SubProjectId = worktask.SubProjectId;
-                workTaskDto.TaskName = worktask.TaskName;
-                workTaskDto.TaskDesc = worktask.TaskDesc;
+                WorkTaskDTO workTaskDto = new WorkTaskDTO
+                {
+                    Id = worktask.Id,
+                    SubProjectId = worktask.SubProjectId,
+                    TaskName = worktask.TaskName,
+                    TaskDesc = worktask.TaskDesc
+                };
 
                 ListWorkTaskDto.Add(workTaskDto);
 
@@ -114,11 +145,12 @@ namespace AtoCash.Controllers
 
         // PUT: api/WorkTasks/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutWorkTask(int id, WorkTaskDTO workTaskDto)
         {
             if (id != workTaskDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var workTask = await _context.WorkTasks.FindAsync(id);
@@ -152,13 +184,15 @@ namespace AtoCash.Controllers
 
         // POST: api/WorkTasks
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<WorkTask>> PostWorkTask(WorkTaskDTO workTaskDto)
         {
-            WorkTask workTask = new WorkTask();
-
-            workTask.SubProjectId = workTaskDto.SubProjectId;
-            workTask.TaskName = workTaskDto.TaskName;
-            workTask.TaskDesc = workTaskDto.TaskDesc;
+            WorkTask workTask = new WorkTask
+            {
+                SubProjectId = workTaskDto.SubProjectId,
+                TaskName = workTaskDto.TaskName,
+                TaskDesc = workTaskDto.TaskDesc
+            };
 
             _context.WorkTasks.Add(workTask);
             await _context.SaveChangesAsync();
@@ -170,6 +204,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/WorkTasks/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteWorkTask(int id)
         {
             var workTask = await _context.WorkTasks.FindAsync(id);

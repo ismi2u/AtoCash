@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-      [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
     public class SubProjectsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -45,13 +46,40 @@ namespace AtoCash.Controllers
 
         }
 
+
+        [HttpGet("{id}")]
+        [ActionName("GetSubProjectsForProjects")]
+        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsForProjects(int id)
+        {
+            var listOfSubProject = _context.SubProjects.Where(s => s.ProjectId == id).ToList();
+
+            List<SubProjectVM> ListSubProjectVM = new List<SubProjectVM>();
+
+            if (listOfSubProject != null)
+            {
+                foreach (var item in listOfSubProject)
+                {
+                    SubProjectVM subproject = new SubProjectVM()
+                    {
+                        Id = item.Id,
+                         SubProjectName = item.SubProjectName
+                    };
+                    ListSubProjectVM.Add(subproject);
+
+                }
+                return Ok(listOfSubProject);
+            }
+            return Ok(new RespStatus { Status = "Success", Message = "No SubProjects Assigned to Employee" });
+
+        }
+
         [HttpGet]
         [ActionName("SubProjectsByProjectForDropdown")]
         public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsByProjectForDropdown(int Id)
         {
             List<SubProjectVM> ListSubProjectVM = new List<SubProjectVM>();
 
-            var subProjects = await _context.SubProjects.Where(s => s.ProjectId==Id).ToListAsync();
+            var subProjects = await _context.SubProjects.Where(s => s.ProjectId == Id).ToListAsync();
             foreach (SubProject subProject in subProjects)
             {
                 SubProjectVM subProjectVM = new SubProjectVM
@@ -114,11 +142,12 @@ namespace AtoCash.Controllers
 
         // PUT: api/SubProjects/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutSubProject(int id, SubProjectDTO subProjectDto)
         {
             if (id != subProjectDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var subProj = await _context.SubProjects.FindAsync(id);
@@ -151,10 +180,12 @@ namespace AtoCash.Controllers
 
         // POST: api/SubProjects
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<SubProject>> PostSubProject(SubProjectDTO subProjectDto)
         {
             SubProject SubProj = new SubProject
             {
+                ProjectId = subProjectDto.ProjectId,
                 SubProjectName = subProjectDto.SubProjectName,
                 SubProjectDesc = subProjectDto.SubProjectDesc
             };
@@ -167,6 +198,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/SubProjects/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteSubProject(int id)
         {
             var subProject = await _context.SubProjects.FindAsync(id);

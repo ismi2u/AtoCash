@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using AtoCash.Data;
 
 namespace AtoCash.Authentication
 {
@@ -17,26 +18,19 @@ namespace AtoCash.Authentication
     {
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             this.roleManager = roleManager;
-
             this.userManager = userManager;
-
-            this.signInManager = signInManager;
         }
 
 
         [HttpPost]
         [ActionName("CreateRole")]
-        //[Authorize(Roles = "AtominosAdmin, Admin, User, Manager, Finmanager")]
+
         public async Task<IActionResult> CreateRole([FromBody] RoleModel model)
         {
-            
-
-
             IdentityRole identityRole = new IdentityRole()
             {
                 Name = model.RoleName
@@ -63,7 +57,7 @@ namespace AtoCash.Authentication
 
         [HttpGet]
         [ActionName("ListUsers")]
-        [Authorize(Roles = "Admin, User")]
+
         public IActionResult ListUsers()
         {
             var users = userManager.Users;
@@ -71,11 +65,9 @@ namespace AtoCash.Authentication
             return Ok(users);
         }
 
-
-
         [HttpGet]
         [ActionName("ListRoles")]
-        [Authorize(Roles = "Admin, User")]
+
         public IActionResult ListRoles()
         {
             var roles = roleManager.Roles;
@@ -83,12 +75,57 @@ namespace AtoCash.Authentication
             return Ok(roles);
         }
 
+        [HttpGet("{id}")]
+        [ActionName("GetUserByUserId")]
+        public async Task<IActionResult> GetUserByUserId(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+
+            if (user == null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "User not Found" });
+            }
+
+            var rolenames = await userManager.GetRolesAsync(user);
+
+
+            List<string> roleids = new List<string>();
+
+            foreach (string role in rolenames)
+            {
+                var test = await roleManager.FindByNameAsync(role);
+
+                roleids.Add(test.Id);
+            }
+
+            return Ok(new { user, roleids });
+        }
+
+        [HttpGet("{id}")]
+        [ActionName("GetRoleByRoleId")]
+        public async Task<IActionResult> GetRoleByRoleId(string id)
+        {
+            var role = await roleManager.FindByIdAsync(id);
+
+            if (role == null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Role not Found" });
+            }
+
+            return Ok(role);
+        }
+
         [HttpDelete]
         [ActionName("DeleteRole")]
-          [Authorize(Roles = "AtominosAdmin, Admin")]
+
         public async Task<IActionResult> DeleteRole(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
+
+            if (role == null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Role not Found" });
+            }
 
             IdentityResult result = await roleManager.DeleteAsync(role);
 
@@ -109,10 +146,14 @@ namespace AtoCash.Authentication
 
         [HttpDelete]
         [ActionName("DeleteUser")]
-          [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await userManager.FindByIdAsync(id);
+
+            if (user ==null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "User not Found" });
+            }
 
             IdentityResult result = await userManager.DeleteAsync(user);
 
@@ -136,7 +177,6 @@ namespace AtoCash.Authentication
 
         [HttpPut]
         [ActionName("EditRole")]
-          [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> EditRole(EditRoleModel model)
         {
             var role = await roleManager.FindByIdAsync(model.Id);
@@ -163,7 +203,6 @@ namespace AtoCash.Authentication
 
         [HttpPut]
         [ActionName("EditUser")]
-          [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> EditUser(EditUserModel model)
         {
             var user = await userManager.FindByIdAsync(model.Id);
@@ -194,37 +233,50 @@ namespace AtoCash.Authentication
         ///
         [HttpPost]
         [ActionName("AssignRole")]
-        //[Authorize(Roles = "AtominosAdmin, Admin")]
-        public async Task<IActionResult> AssignRole([FromBody] UserToRoleModel model)
+
+        public async Task<IActionResult> AssignRole([FromBody] UserToRoleModel Model)
         {
-            var user = await userManager.FindByIdAsync(model.UserId);
 
-            var role = await roleManager.FindByIdAsync(model.RoleId);
+            string userId = Model.UserId;
+            ApplicationUser user = await userManager.FindByIdAsync(userId);
 
-            if (await userManager.IsInRoleAsync(user, role.Name))
+            //Remove Exisint Roles.
+            var roles = await userManager.GetRolesAsync(user);
+            await userManager.RemoveFromRolesAsync(user, roles.ToArray());
+            //
+
+            List<string> roleIds = Model.RoleIds;
+
+            List<RespStatus> ListRespStatus = new List<RespStatus>();
+
+            foreach (string RoleId in roleIds)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "User already has the Role" });
+                IdentityRole role = await roleManager.FindByIdAsync(RoleId);
+                IdentityResult result = await userManager.AddToRoleAsync(user, role.Name);
+
+                if (result.Succeeded)
+                {
+                    RespStatus respStatus = new RespStatus()
+                    {
+                        Message = role.Name + " assigned to User", 
+                        Status = "Success" 
+                    };
+                    ListRespStatus.Add(respStatus);
+                }
+                else
+                {
+                    RespStatus respStatus = new RespStatus();
+                    foreach (IdentityError error in result.Errors)
+                    {
+                        respStatus.Message = respStatus.Message + error.Description + "\n";
+                        respStatus.Status = "Failure";
+                    }
+                    ListRespStatus.Add(respStatus);
+                }
             }
-
-
-            IdentityResult result = await userManager.AddToRoleAsync(user, role.Name);
-
-            if (result.Succeeded)
-            {
-                return Ok(new RespStatus { Status = "Success", Message = role.Name + " assigned to User" });
-            }
-
-            RespStatus respStatus = new RespStatus();
-
-            foreach (IdentityError error in result.Errors)
-            {
-                respStatus.Message = respStatus.Message + error.Description + "\n";
-            }
-
-            return BadRequest(respStatus);
+            return BadRequest(ListRespStatus);
 
         }
-
 
     }
 }

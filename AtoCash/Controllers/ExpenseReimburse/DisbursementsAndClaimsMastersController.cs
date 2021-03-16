@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
@@ -92,7 +93,7 @@ namespace AtoCash.Controllers
         {
             if (id != disbursementsAndClaimsMasterDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
             }
 
             var disbursementsAndClaimsMaster = await _context.DisbursementsAndClaimsMasters.FindAsync(id);

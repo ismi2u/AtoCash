@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
-      [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ProjectManagementController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -33,10 +34,12 @@ namespace AtoCash.Controllers
 
             foreach (ProjectManagement projMgt in projManagements)
             {
-                ProjectManagementDTO projectmgmtDTO = new ProjectManagementDTO();
-                projectmgmtDTO.Id = projMgt.Id;
-                projectmgmtDTO.ProjectId = projMgt.ProjectId;
-                projectmgmtDTO.EmployeeId = projMgt.EmployeeId;
+                ProjectManagementDTO projectmgmtDTO = new ProjectManagementDTO
+                {
+                    Id = projMgt.Id,
+                    ProjectId = projMgt.ProjectId,
+                    EmployeeId = projMgt.EmployeeId
+                };
 
                 ListProjectManagementDTO.Add(projectmgmtDTO);
 
@@ -65,13 +68,40 @@ namespace AtoCash.Controllers
             return projManagementDTO;
         }
 
-        // PUT: api/ProjectManagement/5
+        // GET: api/ProjectManagement/5
+        [HttpGet("{id}")]
+        [ActionName("GetEmployeeAssignedProjects")]
+        public ActionResult<ProjectVM> GetEmployeeAssignedProjects(int id)
+        {
+            var listOfProjmgts =  _context.ProjectManagements.Where(p => p.EmployeeId == id).ToList();
+
+            List<ProjectVM> ListprojectVM = new List<ProjectVM>();
+
+            if (listOfProjmgts != null)
+            { 
+                foreach( var item in listOfProjmgts)
+                {
+                    ProjectVM project = new ProjectVM() 
+                    { 
+                        Id = item.ProjectId, 
+                        ProjectName = item.Project.ProjectName 
+                    };
+                    ListprojectVM.Add(project);
+
+                }
+                return Ok(ListprojectVM);
+            }
+            return Ok(new RespStatus { Status = "Success", Message = "No Projects Assigned to Employee" });
+        }
+
+            // PUT: api/ProjectManagement/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutProjectManagement(int id, ProjectManagementDTO projectManagementDto)
         {
             if (id != projectManagementDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
 
@@ -105,12 +135,14 @@ namespace AtoCash.Controllers
 
         // POST: api/ProjectManagement
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ProjectManagement>> PostProjectManagement(ProjectManagementDTO projectManagementDTO)
         {
-            ProjectManagement projectManagement = new ProjectManagement();
-
-            projectManagement.ProjectId = projectManagementDTO.ProjectId;
-            projectManagement.EmployeeId = projectManagementDTO.EmployeeId;
+            ProjectManagement projectManagement = new ProjectManagement
+            {
+                ProjectId = projectManagementDTO.ProjectId,
+                EmployeeId = projectManagementDTO.EmployeeId
+            };
 
 
             _context.ProjectManagements.Add(projectManagement);
@@ -122,6 +154,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ProjectManagement/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteProjectManagement(int id)
         {
             var projectManagement = await _context.ProjectManagements.FindAsync(id);

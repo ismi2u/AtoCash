@@ -11,6 +11,8 @@ namespace AtoCash.Models
     {
 
         public int Id { get; set; }
+        public string EmployeeName { get; set; }
+
         public int EmployeeId { get; set; }
         public Double PettyClaimAmount { get; set; }
 
@@ -18,11 +20,15 @@ namespace AtoCash.Models
 
         public DateTime CashReqDate { get; set; }
 
+        public string Department { get; set; }
         public int? DepartmentId { get; set; }
+        public string Project { get; set; }
         public int? ProjectId { get; set; }
 
+        public string SubProject { get; set; }
         public int? SubProjectId { get; set; }
 
+        public string WorkTask { get; set; }
         public int? WorkTaskId { get; set; }
 
     }

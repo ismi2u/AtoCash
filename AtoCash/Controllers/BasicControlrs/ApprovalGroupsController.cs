@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+  
     public class ApprovalGroupsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -26,6 +27,7 @@ namespace AtoCash.Controllers
 
         [HttpGet]
         [ActionName("ApprovalGroupsForDropdown")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
         public async Task<ActionResult<IEnumerable<ApprovalGroupVM>>> GetApprovalGroupsForDropDown()
         {
             List<ApprovalGroupVM> ListApprovalGroupVM = new List<ApprovalGroupVM>();
@@ -47,6 +49,7 @@ namespace AtoCash.Controllers
         }
         // GET: api/ApprovalGroups
         [HttpGet]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
         public async Task<ActionResult<IEnumerable<ApprovalGroup>>> GetApprovalGroups()
         {
             return await _context.ApprovalGroups.ToListAsync();
@@ -54,6 +57,7 @@ namespace AtoCash.Controllers
 
         // GET: api/ApprovalGroups/5
         [HttpGet("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
         public async Task<ActionResult<ApprovalGroup>> GetApprovalGroup(int id)
         {
             var approvalGroup = await _context.ApprovalGroups.FindAsync(id);
@@ -69,11 +73,12 @@ namespace AtoCash.Controllers
         // PUT: api/ApprovalGroups/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutApprovalGroup(int id, ApprovalGroup approvalGroup)
         {
             if (id != approvalGroup.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is Invalid" });
             }
 
             _context.Entry(approvalGroup).State = EntityState.Modified;
@@ -100,6 +105,7 @@ namespace AtoCash.Controllers
         // POST: api/ApprovalGroups
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalGroup>> PostApprovalGroup(ApprovalGroup approvalGroup)
         {
             _context.ApprovalGroups.Add(approvalGroup);
@@ -110,6 +116,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalGroups/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteApprovalGroup(int id)
         {
             var approvalGroup = await _context.ApprovalGroups.FindAsync(id);

@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
     public class EmployeesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -124,11 +125,12 @@ namespace AtoCash.Controllers
 
         // PUT: api/Employees/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutEmployee(int id, EmployeeDTO employeeDto)
         {
             if (id != employeeDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var employee = await _context.Employees.FindAsync(id);
@@ -178,7 +180,7 @@ namespace AtoCash.Controllers
 
         // POST: api/Employees
         [HttpPost]
-
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<Employee>> PostEmployee(EmployeeDTO employeeDto)
         {
             Employee employee = new Employee
@@ -212,6 +214,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
             var employee = await _context.Employees.FindAsync(id);

@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize(Roles = "AtominosAdmin, Admin")]
     public class EmpCurrentPettyCashBalancesController : ControllerBase
@@ -75,7 +76,7 @@ namespace AtoCash.Controllers
         {
             if (id != empCurrentPettyCashBalanceDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var empCurrentPettyCashBalance = await _context.EmpCurrentPettyCashBalances.FindAsync(id);
@@ -124,6 +125,22 @@ namespace AtoCash.Controllers
 
             return CreatedAtAction("GetEmpCurrentPettyCashBalance", new { id = empCurrentPettyCashBalance.Id }, empCurrentPettyCashBalance);
         }
+
+        // GET: api/EmpCurrentPettyCashBalances/GetEmpCashBalanceVsAdvanced
+        [HttpGet("{id}")]
+        [ActionName("GetEmpCashBalanceVsAdvanced")]
+        public ActionResult<CashbalVsAdvancedVM> GetEmpCashBalanceVsAdvanced(int id)
+        {
+            CashbalVsAdvancedVM cashbalVsAdvancedVM = new CashbalVsAdvancedVM()
+            {
+                CurCashBal = _context.EmpCurrentPettyCashBalances.Find(id).CurBalance,
+                MaxCashAllowed = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed
+
+            };
+            return Ok(cashbalVsAdvancedVM);
+        }
+
+        
 
         // DELETE: api/EmpCurrentPettyCashBalances/5
         [HttpDelete("{id}")]

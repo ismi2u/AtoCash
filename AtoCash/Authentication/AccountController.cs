@@ -195,7 +195,7 @@ namespace AtoCash.Authentication
 
                 return NotFound();
             }
-            return BadRequest();
+            return BadRequest(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
         }
 
 

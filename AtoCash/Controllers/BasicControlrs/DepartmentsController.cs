@@ -13,7 +13,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
     public class DepartmentsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -94,11 +94,12 @@ namespace AtoCash.Controllers
         // PUT: api/Departments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutDepartment(int id, DepartmentDTO departmentDto)
         {
             if (id != departmentDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new Authentication.RespStatus { Status = "Failure", Message = "Id not Valid for Department" });
             }
 
             var department = await _context.Departments.FindAsync(id);
@@ -132,6 +133,7 @@ namespace AtoCash.Controllers
 
         // POST: api/Departments
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<Department>> PostDepartment(DepartmentDTO departmentDto)
         {
             Department department = new Department
@@ -149,6 +151,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Departments/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
             var department = await _context.Departments.FindAsync(id);

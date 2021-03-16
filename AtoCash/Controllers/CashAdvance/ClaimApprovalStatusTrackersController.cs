@@ -101,7 +101,7 @@ namespace AtoCash.Controllers
         {
             if (id != claimApprovalStatusTrackerDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
@@ -351,7 +351,20 @@ namespace AtoCash.Controllers
 
         }
 
+        private enum RequestType
+        {
+            CashAdvance = 1,
+            ExpenseReim
 
+        }
+
+        private enum ApprovalStatus
+        {
+            Pending = 1,
+            Approved,
+            Rejected
+
+        }
 
 
 

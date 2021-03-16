@@ -10,32 +10,25 @@ namespace AtoCash.Models
 {
 
 
-   public enum ApprovalStatus
+
+    public class ApprovalStatusType
     {
-        Pending = 1,
-        Approved,
-        Rejected
+
+        [Key]
+        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        [Required]
+        [Column(TypeName = "nvarchar(25)")]
+        public string Status { get; set; }
+
+        [Column(TypeName = "nvarchar(100)")]
+        public string StatusDesc { get; set; }
+
+
+        //    //Pending = 0,
+        //    //Approved = 1,
+        //    //Rejected = 2
 
     }
-
-    //public class ApprovalStatusType
-    //{
-
-    //    [Key]
-    //    [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
-    //    public int Id { get; set; }
-
-    //    [Required]
-    //    [Column(TypeName = "nvarchar(25)")]
-    //    public string Status { get; set; }
-
-    //    [Column(TypeName = "nvarchar(100)")]
-    //    public string StatusDesc { get; set; }
-
-
-    //    //Pending = 0,
-    //    //Approved = 1,
-    //    //Rejected = 2
-
-    //}
 }

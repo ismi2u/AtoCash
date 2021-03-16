@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
@@ -33,12 +34,13 @@ namespace AtoCash.Controllers
 
             foreach (ApprovalRoleMap approvalRoleMap in approvalRoleMaps)
             {
-                ApprovalRoleMapDTO approvalRoleMapDTO = new ApprovalRoleMapDTO();
-
-                approvalRoleMapDTO.Id = approvalRoleMap.Id;
-                approvalRoleMapDTO.ApprovalGroupId = approvalRoleMap.ApprovalGroupId;
-                approvalRoleMapDTO.RoleId = approvalRoleMap.RoleId;
-                approvalRoleMapDTO.ApprovalLevelId = approvalRoleMap.ApprovalLevelId;
+                ApprovalRoleMapDTO approvalRoleMapDTO = new ApprovalRoleMapDTO
+                {
+                    Id = approvalRoleMap.Id,
+                    ApprovalGroupId = approvalRoleMap.ApprovalGroupId,
+                    RoleId = approvalRoleMap.RoleId,
+                    ApprovalLevelId = approvalRoleMap.ApprovalLevelId
+                };
 
                 ListApprovalRoleMapDTO.Add(approvalRoleMapDTO);
 
@@ -74,7 +76,7 @@ namespace AtoCash.Controllers
         {
             if (id != approvalRoleMapDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);
@@ -113,12 +115,13 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<ApprovalRoleMap>> PostApprovalRoleMap(ApprovalRoleMapDTO approvalRoleMapDto)
         {
-            ApprovalRoleMap approvalRoleMap = new ApprovalRoleMap();
-
-            approvalRoleMap.Id = approvalRoleMapDto.Id;
-            approvalRoleMap.ApprovalGroupId = approvalRoleMapDto.ApprovalGroupId;
-            approvalRoleMap.RoleId = approvalRoleMapDto.RoleId;
-            approvalRoleMap.ApprovalLevelId = approvalRoleMapDto.ApprovalLevelId;
+            ApprovalRoleMap approvalRoleMap = new ApprovalRoleMap
+            {
+                Id = approvalRoleMapDto.Id,
+                ApprovalGroupId = approvalRoleMapDto.ApprovalGroupId,
+                RoleId = approvalRoleMapDto.RoleId,
+                ApprovalLevelId = approvalRoleMapDto.ApprovalLevelId
+            };
 
             _context.ApprovalRoleMaps.Add(approvalRoleMap);
             await _context.SaveChangesAsync();

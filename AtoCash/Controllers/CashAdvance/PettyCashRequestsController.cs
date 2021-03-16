@@ -13,9 +13,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    //[Authorize(Roles = "AtominosAdmin, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
+
     public class PettyCashRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -23,12 +25,14 @@ namespace AtoCash.Controllers
 
         public PettyCashRequestsController(AtoCashDbContext context, IEmailSender emailSender)
         {
-            _context = context;
-            _emailSender = emailSender;
+            this._context = context;
+            this._emailSender = emailSender;
         }
+
 
         // GET: api/PettyCashRequests
         [HttpGet]
+        [ActionName("GetPettyCashRequests")]
         public async Task<ActionResult<IEnumerable<PettyCashRequestDTO>>> GetPettyCashRequests()
         {
             List<PettyCashRequestDTO> ListPettyCashRequestDTO = new List<PettyCashRequestDTO>();
@@ -40,13 +44,13 @@ namespace AtoCash.Controllers
                 PettyCashRequestDTO pettyCashRequestsDTO = new PettyCashRequestDTO
                 {
                     Id = pettyCashRequest.Id,
-                    EmployeeId = pettyCashRequest.EmployeeId,
+                    EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
                     PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
                     PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
                     CashReqDate = pettyCashRequest.CashReqDate,
-                    ProjectId = pettyCashRequest.ProjectId,
-                    SubProjectId = pettyCashRequest.SubProjectId,
-                    WorkTaskId = pettyCashRequest.WorkTaskId
+                    Project = _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName,
+                    SubProject = _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName,
+                    WorkTask = _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName
                 };
 
                 ListPettyCashRequestDTO.Add(pettyCashRequestsDTO);
@@ -56,11 +60,14 @@ namespace AtoCash.Controllers
             return ListPettyCashRequestDTO;
         }
 
+
+
         // GET: api/PettyCashRequests/5
         [HttpGet("{id}")]
+        [ActionName("GetPettyCashRequest")]
         public async Task<ActionResult<PettyCashRequestDTO>> GetPettyCashRequest(int id)
         {
-            PettyCashRequestDTO pettyCashRequestDTO = new PettyCashRequestDTO();
+
 
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
 
@@ -68,26 +75,30 @@ namespace AtoCash.Controllers
             {
                 return NotFound();
             }
-
-            pettyCashRequestDTO.Id = pettyCashRequest.Id;
-            pettyCashRequestDTO.EmployeeId = pettyCashRequest.EmployeeId;
-            pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
-            pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
-            pettyCashRequestDTO.CashReqDate = pettyCashRequest.CashReqDate;
-            pettyCashRequestDTO.ProjectId = pettyCashRequest.ProjectId;
-            pettyCashRequestDTO.SubProjectId = pettyCashRequest.SubProjectId;
-            pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
+            PettyCashRequestDTO pettyCashRequestDTO = new PettyCashRequestDTO
+            {
+                Id = pettyCashRequest.Id,
+                EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
+                PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
+                PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
+                CashReqDate = pettyCashRequest.CashReqDate,
+                Project = _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName,
+                SubProject = _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName,
+                WorkTask = _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName
+            };
 
             return pettyCashRequestDTO;
         }
 
         // PUT: api/PettyCashRequests/5
         [HttpPut("{id}")]
+        [ActionName("PutPettyCashRequest")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutPettyCashRequest(int id, PettyCashRequestDTO pettyCashRequestDto)
         {
             if (id != pettyCashRequestDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
@@ -128,6 +139,7 @@ namespace AtoCash.Controllers
 
         // POST: api/PettyCashRequests
         [HttpPost]
+        [ActionName("PostPettyCashRequest")]
         public async Task<ActionResult<PettyCashRequest>> PostPettyCashRequest(PettyCashRequestDTO pettyCashRequestDto)
         {
 
@@ -146,7 +158,7 @@ namespace AtoCash.Controllers
             }
             else
             {
-                return BadRequest(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
+                return UnprocessableEntity(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
             }
 
 
@@ -154,6 +166,8 @@ namespace AtoCash.Controllers
 
         // DELETE: api/PettyCashRequests/5
         [HttpDelete("{id}")]
+        [ActionName("DeletePettyCashRequest")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeletePettyCashRequest(int id)
         {
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
@@ -194,8 +208,12 @@ namespace AtoCash.Controllers
         {
             //If Employee has no previous record of requesting the Cash so add a new record with full balance to amount to "EmpCurrentPettyCashBalance"
             //<<<-----------
+         
+
             Double empPettyCashAmounteligible = _context.JobRoles.Find(_context.Employees.Find(pettyCashRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
 
+
+            var test =  _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Any();
             //Check if employee cash balance is availabel in the EmpCurrentPettyCashBalance table, if NOT then ADD
             if (!_context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Any())
             {
@@ -221,7 +239,7 @@ namespace AtoCash.Controllers
         private async Task ProcessPettyCashRequestClaim(PettyCashRequestDTO pettyCashRequestDto, Double empCurAvailBal)
         {
 
-            if (pettyCashRequestDto.ProjectId == null)
+            if (pettyCashRequestDto.ProjectId != null)
             {
                 //Goes to Option 1 (Project)
                 await Task.Run(() => ProjectCashRequest(pettyCashRequestDto, empCurAvailBal));
@@ -291,7 +309,7 @@ namespace AtoCash.Controllers
                 EmployeeId = pettyCashRequestDto.EmployeeId,
                 PettyCashRequestId = pettyCashRequestDto.Id,
                 DepartmentId = null,
-                ProjectId = pettyCashRequestDto.ProjectId.Value,
+                ProjectId = pettyCashRequestDto.ProjectId,
                 RoleId = approver.RoleId,
                 ReqDate = DateTime.Now,
                 FinalApprovedDate = null,
@@ -351,7 +369,7 @@ namespace AtoCash.Controllers
             Double empReqAmount = pettyCashRequestDto.PettyClaimAmount;
             int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
 
-           
+
 
             var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == empid).FirstOrDefault();
             curPettyCashBal.Id = curPettyCashBal.Id;
@@ -439,6 +457,7 @@ namespace AtoCash.Controllers
             #endregion
 
         }
+
 
 
     }

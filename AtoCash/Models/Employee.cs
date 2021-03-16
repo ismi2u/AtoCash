@@ -87,5 +87,14 @@ namespace AtoCash.Models
         public virtual ApprovalGroup ApprovalGroup { get; set; }
         public int ApprovalGroupId { get; set; }
 
+
+        public string GetFullName()
+        {
+
+            return String.Join(" ", FirstName, MiddleName, LastName);
+            
+             
+
+        }
     }
 }

@@ -9,6 +9,7 @@ using AtoCash.Data;
 using AtoCash.Models;
 using EmailService;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
@@ -36,14 +37,15 @@ namespace AtoCash.Controllers
 
             foreach (TravelApprovalRequest travelrequest in travelrequests)
             {
-                TravelApprovalRequestDTO travelApprovalRequestDTO = new TravelApprovalRequestDTO();
-
-                travelApprovalRequestDTO.Id = travelrequest.Id;
-                travelApprovalRequestDTO.EmployeeId = travelrequest.EmployeeId;
-                travelApprovalRequestDTO.TravelStartDate = travelrequest.TravelStartDate;
-                travelApprovalRequestDTO.TravelEndDate = travelrequest.TravelEndDate;
-                travelApprovalRequestDTO.TravelPurpose = travelrequest.TravelPurpose;
-                travelApprovalRequestDTO.CurrentStatus = travelrequest.CurrentStatus;
+                TravelApprovalRequestDTO travelApprovalRequestDTO = new TravelApprovalRequestDTO
+                {
+                    Id = travelrequest.Id,
+                    EmployeeId = travelrequest.EmployeeId,
+                    TravelStartDate = travelrequest.TravelStartDate,
+                    TravelEndDate = travelrequest.TravelEndDate,
+                    TravelPurpose = travelrequest.TravelPurpose,
+                    CurrentStatus = travelrequest.CurrentStatus
+                };
 
                 ListTravelRequestDTO.Add(travelApprovalRequestDTO);
 
@@ -58,15 +60,16 @@ namespace AtoCash.Controllers
         {
             var travelrequest = await _context.TravelApprovalRequests.FindAsync(id);
 
-            TravelApprovalRequestDTO travelApprovalRequestDTO = new TravelApprovalRequestDTO();
-
-            travelApprovalRequestDTO.Id = travelrequest.Id;
-            travelApprovalRequestDTO.EmployeeId = travelrequest.EmployeeId;
-            travelApprovalRequestDTO.TravelStartDate = travelrequest.TravelStartDate;
-            travelApprovalRequestDTO.TravelEndDate = travelrequest.TravelEndDate;
-            travelApprovalRequestDTO.TravelPurpose = travelrequest.TravelPurpose;
-            travelApprovalRequestDTO.ReqRaisedDate = travelrequest.ReqRaisedDate;
-            travelApprovalRequestDTO.CurrentStatus = travelrequest.CurrentStatus;
+            TravelApprovalRequestDTO travelApprovalRequestDTO = new TravelApprovalRequestDTO
+            {
+                Id = travelrequest.Id,
+                EmployeeId = travelrequest.EmployeeId,
+                TravelStartDate = travelrequest.TravelStartDate,
+                TravelEndDate = travelrequest.TravelEndDate,
+                TravelPurpose = travelrequest.TravelPurpose,
+                ReqRaisedDate = travelrequest.ReqRaisedDate,
+                CurrentStatus = travelrequest.CurrentStatus
+            };
 
 
             if (travelrequest == null)
@@ -83,7 +86,7 @@ namespace AtoCash.Controllers
         {
             if (id != travelApprovalRequestDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
             }
 
             var travelApprovalRequest = await _context.TravelApprovalRequests.FindAsync(id);
@@ -134,18 +137,19 @@ namespace AtoCash.Controllers
         {
             /// Step 1 : enter a record in TravelApprovalRequest table
 
-            TravelApprovalRequest travelApprovalRequest = new TravelApprovalRequest();
-
-            travelApprovalRequest.EmployeeId = travelApprovalRequestDto.EmployeeId;
-            travelApprovalRequest.TravelStartDate = travelApprovalRequestDto.TravelStartDate;
-            travelApprovalRequest.TravelEndDate = travelApprovalRequestDto.TravelEndDate;
-            travelApprovalRequest.TravelPurpose = travelApprovalRequestDto.TravelPurpose;
-            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate;
-            travelApprovalRequest.CurrentStatus = travelApprovalRequestDto.CurrentStatus;
-            travelApprovalRequest.DepartmentId =  _context.Employees.Find(travelApprovalRequestDto.EmployeeId).DepartmentId;
-            travelApprovalRequest.ProjectId = travelApprovalRequestDto.ProjectId;
-            travelApprovalRequest.SubProjectId = travelApprovalRequestDto.SubProjectId;
-            travelApprovalRequest.WorkTaskId = travelApprovalRequestDto.WorkTaskId;
+            TravelApprovalRequest travelApprovalRequest = new TravelApprovalRequest
+            {
+                EmployeeId = travelApprovalRequestDto.EmployeeId,
+                TravelStartDate = travelApprovalRequestDto.TravelStartDate,
+                TravelEndDate = travelApprovalRequestDto.TravelEndDate,
+                TravelPurpose = travelApprovalRequestDto.TravelPurpose,
+                ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate,
+                CurrentStatus = travelApprovalRequestDto.CurrentStatus,
+                DepartmentId = _context.Employees.Find(travelApprovalRequestDto.EmployeeId).DepartmentId,
+                ProjectId = travelApprovalRequestDto.ProjectId,
+                SubProjectId = travelApprovalRequestDto.SubProjectId,
+                WorkTaskId = travelApprovalRequestDto.WorkTaskId
+            };
 
             _context.TravelApprovalRequests.Add(travelApprovalRequest);
             await _context.SaveChangesAsync();

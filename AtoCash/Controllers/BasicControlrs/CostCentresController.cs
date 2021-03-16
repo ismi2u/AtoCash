@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
     public class CostCentresController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -69,11 +70,12 @@ namespace AtoCash.Controllers
         // PUT: api/CostCentres/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutCostCentre(int id, CostCentre costCentre)
         {
             if (id != costCentre.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             _context.Entry(costCentre).State = EntityState.Modified;
@@ -100,6 +102,7 @@ namespace AtoCash.Controllers
         // POST: api/CostCentres
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<CostCentre>> PostCostCentre(CostCentre costCentre)
         {
             _context.CostCentres.Add(costCentre);
@@ -110,6 +113,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/CostCentres/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteCostCentre(int id)
         {
             var costCentre = await _context.CostCentres.FindAsync(id);

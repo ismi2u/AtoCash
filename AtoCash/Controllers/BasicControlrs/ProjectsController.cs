@@ -8,12 +8,13 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-      [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
     public class ProjectsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -96,11 +97,12 @@ namespace AtoCash.Controllers
 
         // PUT: api/Projects/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutProject(int id, ProjectDTO projectDto)
         {
             if (id != projectDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var proj = await _context.Projects.FindAsync(id);
@@ -134,6 +136,7 @@ namespace AtoCash.Controllers
 
         // POST: api/Projects
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<Project>> PostProject(ProjectDTO projectDto)
         {
 
@@ -152,6 +155,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Projects/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteProject(int id)
         {
             var project = await _context.Projects.FindAsync(id);

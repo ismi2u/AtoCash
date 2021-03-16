@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
@@ -74,7 +75,7 @@ namespace AtoCash.Controllers
         {
             if (id != requestType.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             _context.Entry(requestType).State = EntityState.Modified;

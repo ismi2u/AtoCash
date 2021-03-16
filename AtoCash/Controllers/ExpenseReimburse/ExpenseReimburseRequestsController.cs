@@ -12,6 +12,7 @@ using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using EmailService;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
@@ -109,7 +110,7 @@ namespace AtoCash.Controllers
         {
             if (id != expenseReimburseRequestDto.Id)
             {
-                return BadRequest();
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var expenseReimburseRequest = await _context.ExpenseReimburseRequests.FindAsync(id);

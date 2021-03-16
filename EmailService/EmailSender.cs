@@ -64,7 +64,7 @@ namespace EmailService
             emailMessage.From.Add(new MailboxAddress(_emailConfig.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
-            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = string.Format("<h2 style = 'color-red'>{ 0 }</h2>", message.Content )};
+            emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = string.Format("<h2 style = 'color-red'>{0}</h2>", message.Content )};
 
             return emailMessage;
         }
