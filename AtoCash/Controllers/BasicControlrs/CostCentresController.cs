@@ -78,6 +78,12 @@ namespace AtoCash.Controllers
                 return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var ccentre = _context.CostCentres.Where(c => c.CostCentreCode == costCentre.CostCentreCode).FirstOrDefault();
+            if (ccentre != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
+            }
+
             _context.Entry(costCentre).State = EntityState.Modified;
 
             try

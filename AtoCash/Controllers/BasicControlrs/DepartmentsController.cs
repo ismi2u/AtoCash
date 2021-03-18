@@ -103,6 +103,12 @@ namespace AtoCash.Controllers
                 return BadRequest(new Authentication.RespStatus { Status = "Failure", Message = "Id not Valid for Department" });
             }
 
+            var dept = _context.Departments.Where(c => c.DeptCode == departmentDto.DeptCode).FirstOrDefault();
+            if (dept != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Department Already Exists" });
+            }
+
             var department = await _context.Departments.FindAsync(id);
 
             department.Id = departmentDto.Id;

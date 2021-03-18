@@ -55,6 +55,12 @@ namespace AtoCash.Controllers
                 return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var emplymtTypes = _context.EmploymentTypes.Where(e => e.EmpJobTypeCode == employmentType.EmpJobTypeCode).FirstOrDefault();
+            if (emplymtTypes != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "EmploymentType Already Exists" });
+            }
+
             _context.Entry(employmentType).State = EntityState.Modified;
 
             try

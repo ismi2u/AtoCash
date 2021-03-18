@@ -133,6 +133,12 @@ namespace AtoCash.Controllers
                 return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
+            if (emplye != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
+            }
+
             var employee = await _context.Employees.FindAsync(id);
 
             employee.Id = employeeDto.Id;
@@ -183,6 +189,14 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<Employee>> PostEmployee(EmployeeDTO employeeDto)
         {
+
+            var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
+            if (emplye != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
+            }
+
+
             Employee employee = new Employee
             {
                 FirstName = employeeDto.FirstName,

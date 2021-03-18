@@ -78,6 +78,12 @@ namespace AtoCash.Controllers
                 return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var ReqType = _context.RequestTypes.Where(r => r.RequestName == requestType.RequestName).FirstOrDefault();
+            if (ReqType != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "RequestType Already Exists" });
+            }
+
             _context.Entry(requestType).State = EntityState.Modified;
 
             try

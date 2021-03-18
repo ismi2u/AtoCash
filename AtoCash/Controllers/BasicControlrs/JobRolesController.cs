@@ -77,6 +77,13 @@ namespace AtoCash.Controllers
                 return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var jRole = _context.JobRoles.Where(c => c.RoleCode == role.RoleCode).FirstOrDefault();
+            if (jRole != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "JobRole Already Exists" });
+            }
+
+
             _context.Entry(role).State = EntityState.Modified;
 
             try

@@ -131,6 +131,12 @@ namespace AtoCash.Controllers
                 return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var project = _context.Projects.Where(c => c.ProjectName == projectDto.ProjectName).FirstOrDefault();
+            if (project != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "ProjectName Already Exists" });
+            }
+
             var proj = await _context.Projects.FindAsync(id);
 
             proj.Id = projectDto.Id;
@@ -170,6 +176,7 @@ namespace AtoCash.Controllers
             {
                 return BadRequest(new RespStatus { Status = "Failure", Message = "ProjectName Already Exists" });
             }
+
             Project proj = new Project
             {
                 ProjectName = projectDto.ProjectName,
