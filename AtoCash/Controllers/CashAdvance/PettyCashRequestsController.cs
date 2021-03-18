@@ -48,13 +48,13 @@ namespace AtoCash.Controllers
                     PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
                     PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
                     CashReqDate = pettyCashRequest.CashReqDate,
-                    Project = _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName,
-                    SubProject = _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName,
-                    WorkTask = _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName
+                    Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptName : String.Empty,
+                    Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : String.Empty,
+                    SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : String.Empty,
+                    WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : String.Empty
                 };
 
                 ListPettyCashRequestDTO.Add(pettyCashRequestsDTO);
-
             }
 
             return ListPettyCashRequestDTO;
@@ -210,25 +210,24 @@ namespace AtoCash.Controllers
             //<<<-----------
          
 
-            Double empPettyCashAmounteligible = _context.JobRoles.Find(_context.Employees.Find(pettyCashRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
+            Double empPettyCashAmountEligible = _context.JobRoles.Find(_context.Employees.Find(pettyCashRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
 
-
-            var test =  _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Any();
+           
             //Check if employee cash balance is availabel in the EmpCurrentPettyCashBalance table, if NOT then ADD
             if (!_context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Any())
             {
                 _context.EmpCurrentPettyCashBalances.Add(new EmpCurrentPettyCashBalance()
                 {
                     EmployeeId = pettyCashRequest.EmployeeId,
-                    CurBalance = empPettyCashAmounteligible
+                    CurBalance = empPettyCashAmountEligible
                 });
 
                 _context.SaveChangesAsync();
 
-                return empPettyCashAmounteligible;
+                return empPettyCashAmountEligible;
             }
 
-            return _context.EmpCurrentPettyCashBalances.Find(pettyCashRequest.EmployeeId).CurBalance;
+            return _context.EmpCurrentPettyCashBalances.Where( e=> e.EmployeeId == pettyCashRequest.EmployeeId).Select( b => b.CurBalance).FirstOrDefault();
 
 
         }
@@ -272,12 +271,11 @@ namespace AtoCash.Controllers
             int empid = pettyCashRequestDto.EmployeeId;
             Double empReqAmount = pettyCashRequestDto.PettyClaimAmount;
             int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
-
-
-
+            double maxCashAllowedForRole = (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed);
+            
             var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == empid).FirstOrDefault();
             curPettyCashBal.Id = curPettyCashBal.Id;
-            curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount;
+            curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount <= maxCashAllowedForRole ? empCurAvailBal - empReqAmount : maxCashAllowedForRole;
             curPettyCashBal.EmployeeId = empid;
             _context.Update(curPettyCashBal);
             await _context.SaveChangesAsync();
@@ -290,10 +288,11 @@ namespace AtoCash.Controllers
                 EmployeeId = empid,
                 PettyClaimAmount = empReqAmount,
                 CashReqDate = DateTime.Now,
-                DepartmentId = pettyCashRequestDto.DepartmentId,
+                DepartmentId = null,
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
-                WorkTaskId = pettyCashRequestDto.WorkTaskId
+                WorkTaskId = pettyCashRequestDto.WorkTaskId,
+                PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc
             };
             _context.PettyCashRequests.Add(pcrq);
             await _context.SaveChangesAsync();
@@ -373,7 +372,14 @@ namespace AtoCash.Controllers
 
             var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == empid).FirstOrDefault();
             curPettyCashBal.Id = curPettyCashBal.Id;
+            if (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed <= empCurAvailBal - empReqAmount)
+            { 
             curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount;
+            }
+            else
+            { 
+            
+}
             curPettyCashBal.EmployeeId = empid;
             _context.Update(curPettyCashBal);
             await _context.SaveChangesAsync();
@@ -387,20 +393,56 @@ namespace AtoCash.Controllers
                 EmployeeId = empid,
                 PettyClaimAmount = empReqAmount,
                 CashReqDate = DateTime.Now,
+                PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc,
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
-                WorkTaskId = pettyCashRequestDto.WorkTaskId
+                WorkTaskId = pettyCashRequestDto.WorkTaskId,
+                DepartmentId = pettyCashRequestDto.DepartmentId
+
 
 
             };
             _context.PettyCashRequests.Add(pcrq);
             await _context.SaveChangesAsync();
+
+            //get the saved record Id
+            pettyCashRequestDto.Id = pcrq.Id;
+
             #endregion
 
             //##### STEP 3. ClaimsApprovalTracker to be updated for all the allowed Approvers
             //##### STEP 4. Send email to all the allowed Approvers
             #region
+
+
+            //var test = from ARoleMaps in _context.ApprovalRoleMaps
+            //           from ALevel in _context.ApprovalLevels
+            //           where ARoleMaps.ApprovalGroupId == empApprGroupId
+            //           select new
+            //           {
+            //               Id = ARoleMaps.Id,
+            //               ApprovalGroup = _context.ApprovalGroups.Find(ARoleMaps.ApprovalGroupId).ApprovalGroupCode,
+            //               ApprovalGroupId = ARoleMaps.ApprovalGroupId,
+            //               JobRole = _context.JobRoles.Find(ARoleMaps.JobRole.Id).RoleCode,
+            //               JobRoleId = ARoleMaps.JobRole.Id,
+            //               ApprovalLevel = _context.ApprovalLevels.Find(ARoleMaps.ApprovalLevelId).Level,
+            //               ApprovalLevelId = ARoleMaps.ApprovalLevelId
+            //           };
+
+
+            var rolemapss =  _context.ApprovalRoleMaps.ToList();
+            var tets = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId== empApprGroupId).ToList();
+            var applevels = _context.ApprovalLevels.ToList();
+
+            var td =
+    from a in _context.ApprovalRoleMaps
+    join l in _context.ApprovalLevels on a.ApprovalLevelId equals l.Id
+    where a.ApprovalGroupId == empApprGroupId
+    select a;
+
             var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).ToList().OrderBy(a => a.ApprovalLevel);
+
+
 
             foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
             {

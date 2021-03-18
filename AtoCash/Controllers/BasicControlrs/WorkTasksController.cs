@@ -49,11 +49,11 @@ namespace AtoCash.Controllers
 
 
         [HttpGet("{id}")]
-        [ActionName("GetTasksForSubProjects")]
-        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetTasksForSubProjects(int id)
+        [ActionName("GetWorkTasksForSubProjects")]
+        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetWorkTasksForSubProjects(int id)
         {
            
-            var listOfTasks = _context.WorkTasks.Where(t => t.SubProjectId == id).ToList();
+            var listOfTasks = await _context.WorkTasks.Where(t => t.SubProjectId == id).ToListAsync();
 
             List<WorkTaskVM> ListWorkTaskVM = new List<WorkTaskVM>();
 
@@ -76,12 +76,12 @@ namespace AtoCash.Controllers
         }
 
         [HttpGet]
-        [ActionName("WorkTasksBySubProjectForDropdown")]
-        public async Task<ActionResult<IEnumerable<WorkTaskVM>>> GetWorkTasksBySubProjectForDropdown(int Id)
+        [ActionName("GetWorkTasksForDropdown")]
+        public async Task<ActionResult<IEnumerable<WorkTaskVM>>> GetWorkTasksForDropdown()
         {
             List<WorkTaskVM> ListWorkTaskVM = new List<WorkTaskVM>();
 
-            var workTasks = await _context.WorkTasks.Where(w => w.SubProjectId == Id).ToListAsync();
+            var workTasks = await _context.WorkTasks.ToListAsync();
             foreach (WorkTask workTask in workTasks)
             {
                 WorkTaskVM workTaskVM = new WorkTaskVM
@@ -187,6 +187,13 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<WorkTask>> PostWorkTask(WorkTaskDTO workTaskDto)
         {
+
+            var wTask = _context.WorkTasks.Where(c => c.TaskName == workTaskDto.TaskName).FirstOrDefault();
+            if (wTask != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "TaskName Already Exists" });
+            }
+
             WorkTask workTask = new WorkTask
             {
                 SubProjectId = workTaskDto.SubProjectId,

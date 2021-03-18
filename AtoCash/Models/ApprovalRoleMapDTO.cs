@@ -10,8 +10,13 @@ namespace AtoCash.Models
     public class ApprovalRoleMapDTO
     {
         public int Id { get; set; }
+
+        public string ApprovalGroup { get; set; }
         public int ApprovalGroupId { get; set; }
+        public string Role { get; set; }
         public int RoleId { get; set; }
+
+        public string ApprovalLevel { get; set; }
         public int ApprovalLevelId { get; set; }
     }
 }

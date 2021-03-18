@@ -68,31 +68,7 @@ namespace AtoCash.Controllers
             return projManagementDTO;
         }
 
-        // GET: api/ProjectManagement/5
-        [HttpGet("{id}")]
-        [ActionName("GetEmployeeAssignedProjects")]
-        public ActionResult<ProjectVM> GetEmployeeAssignedProjects(int id)
-        {
-            var listOfProjmgts =  _context.ProjectManagements.Where(p => p.EmployeeId == id).ToList();
-
-            List<ProjectVM> ListprojectVM = new List<ProjectVM>();
-
-            if (listOfProjmgts != null)
-            { 
-                foreach( var item in listOfProjmgts)
-                {
-                    ProjectVM project = new ProjectVM() 
-                    { 
-                        Id = item.ProjectId, 
-                        ProjectName = item.Project.ProjectName 
-                    };
-                    ListprojectVM.Add(project);
-
-                }
-                return Ok(ListprojectVM);
-            }
-            return Ok(new RespStatus { Status = "Success", Message = "No Projects Assigned to Employee" });
-        }
+       
 
             // PUT: api/ProjectManagement/5
         [HttpPut("{id}")]

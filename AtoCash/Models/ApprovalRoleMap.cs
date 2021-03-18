@@ -21,11 +21,11 @@ namespace AtoCash.Models
 
         [Required]
         [ForeignKey("RoleId")]
-        public virtual JobRole Role { get; set; }
+        public virtual JobRole JobRole { get; set; }
         public int RoleId { get; set; }
 
         [Required]
-
+        [ForeignKey("ApprovalLevelId")]
         public virtual ApprovalLevel ApprovalLevel { get; set; }
         public int ApprovalLevelId { get; set; }
     }

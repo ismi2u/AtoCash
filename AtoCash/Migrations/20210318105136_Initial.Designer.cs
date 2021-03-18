@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtoCash.Migrations
 {
     [DbContext(typeof(AtoCashDbContext))]
-    [Migration("20210225025735_Initials")]
-    partial class Initials
+    [Migration("20210318105136_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -181,6 +181,9 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ApprovalLevelId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ApprovalStatusTypeId")
                         .HasColumnType("int");
 
@@ -213,6 +216,8 @@ namespace AtoCash.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ApprovalLevelId");
 
                     b.HasIndex("ApprovalStatusTypeId");
 
@@ -978,7 +983,7 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AtoCash.Models.JobRole", "Role")
+                    b.HasOne("AtoCash.Models.JobRole", "JobRole")
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -988,11 +993,17 @@ namespace AtoCash.Migrations
 
                     b.Navigation("ApprovalLevel");
 
-                    b.Navigation("Role");
+                    b.Navigation("JobRole");
                 });
 
             modelBuilder.Entity("AtoCash.Models.ClaimApprovalStatusTracker", b =>
                 {
+                    b.HasOne("AtoCash.Models.ApprovalLevel", "ApprovalLevel")
+                        .WithMany()
+                        .HasForeignKey("ApprovalLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AtoCash.Models.ApprovalStatusType", "ApprovalStatusType")
                         .WithMany()
                         .HasForeignKey("ApprovalStatusTypeId")
@@ -1034,6 +1045,8 @@ namespace AtoCash.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApprovalLevel");
 
                     b.Navigation("ApprovalStatusType");
 

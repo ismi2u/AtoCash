@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "4XSK73k3l5ztvP7KhM05PlSz0fp05vK2ItEErxXcR7PpMIJVx/JcUqKqIiN6A8bDPgA0rG6YDfRQDFKHb8PcuQ==",
+  "dgSpecHash": "iRx5J4puK3YpbMftVXSaXWEF5gCOeP5RTm9O5nLE3F8d9BCSSt4qnlc1H6MjmIyZ/oiJXEFh/St+fAtDhsU7NA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\EmailService.csproj",
+  "projectFilePath": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\EmailService.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MohamedKhan\\.nuget\\packages\\mailkit\\2.6.0\\mailkit.2.6.0.nupkg.sha512",
     "C:\\Users\\MohamedKhan\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\3.1.4\\microsoft.extensions.dependencyinjection.3.1.4.nupkg.sha512",

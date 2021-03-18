@@ -38,8 +38,12 @@ namespace AtoCash.Controllers
                 {
                     Id = approvalRoleMap.Id,
                     ApprovalGroupId = approvalRoleMap.ApprovalGroupId,
+                    ApprovalGroup = _context.ApprovalGroups.Find(approvalRoleMap.ApprovalGroupId).ApprovalGroupCode,
                     RoleId = approvalRoleMap.RoleId,
-                    ApprovalLevelId = approvalRoleMap.ApprovalLevelId
+                    Role = _context.JobRoles.Find(approvalRoleMap.RoleId).RoleCode,
+                    ApprovalLevelId = approvalRoleMap.ApprovalLevelId,
+                    ApprovalLevel = _context.ApprovalLevels.Find(approvalRoleMap.ApprovalLevelId).Level
+
                 };
 
                 ListApprovalRoleMapDTO.Add(approvalRoleMapDTO);
@@ -89,7 +93,7 @@ namespace AtoCash.Controllers
             approvalRoleMap.ApprovalLevelId = approvalRoleMapDto.ApprovalLevelId;
 
             _context.ApprovalRoleMaps.Update(approvalRoleMap);
-            //_context.Entry(projectDto).State = EntityState.Modified;
+            _context.Entry(approvalRoleMap).State = EntityState.Modified;
 
 
             try

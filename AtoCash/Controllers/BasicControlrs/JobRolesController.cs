@@ -103,6 +103,11 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<JobRole>> PostRole(JobRole role)
         {
+            var jRole = _context.JobRoles.Where(c => c.RoleCode == role.RoleCode).FirstOrDefault();
+            if (jRole != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "JobRole Already Exists" });
+            }
             _context.JobRoles.Add(role);
             await _context.SaveChangesAsync();
 

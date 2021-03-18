@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\EmailService.csproj": {}
+    "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\EmailService.csproj": {}
   },
   "projects": {
-    "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\EmailService.csproj": {
+    "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\EmailService.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\EmailService.csproj",
+        "projectUniqueName": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\EmailService.csproj",
         "projectName": "EmailService",
-        "projectPath": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\EmailService.csproj",
+        "projectPath": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\EmailService.csproj",
         "packagesPath": "C:\\Users\\MohamedKhan\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\MohamedKhan\\Source\\Repos\\AtoCash\\EmailService\\obj\\",
+        "outputPath": "C:\\Users\\MohamedKhan\\source\\repos\\AtoCash\\EmailService\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\MohamedKhan\\AppData\\Roaming\\NuGet\\NuGet.Config",

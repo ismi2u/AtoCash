@@ -104,6 +104,12 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<RequestType>> PostRequestType(RequestType requestType)
         {
+            var ReqType = _context.RequestTypes.Where(r => r.RequestName == requestType.RequestName).FirstOrDefault();
+            if (ReqType != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "RequestType Already Exists" });
+            }
+
             _context.RequestTypes.Add(requestType);
             await _context.SaveChangesAsync();
 

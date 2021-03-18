@@ -51,7 +51,7 @@ namespace AtoCash.Controllers
         [ActionName("GetSubProjectsForProjects")]
         public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsForProjects(int id)
         {
-            var listOfSubProject = _context.SubProjects.Where(s => s.ProjectId == id).ToList();
+            var listOfSubProject = await _context.SubProjects.Where(s => s.ProjectId == id).ToListAsync();
 
             List<SubProjectVM> ListSubProjectVM = new List<SubProjectVM>();
 
@@ -74,12 +74,12 @@ namespace AtoCash.Controllers
         }
 
         [HttpGet]
-        [ActionName("SubProjectsByProjectForDropdown")]
-        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsByProjectForDropdown(int Id)
+        [ActionName("GetSubProjectsForDropdown")]
+        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsForDropdown()
         {
             List<SubProjectVM> ListSubProjectVM = new List<SubProjectVM>();
 
-            var subProjects = await _context.SubProjects.Where(s => s.ProjectId == Id).ToListAsync();
+            var subProjects = await _context.SubProjects.ToListAsync();
             foreach (SubProject subProject in subProjects)
             {
                 SubProjectVM subProjectVM = new SubProjectVM
@@ -183,6 +183,12 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<SubProject>> PostSubProject(SubProjectDTO subProjectDto)
         {
+            var subproject = _context.SubProjects.Where(c => c.SubProjectName == subProjectDto.SubProjectName).FirstOrDefault();
+            if (subproject != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Sub Pproject Already Exists" });
+            }
+
             SubProject SubProj = new SubProject
             {
                 ProjectId = subProjectDto.ProjectId,

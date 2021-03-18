@@ -81,6 +81,13 @@ namespace AtoCash.Controllers
         [HttpPost]
         public async Task<ActionResult<EmploymentType>> PostEmploymentType(EmploymentType employmentType)
         {
+
+            var emplymtTypes = _context.EmploymentTypes.Where(e => e.EmpJobTypeCode == employmentType.EmpJobTypeCode).FirstOrDefault();
+            if (emplymtTypes != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "EmploymentType Already Exists" });
+            }
+
             _context.EmploymentTypes.Add(employmentType);
             await _context.SaveChangesAsync();
 

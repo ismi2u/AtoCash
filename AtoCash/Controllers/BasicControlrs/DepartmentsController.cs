@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
@@ -136,6 +137,12 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<Department>> PostDepartment(DepartmentDTO departmentDto)
         {
+            var dept = _context.Departments.Where(c => c.DeptCode == departmentDto.DeptCode).FirstOrDefault();
+            if (dept != null)
+            {
+                return BadRequest(new RespStatus { Status = "Failure", Message = "Department Already Exists" });
+            }
+
             Department department = new Department
             {
                 DeptCode = departmentDto.DeptCode,
