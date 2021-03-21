@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-  
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ApprovalGroupsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -27,7 +27,6 @@ namespace AtoCash.Controllers
 
         [HttpGet]
         [ActionName("ApprovalGroupsForDropdown")]
-        [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
         public async Task<ActionResult<IEnumerable<ApprovalGroupVM>>> GetApprovalGroupsForDropDown()
         {
             List<ApprovalGroupVM> ListApprovalGroupVM = new List<ApprovalGroupVM>();
@@ -49,7 +48,6 @@ namespace AtoCash.Controllers
         }
         // GET: api/ApprovalGroups
         [HttpGet]
-        [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
         public async Task<ActionResult<IEnumerable<ApprovalGroup>>> GetApprovalGroups()
         {
             return await _context.ApprovalGroups.ToListAsync();
@@ -57,14 +55,13 @@ namespace AtoCash.Controllers
 
         // GET: api/ApprovalGroups/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
         public async Task<ActionResult<ApprovalGroup>> GetApprovalGroup(int id)
         {
             var approvalGroup = await _context.ApprovalGroups.FindAsync(id);
 
             if (approvalGroup == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return approvalGroup;
@@ -78,7 +75,7 @@ namespace AtoCash.Controllers
         {
             if (id != approvalGroup.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is Invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is Invalid" });
             }
 
             _context.Entry(approvalGroup).State = EntityState.Modified;
@@ -91,7 +88,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalGroupExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -122,7 +119,7 @@ namespace AtoCash.Controllers
             var approvalGroup = await _context.ApprovalGroups.FindAsync(id);
             if (approvalGroup == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ApprovalGroups.Remove(approvalGroup);

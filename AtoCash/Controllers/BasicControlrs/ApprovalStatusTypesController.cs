@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ApprovalStatusTypesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -39,7 +39,7 @@ namespace AtoCash.Controllers
 
             if (approvalStatusType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return approvalStatusType;
@@ -48,11 +48,12 @@ namespace AtoCash.Controllers
         // PUT: api/ApprovalStatusTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutApprovalStatusType(int id, ApprovalStatusType approvalStatusType)
         {
             if (id != approvalStatusType.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             _context.Entry(approvalStatusType).State = EntityState.Modified;
@@ -65,7 +66,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalStatusTypeExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -79,6 +80,7 @@ namespace AtoCash.Controllers
         // POST: api/ApprovalStatusTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalStatusType>> PostApprovalStatusType(ApprovalStatusType approvalStatusType)
         {
             _context.ApprovalStatusTypes.Add(approvalStatusType);
@@ -89,12 +91,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalStatusTypes/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteApprovalStatusType(int id)
         {
             var approvalStatusType = await _context.ApprovalStatusTypes.FindAsync(id);
             if (approvalStatusType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ApprovalStatusTypes.Remove(approvalStatusType);

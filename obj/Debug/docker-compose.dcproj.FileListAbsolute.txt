@@ -34,6 +34,10 @@ C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\MimeKit.dll
 C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\MailKit.dll
 C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\BouncyCastle.Crypto.dll
 C:\Users\MohamedKhan\source\repos\AtoCashAuth\bin\Debug\EmailService.pdb
+C:\Users\MohamedKhan\source\repos\AtoCash\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
+C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\AtoCash.deps.json
+C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\AtoCash.runtimeconfig.json
+C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\AtoCash.runtimeconfig.dev.json
 C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\appsettings.Development.json
 C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\appsettings.json
 C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\AtoCash.exe
@@ -72,5 +76,4 @@ C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\Microsoft.AspNetCore.Cryptog
 C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\AtoCash.pdb
 C:\Users\MohamedKhan\source\repos\AtoCash\bin\Debug\EmailService.pdb
 C:\Users\MohamedKhan\source\repos\AtoCash\obj\Debug\docker-compose.dcprojAssemblyReference.cache
-C:\Users\MohamedKhan\source\repos\AtoCash\obj\Debug\docker-compose.dcproj.CoreCompileInputs.cache
 C:\Users\MohamedKhan\source\repos\AtoCash\obj\Debug\docker-compose.dcproj.CopyComplete

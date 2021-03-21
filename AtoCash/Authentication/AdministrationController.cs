@@ -83,7 +83,7 @@ namespace AtoCash.Authentication
 
             if (user == null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "User not Found" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "User not Found" });
             }
 
             var rolenames = await userManager.GetRolesAsync(user);
@@ -109,7 +109,7 @@ namespace AtoCash.Authentication
 
             if (role == null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Role not Found" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Role not Found" });
             }
 
             return Ok(role);
@@ -124,7 +124,7 @@ namespace AtoCash.Authentication
 
             if (role == null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Role not Found" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Role not Found" });
             }
 
             IdentityResult result = await roleManager.DeleteAsync(role);
@@ -152,7 +152,7 @@ namespace AtoCash.Authentication
 
             if (user ==null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "User not Found" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "User not Found" });
             }
 
             IdentityResult result = await userManager.DeleteAsync(user);
@@ -248,15 +248,15 @@ namespace AtoCash.Authentication
             List<string> roleIds = Model.RoleIds;
 
             List<RespStatus> ListRespStatus = new List<RespStatus>();
-
             foreach (string RoleId in roleIds)
             {
                 IdentityRole role = await roleManager.FindByIdAsync(RoleId);
                 IdentityResult result = await userManager.AddToRoleAsync(user, role.Name);
+                RespStatus respStatus;
 
                 if (result.Succeeded)
                 {
-                    RespStatus respStatus = new RespStatus()
+                    respStatus = new RespStatus()
                     {
                         Message = role.Name + " assigned to User", 
                         Status = "Success" 
@@ -265,7 +265,7 @@ namespace AtoCash.Authentication
                 }
                 else
                 {
-                    RespStatus respStatus = new RespStatus();
+                     respStatus = new RespStatus();
                     foreach (IdentityError error in result.Errors)
                     {
                         respStatus.Message = respStatus.Message + error.Description + "\n";
@@ -274,7 +274,9 @@ namespace AtoCash.Authentication
                     ListRespStatus.Add(respStatus);
                 }
             }
-            return BadRequest(ListRespStatus);
+
+            return Ok(ListRespStatus);
+
 
         }
 

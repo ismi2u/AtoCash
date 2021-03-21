@@ -45,7 +45,7 @@ namespace AtoCash
             services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AtoCashDBServer")));
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AtoCashDbContext>();
-
+            //services.AddHttpsRedirection(options => options.HttpsPort = 443);
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

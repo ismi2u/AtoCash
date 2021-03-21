@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ApprovalRoleMapsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -63,7 +63,7 @@ namespace AtoCash.Controllers
 
             if (approvalRoleMap == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             approvalRoleMapDTO.Id = approvalRoleMap.Id;
@@ -76,17 +76,18 @@ namespace AtoCash.Controllers
 
         // PUT: api/ApprovalRoleMaps/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutApprovalRoleMap(int id, ApprovalRoleMapDTO approvalRoleMapDto)
         {
             if (id != approvalRoleMapDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.RoleId == approvalRoleMapDto.RoleId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
             if (AprvRolMap != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Approval Role Map Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Role Map Already Exists" });
             }
 
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);
@@ -110,7 +111,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalRoleMapExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -123,12 +124,13 @@ namespace AtoCash.Controllers
 
         // POST: api/ApprovalRoleMaps
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalRoleMap>> PostApprovalRoleMap(ApprovalRoleMapDTO approvalRoleMapDto)
         {
             var AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.RoleId == approvalRoleMapDto.RoleId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
             if (AprvRolMap != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Approval Role Map Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Role Map Already Exists" });
             }
 
 
@@ -148,12 +150,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalRoleMaps/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteApprovalRoleMap(int id)
         {
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);
             if (approvalRoleMap == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ApprovalRoleMaps.Remove(approvalRoleMap);

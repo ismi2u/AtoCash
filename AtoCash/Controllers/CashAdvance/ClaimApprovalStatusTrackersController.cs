@@ -15,7 +15,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ClaimApprovalStatusTrackersController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -41,11 +41,15 @@ namespace AtoCash.Controllers
                 {
                     Id = claimApprovalStatusTracker.Id,
                     EmployeeId = claimApprovalStatusTracker.EmployeeId,
+                    EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
                     PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
                     ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
                     DepartmentId = claimApprovalStatusTracker.DepartmentId,
+                    DepartmentName = _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName,
                     ProjectId = claimApprovalStatusTracker.ProjectId,
+                    ProjectName = _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName,
                     RoleId = claimApprovalStatusTracker.RoleId,
+                    JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName,
                     ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId,
                     ReqDate = claimApprovalStatusTracker.ReqDate,
                     FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate,
@@ -63,26 +67,32 @@ namespace AtoCash.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ClaimApprovalStatusTrackerDTO>> GetClaimApprovalStatusTracker(int id)
         {
-            ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new ClaimApprovalStatusTrackerDTO();
+            
 
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
 
             if (claimApprovalStatusTracker == null)
             {
-                return NotFound();
+                return NoContent();
             }
-
-            claimApprovalStatusTrackerDTO.Id = claimApprovalStatusTracker.Id;
-            claimApprovalStatusTrackerDTO.EmployeeId = claimApprovalStatusTracker.EmployeeId;
-            claimApprovalStatusTrackerDTO.PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId;
-            claimApprovalStatusTrackerDTO.ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId;
-            claimApprovalStatusTrackerDTO.DepartmentId = claimApprovalStatusTracker.DepartmentId;
-            claimApprovalStatusTrackerDTO.ProjectId = claimApprovalStatusTracker.ProjectId;
-            claimApprovalStatusTrackerDTO.RoleId = claimApprovalStatusTracker.RoleId;
-            claimApprovalStatusTrackerDTO.ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId;
-            claimApprovalStatusTrackerDTO.ReqDate = claimApprovalStatusTracker.ReqDate;
-            claimApprovalStatusTrackerDTO.FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate;
-            claimApprovalStatusTrackerDTO.ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId;
+            ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new ClaimApprovalStatusTrackerDTO
+            {
+                Id = claimApprovalStatusTracker.Id,
+                EmployeeId = claimApprovalStatusTracker.EmployeeId,
+                EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
+                PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
+                ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
+                DepartmentId = claimApprovalStatusTracker.DepartmentId,
+                DepartmentName = _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName,
+                ProjectId = claimApprovalStatusTracker.ProjectId,
+                ProjectName = _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName,
+                RoleId = claimApprovalStatusTracker.RoleId,
+                JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName,
+                ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId,
+                ReqDate = claimApprovalStatusTracker.ReqDate,
+                FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate,
+                ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId
+            };
 
             return claimApprovalStatusTrackerDTO;
         }
@@ -97,11 +107,12 @@ namespace AtoCash.Controllers
         // PUT: api/ClaimApprovalStatusTrackers/5
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutClaimApprovalStatusTracker(int id, ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto)
         {
             if (id != claimApprovalStatusTrackerDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
@@ -167,7 +178,7 @@ namespace AtoCash.Controllers
             {
                 if (!ClaimApprovalStatusTrackerExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -181,6 +192,7 @@ namespace AtoCash.Controllers
         // POST: api/ClaimApprovalStatusTrackers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ClaimApprovalStatusTracker>> PostClaimApprovalStatusTracker(ClaimApprovalStatusTracker claimApprovalStatusTrackerDto)
         {
             ClaimApprovalStatusTracker claimApprovalStatusTracker = new ClaimApprovalStatusTracker
@@ -206,12 +218,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ClaimApprovalStatusTrackers/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteClaimApprovalStatusTracker(int id)
         {
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
             if (claimApprovalStatusTracker == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ClaimApprovalStatusTrackers.Remove(claimApprovalStatusTracker);
@@ -239,7 +252,7 @@ namespace AtoCash.Controllers
 
             if (id == 0)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Id is Invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Id is Invalid" });
             }
 
 
@@ -248,7 +261,7 @@ namespace AtoCash.Controllers
 
             if (roleid == 0)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Role Id is Invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Role Id is Invalid" });
             }
 
             var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == 1);
@@ -260,11 +273,15 @@ namespace AtoCash.Controllers
                 {
                     Id = claimApprovalStatusTracker.Id,
                     EmployeeId = claimApprovalStatusTracker.EmployeeId,
+                    EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
                     PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
                     ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
                     DepartmentId = claimApprovalStatusTracker.DepartmentId,
+                    DepartmentName = _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName,
                     ProjectId = claimApprovalStatusTracker.ProjectId,
+                    ProjectName = _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName,
                     RoleId = claimApprovalStatusTracker.RoleId,
+                    JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName,
                     ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId,
                     ReqDate = claimApprovalStatusTracker.ReqDate,
                     FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate,
@@ -292,14 +309,14 @@ namespace AtoCash.Controllers
 
             if (id == 0)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Id is Invalid" });
+                return NotFound(new RespStatus { Status = "Failure", Message = "Employee Id is Invalid" });
             }
             //get the RoleID of the Employee (Approver)
             int roleid = _context.Employees.Find(id).RoleId;
 
             if (roleid == 0)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Role Id is Invalid" });
+                return NotFound(new RespStatus { Status = "Failure", Message = "Role Id is Invalid" });
             }
 
             return Ok(_context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == 1).Count());
@@ -319,7 +336,7 @@ namespace AtoCash.Controllers
 
             if (id == 0)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "PettycashRequest Id is Invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "PettycashRequest Id is Invalid" });
             }
 
 
@@ -328,7 +345,7 @@ namespace AtoCash.Controllers
 
             if (claimRequestTracks == null)
             {
-                return NotFound(new RespStatus { Status = "Failure", Message = "PettycashRequest Id is Not Found" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "PettycashRequest Id is Not Found" });
             }
 
             List<ApprovalStatusFlowVM> ListApprovalStatusFlow = new List<ApprovalStatusFlowVM>();
@@ -338,10 +355,10 @@ namespace AtoCash.Controllers
                 ApprovalStatusFlowVM approvalStatusFlow = new ApprovalStatusFlowVM()
                 {
                     ApprovalLevel = claim.ApprovalLevelId,
-                    ApproverRole = claim.RoleId,
+                    ApproverRole = _context.JobRoles.Find(claim.RoleId).RoleName,
                     ApproverName = _context.Employees.Where(x => x.RoleId == claim.RoleId).Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault(),
                     ApprovedDate = claim.FinalApprovedDate,
-                    ApprovalStatusTypeId = claim.ApprovalStatusTypeId
+                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(claim.ApprovalStatusTypeId).Status
 
                 };
                 ListApprovalStatusFlow.Add(approvalStatusFlow);

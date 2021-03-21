@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class CostCentresController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -61,7 +61,7 @@ namespace AtoCash.Controllers
 
             if (costCentre == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return costCentre;
@@ -75,13 +75,13 @@ namespace AtoCash.Controllers
         {
             if (id != costCentre.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var ccentre = _context.CostCentres.Where(c => c.CostCentreCode == costCentre.CostCentreCode).FirstOrDefault();
             if (ccentre != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
             }
 
             _context.Entry(costCentre).State = EntityState.Modified;
@@ -94,7 +94,7 @@ namespace AtoCash.Controllers
             {
                 if (!CostCentreExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -114,7 +114,7 @@ namespace AtoCash.Controllers
             var ccentre = _context.CostCentres.Where(c => c.CostCentreCode == costCentre.CostCentreCode).FirstOrDefault();
             if (ccentre != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
             }
             _context.CostCentres.Add(costCentre);
             await _context.SaveChangesAsync();
@@ -130,7 +130,7 @@ namespace AtoCash.Controllers
             var costCentre = await _context.CostCentres.FindAsync(id);
             if (costCentre == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.CostCentres.Remove(costCentre);

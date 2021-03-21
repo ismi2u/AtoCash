@@ -13,6 +13,7 @@ namespace AtoCash.Models
         public int Id { get; set; }
 
         public string DeptName { get; set; }
+        public string DeptDesc{ get; set; }
 
     }
 }

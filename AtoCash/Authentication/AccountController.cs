@@ -46,7 +46,7 @@ namespace AtoCash.Authentication
 
             if (empIdExists)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Id is already taken" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Id is already taken" });
             }
 
 
@@ -56,7 +56,7 @@ namespace AtoCash.Authentication
 
             if (useremail != null)
             {
-                return NotFound(new RespStatus { Status = "Failure", Message = "Email is already taken" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Email is already taken" });
             }
 
             MailAddress mailAddress = new MailAddress(model.Email);
@@ -64,7 +64,7 @@ namespace AtoCash.Authentication
             //MODIFY HOST DOMAIN NAME HERE => CURRENTLY only GMAIL and MAILINATOR
             if ( (mailAddress.Host.ToUpper() != "MAILINATOR.COM") && mailAddress.Host.ToUpper() != "GMAIL.COM")
             {
-                return NotFound(new RespStatus { Status = "Failure", Message = "Use company mail address!" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Use company mail address!" });
             }
             //Creating a IdentityUser object
             var user = new ApplicationUser { 
@@ -87,7 +87,7 @@ namespace AtoCash.Authentication
                 respStatus.Message = respStatus.Message + error.Description + "\n";
             }
 
-            return BadRequest(respStatus);
+            return Ok(respStatus);
 
         }
 
@@ -193,9 +193,9 @@ namespace AtoCash.Authentication
                     return Ok(new { model.email, token, Request.Scheme });
                 }
 
-                return NotFound();
+                return NoContent();
             }
-            return BadRequest(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
+            return Conflict(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
         }
 
 
@@ -222,14 +222,14 @@ namespace AtoCash.Authentication
                     {
                         errResp.Add(error.Description);
                     }
-                    return BadRequest(errResp);
+                    return Ok(errResp);
                 }
 
-                return BadRequest(new RespStatus { Status = "Failure", Message = "User is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "User is invalid" });
 
             }
 
-            return BadRequest(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
+            return Conflict(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
 
         }
 

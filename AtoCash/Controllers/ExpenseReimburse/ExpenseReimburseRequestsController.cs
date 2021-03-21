@@ -18,7 +18,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ExpenseReimburseRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -81,7 +81,7 @@ namespace AtoCash.Controllers
 
             if (expenseReimburseRequest == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             expenseReimburseRequestDTO.Id = expenseReimburseRequest.Id;
@@ -106,11 +106,12 @@ namespace AtoCash.Controllers
 
         // PUT: api/ExpenseReimburseRequests/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutExpenseReimburseRequest(int id, ExpenseReimburseRequestDTO expenseReimburseRequestDto)
         {
             if (id != expenseReimburseRequestDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var expenseReimburseRequest = await _context.ExpenseReimburseRequests.FindAsync(id);
@@ -138,7 +139,7 @@ namespace AtoCash.Controllers
             {
                 if (!ExpenseReimburseRequestExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -151,6 +152,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ExpenseReimburseRequests
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ExpenseReimburseRequest>> PostExpenseReimburseRequest(List<ExpenseReimburseRequestDTO> listExpenseReimburseRequestDto)
         {
             
@@ -280,12 +282,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ExpenseReimburseRequests/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteExpenseReimburseRequest(int id)
         {
             var expenseReimburseRequest = await _context.ExpenseReimburseRequests.FindAsync(id);
             if (expenseReimburseRequest == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ExpenseReimburseRequests.Remove(expenseReimburseRequest);

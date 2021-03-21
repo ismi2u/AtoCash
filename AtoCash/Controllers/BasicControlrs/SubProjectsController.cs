@@ -36,7 +36,8 @@ namespace AtoCash.Controllers
                 SubProjectVM subProjectVM = new SubProjectVM
                 {
                     Id = subProject.Id,
-                    SubProjectName = subProject.SubProjectName
+                    SubProjectName = subProject.SubProjectName,
+                    SubProjectDesc = subProject.SubProjectDesc
                 };
 
                 ListSubProjectVM.Add(subProjectVM);
@@ -130,7 +131,7 @@ namespace AtoCash.Controllers
 
             if (SubProj == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             subProjectDTO.Id = SubProj.Id;
@@ -147,7 +148,7 @@ namespace AtoCash.Controllers
         {
             if (id != subProjectDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var subProj = await _context.SubProjects.FindAsync(id);
@@ -167,7 +168,7 @@ namespace AtoCash.Controllers
             {
                 if (!SubProjectExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -186,7 +187,7 @@ namespace AtoCash.Controllers
             var subproject = _context.SubProjects.Where(c => c.SubProjectName == subProjectDto.SubProjectName).FirstOrDefault();
             if (subproject != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Sub Pproject Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Sub Pproject Already Exists" });
             }
 
             SubProject SubProj = new SubProject
@@ -210,7 +211,7 @@ namespace AtoCash.Controllers
             var subProject = await _context.SubProjects.FindAsync(id);
             if (subProject == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.SubProjects.Remove(subProject);

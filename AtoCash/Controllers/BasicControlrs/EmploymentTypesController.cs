@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class EmploymentTypesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -39,7 +39,7 @@ namespace AtoCash.Controllers
 
             if (employmentType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return employmentType;
@@ -48,17 +48,18 @@ namespace AtoCash.Controllers
         // PUT: api/EmploymentTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutEmploymentType(int id, EmploymentType employmentType)
         {
             if (id != employmentType.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var emplymtTypes = _context.EmploymentTypes.Where(e => e.EmpJobTypeCode == employmentType.EmpJobTypeCode).FirstOrDefault();
             if (emplymtTypes != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "EmploymentType Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "EmploymentType Already Exists" });
             }
 
             _context.Entry(employmentType).State = EntityState.Modified;
@@ -71,7 +72,7 @@ namespace AtoCash.Controllers
             {
                 if (!EmploymentTypeExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -85,13 +86,14 @@ namespace AtoCash.Controllers
         // POST: api/EmploymentTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<EmploymentType>> PostEmploymentType(EmploymentType employmentType)
         {
 
             var emplymtTypes = _context.EmploymentTypes.Where(e => e.EmpJobTypeCode == employmentType.EmpJobTypeCode).FirstOrDefault();
             if (emplymtTypes != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "EmploymentType Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "EmploymentType Already Exists" });
             }
 
             _context.EmploymentTypes.Add(employmentType);
@@ -102,12 +104,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/EmploymentTypes/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteEmploymentType(int id)
         {
             var employmentType = await _context.EmploymentTypes.FindAsync(id);
             if (employmentType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.EmploymentTypes.Remove(employmentType);

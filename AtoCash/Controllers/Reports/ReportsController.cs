@@ -20,6 +20,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
+    [Authorize(Roles = "AtominosAdmin, Admin, Users")]
     public class ReportsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -62,7 +63,7 @@ namespace AtoCash.Controllers
         {
            //if (!LoggedInEmpid == searchModel.EmpId)
            // {
-           //     return BadRequest(new RespStatus() { Status = "Failure", Message = "Employee reports only!" });
+           //     return Ok(new RespStatus() { Status = "Failure", Message = "Employee reports only!" });
            // }
 
           int?  empid = searchModel.EmpId;
@@ -139,7 +140,7 @@ namespace AtoCash.Controllers
                     return GetExcel("CashReimburseReportByEmployee", dt);
                 }
             }
-            return BadRequest(new RespStatus() { Status = "Failure", Message = "User Id not valid" });
+            return Ok(new RespStatus() { Status = "Failure", Message = "User Id not valid" });
         }
 
 
@@ -219,7 +220,7 @@ namespace AtoCash.Controllers
                 return GetExcel("CashReimburseReportByAdmin", dt);
             }
 
-            return BadRequest(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
+            return Ok(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
 
         }
 
@@ -233,7 +234,7 @@ namespace AtoCash.Controllers
         {
             //if (!LoggedInEmpid == searchModel.EmpId)
             //{
-            //    return BadRequest(new RespStatus() { Status = "Failure", Message = "Employee reports only!" });
+            //    return Ok(new RespStatus() { Status = "Failure", Message = "Employee reports only!" });
             //}
 
             int? empid = searchModel.EmpId;
@@ -302,7 +303,7 @@ namespace AtoCash.Controllers
                 return GetExcel("TravelRequestReportByEmployee", dt);
             }
 
-            return BadRequest(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
+            return Ok(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
 
         }
 
@@ -382,7 +383,7 @@ namespace AtoCash.Controllers
                 return GetExcel("TravelRequestReportByAdmin", dt);
             }
 
-            return BadRequest(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
+            return Ok(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
         }
 
 

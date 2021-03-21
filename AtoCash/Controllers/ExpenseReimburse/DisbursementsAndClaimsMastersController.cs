@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class DisbursementsAndClaimsMastersController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -68,7 +68,7 @@ namespace AtoCash.Controllers
 
             if (disbursementsAndClaimsMaster == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             disbursementsAndClaimsMasterDTO.Id = disbursementsAndClaimsMaster.Id;
@@ -89,11 +89,12 @@ namespace AtoCash.Controllers
 
         // PUT: api/DisbursementsAndClaimsMasters/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutDisbursementsAndClaimsMaster(int id, DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDto)
         {
             if (id != disbursementsAndClaimsMasterDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
             }
 
             var disbursementsAndClaimsMaster = await _context.DisbursementsAndClaimsMasters.FindAsync(id);
@@ -124,7 +125,7 @@ namespace AtoCash.Controllers
             {
                 if (!DisbursementsAndClaimsMasterExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -137,6 +138,7 @@ namespace AtoCash.Controllers
 
         // POST: api/DisbursementsAndClaimsMasters
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<DisbursementsAndClaimsMaster>> PostDisbursementsAndClaimsMaster(DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDto)
         {
             DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new DisbursementsAndClaimsMaster
@@ -164,12 +166,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/DisbursementsAndClaimsMasters/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteDisbursementsAndClaimsMaster(int id)
         {
             var disbursementsAndClaimsMaster = await _context.DisbursementsAndClaimsMasters.FindAsync(id);
             if (disbursementsAndClaimsMaster == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.DisbursementsAndClaimsMasters.Remove(disbursementsAndClaimsMaster);

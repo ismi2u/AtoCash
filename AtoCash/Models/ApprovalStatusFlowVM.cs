@@ -8,10 +8,10 @@ namespace AtoCash.Models
     public class ApprovalStatusFlowVM
     {
         public int ApprovalLevel { get; set; }
-        public int ApproverRole { get; set; }
+        public string ApproverRole { get; set; }
         public string ApproverName { get; set; }
         
-        public int ApprovalStatusTypeId { get; set; }
+        public string ApprovalStatusType { get; set; }
         public DateTime? ApprovedDate { get; set; }
 
     }

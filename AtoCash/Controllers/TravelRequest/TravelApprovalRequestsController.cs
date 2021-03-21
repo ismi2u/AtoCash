@@ -15,7 +15,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class TravelApprovalRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -74,7 +74,7 @@ namespace AtoCash.Controllers
 
             if (travelrequest == null)
             {
-                return NotFound();
+                return NoContent();
             }
             return travelApprovalRequestDTO;
         }
@@ -82,11 +82,12 @@ namespace AtoCash.Controllers
         // PUT: api/TravelApprovalRequests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutTravelApprovalRequest(int id, TravelApprovalRequestDTO travelApprovalRequestDto)
         {
             if (id != travelApprovalRequestDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
             }
 
             var travelApprovalRequest = await _context.TravelApprovalRequests.FindAsync(id);
@@ -110,7 +111,7 @@ namespace AtoCash.Controllers
             {
                 if (!TravelApprovalRequestExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -133,6 +134,7 @@ namespace AtoCash.Controllers
 
         // POST: api/TravelApprovalRequests
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<TravelApprovalRequest>> PostTravelApprovalRequest(TravelApprovalRequestDTO travelApprovalRequestDto)
         {
             /// Step 1 : enter a record in TravelApprovalRequest table
@@ -264,12 +266,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/TravelApprovalRequests/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteTravelApprovalRequest(int id)
         {
             var travelApprovalRequest = await _context.TravelApprovalRequests.FindAsync(id);
             if (travelApprovalRequest == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.TravelApprovalRequests.Remove(travelApprovalRequest);

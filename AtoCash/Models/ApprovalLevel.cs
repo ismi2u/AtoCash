@@ -14,8 +14,7 @@ namespace AtoCash.Models
         public int Id { get; set; }
 
         [Required]
-        [Column(TypeName = "nvarchar(10)")]
-        public string Level { get; set; }
+        public int Level { get; set; }
 
         [Column(TypeName = "nvarchar(150)")]
         public string LevelDesc { get; set; }

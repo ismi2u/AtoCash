@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ExpenseTypesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -39,7 +39,7 @@ namespace AtoCash.Controllers
 
             if (expenseType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return expenseType;
@@ -48,11 +48,12 @@ namespace AtoCash.Controllers
         // PUT: api/ExpenseTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutExpenseType(int id, ExpenseType expenseType)
         {
             if (id != expenseType.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             _context.Entry(expenseType).State = EntityState.Modified;
@@ -65,7 +66,7 @@ namespace AtoCash.Controllers
             {
                 if (!ExpenseTypeExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -79,6 +80,7 @@ namespace AtoCash.Controllers
         // POST: api/ExpenseTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ExpenseType>> PostExpenseType(ExpenseType expenseType)
         {
             _context.ExpenseTypes.Add(expenseType);
@@ -89,12 +91,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ExpenseTypes/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteExpenseType(int id)
         {
             var expenseType = await _context.ExpenseTypes.FindAsync(id);
             if (expenseType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ExpenseTypes.Remove(expenseType);

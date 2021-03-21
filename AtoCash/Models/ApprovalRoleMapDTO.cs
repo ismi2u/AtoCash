@@ -16,7 +16,7 @@ namespace AtoCash.Models
         public string Role { get; set; }
         public int RoleId { get; set; }
 
-        public string ApprovalLevel { get; set; }
+        public int ApprovalLevel { get; set; }
         public int ApprovalLevelId { get; set; }
     }
 }

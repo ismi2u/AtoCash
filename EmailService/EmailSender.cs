@@ -44,9 +44,9 @@ namespace EmailService
                    await client.SendAsync(emailmessage);
 
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-
+                    var exex = ex.Message;
                 }
                 finally
                 {

@@ -37,7 +37,8 @@ namespace AtoCash.Controllers
                 ProjectVM projectVM = new ProjectVM
                 {
                     Id = project.Id,
-                    ProjectName = project.ProjectName
+                    ProjectName = project.ProjectName,
+                    ProjectDesc = project.ProjectDesc
                 };
 
                 ListProjectVM.Add(projectVM);
@@ -83,7 +84,7 @@ namespace AtoCash.Controllers
 
             if (proj == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             projectDTO.Id = proj.Id;
@@ -128,13 +129,13 @@ namespace AtoCash.Controllers
         {
             if (id != projectDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var project = _context.Projects.Where(c => c.ProjectName == projectDto.ProjectName).FirstOrDefault();
             if (project != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "ProjectName Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "ProjectName Already Exists" });
             }
 
             var proj = await _context.Projects.FindAsync(id);
@@ -155,7 +156,7 @@ namespace AtoCash.Controllers
             {
                 if (!ProjectExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -174,7 +175,7 @@ namespace AtoCash.Controllers
             var project = _context.Projects.Where(c => c.ProjectName == projectDto.ProjectName).FirstOrDefault();
             if (project != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "ProjectName Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "ProjectName Already Exists" });
             }
 
             Project proj = new Project
@@ -198,7 +199,7 @@ namespace AtoCash.Controllers
             var project = await _context.Projects.FindAsync(id);
             if (project == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.Projects.Remove(project);

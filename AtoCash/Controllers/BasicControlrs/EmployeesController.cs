@@ -96,7 +96,7 @@ namespace AtoCash.Controllers
 
             if (employee == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             employeeDTO.Id = employee.Id;
@@ -130,13 +130,13 @@ namespace AtoCash.Controllers
         {
             if (id != employeeDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
             if (emplye != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
             }
 
             var employee = await _context.Employees.FindAsync(id);
@@ -173,7 +173,7 @@ namespace AtoCash.Controllers
             {
                 if (!EmployeeExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -193,7 +193,7 @@ namespace AtoCash.Controllers
             var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
             if (emplye != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
             }
 
 
@@ -234,7 +234,7 @@ namespace AtoCash.Controllers
             var employee = await _context.Employees.FindAsync(id);
             if (employee == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.Employees.Remove(employee);

@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class ApprovalLevelsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -60,7 +60,7 @@ namespace AtoCash.Controllers
 
             if (approvalLevel == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             approvalLevelDTO.Id = approvalLevel.Id;
@@ -73,11 +73,12 @@ namespace AtoCash.Controllers
         // PUT: api/ApprovalLevels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutApprovalLevel(int id, ApprovalLevelDTO approvalLevelDTO)
         {
             if (id != approvalLevelDTO.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
             }
 
             var approvalLevel = await _context.ApprovalLevels.FindAsync(id);
@@ -97,7 +98,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalLevelExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -110,6 +111,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ApprovalLevels
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalLevel>> PostApprovalLevel(ApprovalLevelDTO approvalLevelDto)
         {
             ApprovalLevel approvalLevel = new ApprovalLevel
@@ -128,12 +130,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalLevels/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteApprovalLevel(int id)
         {
             var approvalLevel = await _context.ApprovalLevels.FindAsync(id);
             if (approvalLevel == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ApprovalLevels.Remove(approvalLevel);

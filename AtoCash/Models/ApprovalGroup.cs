@@ -14,7 +14,7 @@ namespace AtoCash.Models
         public int Id { get; set; }
 
         [Required]
-        [Column(TypeName = "nvarchar(5)")]
+        [Column(TypeName = "nvarchar(20)")]
         public string ApprovalGroupCode { get; set; }
 
         [Required]

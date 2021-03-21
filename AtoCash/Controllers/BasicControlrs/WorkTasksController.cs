@@ -37,7 +37,8 @@ namespace AtoCash.Controllers
                 WorkTaskVM workTaskVM = new WorkTaskVM
                 {
                     Id = workTask.Id,
-                    TaskName = workTask.TaskName
+                    TaskName = workTask.TaskName,
+                    TaskDesc = workTask.TaskDesc
                 };
 
                 ListWorkTaskVM.Add(workTaskVM);
@@ -132,7 +133,7 @@ namespace AtoCash.Controllers
 
             if (worktask == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             workTaskDto.Id = worktask.Id;
@@ -150,7 +151,7 @@ namespace AtoCash.Controllers
         {
             if (id != workTaskDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var workTask = await _context.WorkTasks.FindAsync(id);
@@ -171,7 +172,7 @@ namespace AtoCash.Controllers
             {
                 if (!WorkTaskExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -191,7 +192,7 @@ namespace AtoCash.Controllers
             var wTask = _context.WorkTasks.Where(c => c.TaskName == workTaskDto.TaskName).FirstOrDefault();
             if (wTask != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "TaskName Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "TaskName Already Exists" });
             }
 
             WorkTask workTask = new WorkTask
@@ -217,7 +218,7 @@ namespace AtoCash.Controllers
             var workTask = await _context.WorkTasks.FindAsync(id);
             if (workTask == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.WorkTasks.Remove(workTask);

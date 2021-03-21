@@ -37,7 +37,7 @@ namespace AtoCash.Controllers
                 DepartmentVM departmentVM = new DepartmentVM
                 {
                     Id = department.Id,
-                     DeptName = department.DeptName
+                    DeptDesc = department.DeptCode + "-" + department.DeptName
                 };
 
                 ListDepartmentVM.Add(departmentVM);
@@ -81,7 +81,7 @@ namespace AtoCash.Controllers
 
             if (department == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             departmentDTO.Id = department.Id;
@@ -100,13 +100,13 @@ namespace AtoCash.Controllers
         {
             if (id != departmentDto.Id)
             {
-                return BadRequest(new Authentication.RespStatus { Status = "Failure", Message = "Id not Valid for Department" });
+                return Ok(new Authentication.RespStatus { Status = "Failure", Message = "Id not Valid for Department" });
             }
 
             var dept = _context.Departments.Where(c => c.DeptCode == departmentDto.DeptCode).FirstOrDefault();
             if (dept != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Department Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Department Already Exists" });
             }
 
             var department = await _context.Departments.FindAsync(id);
@@ -127,7 +127,7 @@ namespace AtoCash.Controllers
             {
                 if (!DepartmentExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -146,7 +146,7 @@ namespace AtoCash.Controllers
             var dept = _context.Departments.Where(c => c.DeptCode == departmentDto.DeptCode).FirstOrDefault();
             if (dept != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Department Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Department Already Exists" });
             }
 
             Department department = new Department
@@ -170,7 +170,7 @@ namespace AtoCash.Controllers
             var department = await _context.Departments.FindAsync(id);
             if (department == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.Departments.Remove(department);

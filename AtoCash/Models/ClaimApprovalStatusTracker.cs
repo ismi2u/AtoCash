@@ -19,25 +19,22 @@ namespace AtoCash.Models
         public int EmployeeId { get; set; }
 
 
-        [Required]
+
         [ForeignKey("PettyCashRequestId")]
         public virtual PettyCashRequest PettyCashRequest { get; set; }
         public int? PettyCashRequestId { get; set; }
 
-        [Required]
         [ForeignKey("ExpenseReimburseRequestId")]
         public virtual ExpenseReimburseRequest ExpenseReimburseRequest { get; set; }
         public int? ExpenseReimburseRequestId { get; set; }
 
 
         //Approver Department
-        [Required]
         [ForeignKey("DepartmentId")]
         public virtual Department Department { get; set; }
         public int? DepartmentId { get; set; }
 
         //Approver Project (either Department or Project => Can't be both)
-        [Required]
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }
         public int? ProjectId { get; set; }

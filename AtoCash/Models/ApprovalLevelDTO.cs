@@ -10,7 +10,7 @@ namespace AtoCash.Models
     public class ApprovalLevelDTO
     {
         public int Id { get; set; }
-        public string Level { get; set; }
+        public int Level { get; set; }
         public string LevelDesc { get; set; }
     }
 }

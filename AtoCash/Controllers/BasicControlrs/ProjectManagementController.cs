@@ -58,7 +58,7 @@ namespace AtoCash.Controllers
 
             if (projManagement == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             projManagementDTO.Id = projManagement.Id;
@@ -77,7 +77,7 @@ namespace AtoCash.Controllers
         {
             if (id != projectManagementDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
 
@@ -98,7 +98,7 @@ namespace AtoCash.Controllers
             {
                 if (!ProjectManagementExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -114,6 +114,13 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ProjectManagement>> PostProjectManagement(ProjectManagementDTO projectManagementDTO)
         {
+            var projassigned = _context.ProjectManagements.Where(p => p.EmployeeId == projectManagementDTO.EmployeeId && p.EmployeeId == projectManagementDTO.ProjectId).FirstOrDefault();
+
+            if (projassigned !=null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee is already assigned to the Project" });
+            }
+
             ProjectManagement projectManagement = new ProjectManagement
             {
                 ProjectId = projectManagementDTO.ProjectId,
@@ -136,7 +143,7 @@ namespace AtoCash.Controllers
             var projectManagement = await _context.ProjectManagements.FindAsync(id);
             if (projectManagement == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.ProjectManagements.Remove(projectManagement);

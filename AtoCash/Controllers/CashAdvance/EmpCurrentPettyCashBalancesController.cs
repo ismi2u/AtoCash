@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class EmpCurrentPettyCashBalancesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -58,7 +58,7 @@ namespace AtoCash.Controllers
 
             if (empCurrentPettyCashBalance == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             empCurrentPettyCashBalanceDTO.Id = empCurrentPettyCashBalance.Id;
@@ -72,11 +72,12 @@ namespace AtoCash.Controllers
 
         // PUT: api/EmpCurrentPettyCashBalances/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutEmpCurrentPettyCashBalance(int id, EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDto)
         {
             if (id != empCurrentPettyCashBalanceDto.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var empCurrentPettyCashBalance = await _context.EmpCurrentPettyCashBalances.FindAsync(id);
@@ -97,7 +98,7 @@ namespace AtoCash.Controllers
             {
                 if (!EmpCurrentPettyCashBalanceExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -110,6 +111,7 @@ namespace AtoCash.Controllers
 
         // POST: api/EmpCurrentPettyCashBalances
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<EmpCurrentPettyCashBalance>> PostEmpCurrentPettyCashBalance(EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDto)
         {
             EmpCurrentPettyCashBalance empCurrentPettyCashBalance = new EmpCurrentPettyCashBalance
@@ -144,12 +146,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/EmpCurrentPettyCashBalances/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteEmpCurrentPettyCashBalance(int id)
         {
             var empCurrentPettyCashBalance = await _context.EmpCurrentPettyCashBalances.FindAsync(id);
             if (empCurrentPettyCashBalance == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.EmpCurrentPettyCashBalances.Remove(empCurrentPettyCashBalance);

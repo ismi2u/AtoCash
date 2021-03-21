@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-      [Authorize(Roles = "AtominosAdmin, Admin")]
+      [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class JobRolesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -61,7 +61,7 @@ namespace AtoCash.Controllers
 
             if (role == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return role;
@@ -70,17 +70,18 @@ namespace AtoCash.Controllers
         // PUT: api/Roles/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutRole(int id, JobRole role)
         {
             if (id != role.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var jRole = _context.JobRoles.Where(c => c.RoleCode == role.RoleCode).FirstOrDefault();
             if (jRole != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "JobRole Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "JobRole Already Exists" });
             }
 
 
@@ -94,7 +95,7 @@ namespace AtoCash.Controllers
             {
                 if (!RoleExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -108,12 +109,13 @@ namespace AtoCash.Controllers
         // POST: api/Roles
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<JobRole>> PostRole(JobRole role)
         {
             var jRole = _context.JobRoles.Where(c => c.RoleCode == role.RoleCode).FirstOrDefault();
             if (jRole != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "JobRole Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "JobRole Already Exists" });
             }
             _context.JobRoles.Add(role);
             await _context.SaveChangesAsync();
@@ -123,12 +125,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Roles/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteRole(int id)
         {
             var role = await _context.JobRoles.FindAsync(id);
             if (role == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.JobRoles.Remove(role);

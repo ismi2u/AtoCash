@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+    [Authorize(Roles = "AtominosAdmin, Admin, User")]
     public class RequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -62,7 +62,7 @@ namespace AtoCash.Controllers
 
             if (requestType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             return requestType;
@@ -71,17 +71,18 @@ namespace AtoCash.Controllers
         // PUT: api/Requests/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutRequestType(int id, RequestType requestType)
         {
             if (id != requestType.Id)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var ReqType = _context.RequestTypes.Where(r => r.RequestName == requestType.RequestName).FirstOrDefault();
             if (ReqType != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "RequestType Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "RequestType Already Exists" });
             }
 
             _context.Entry(requestType).State = EntityState.Modified;
@@ -94,7 +95,7 @@ namespace AtoCash.Controllers
             {
                 if (!RequestTypeExists(id))
                 {
-                    return NotFound();
+                    return NoContent();
                 }
                 else
                 {
@@ -108,12 +109,13 @@ namespace AtoCash.Controllers
         // POST: api/Requests
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<RequestType>> PostRequestType(RequestType requestType)
         {
             var ReqType = _context.RequestTypes.Where(r => r.RequestName == requestType.RequestName).FirstOrDefault();
             if (ReqType != null)
             {
-                return BadRequest(new RespStatus { Status = "Failure", Message = "RequestType Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "RequestType Already Exists" });
             }
 
             _context.RequestTypes.Add(requestType);
@@ -124,12 +126,13 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Requests/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteRequestType(int id)
         {
             var requestType = await _context.RequestTypes.FindAsync(id);
             if (requestType == null)
             {
-                return NotFound();
+                return NoContent();
             }
 
             _context.RequestTypes.Remove(requestType);
