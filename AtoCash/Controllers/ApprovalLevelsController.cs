@@ -114,11 +114,25 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalLevel>> PostApprovalLevel(ApprovalLevelDTO approvalLevelDto)
         {
+
+            var aprlevel = _context.ApprovalLevels.Where(a => a.Level == approvalLevelDto.Level).FirstOrDefault();
+            if (aprlevel != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level Already Exists" });
+            }
+
+            
+            if (approvalLevelDto.Level !=  _context.ApprovalLevels.Select(x => x.Level).Max() + 1)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level need to be Linear integer" });
+            }
+
             ApprovalLevel approvalLevel = new()
             {
                 Level = approvalLevelDto.Level,
                 LevelDesc = approvalLevelDto.LevelDesc
             };
+
 
 
             _context.ApprovalLevels.Add(approvalLevel);

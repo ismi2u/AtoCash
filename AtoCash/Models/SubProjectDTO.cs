@@ -10,7 +10,8 @@ namespace AtoCash.Models
     public class SubProjectDTO
     {
         public int Id { get; set; }
-        public int ProjectId { get; set; }
+        public int ProjectId{ get; set; }
+        public string ProjectName{ get; set; }
         public string SubProjectName { get; set; }
         public string SubProjectDesc { get; set; }
     }

@@ -63,7 +63,7 @@ namespace AtoCash.Controllers
                     SubProjectVM subproject = new SubProjectVM()
                     {
                         Id = item.Id,
-                         SubProjectName = item.SubProjectName
+                        SubProjectName = item.SubProjectName
                     };
                     ListSubProjectVM.Add(subproject);
 
@@ -110,6 +110,8 @@ namespace AtoCash.Controllers
                 SubProjectDTO SubProjectDTO = new SubProjectDTO
                 {
                     Id = SubProj.Id,
+                    ProjectId = SubProj.ProjectId,
+                    ProjectName = _context.Projects.Find(SubProj.ProjectId).ProjectName,
                     SubProjectName = SubProj.SubProjectName,
                     SubProjectDesc = SubProj.SubProjectDesc
                 };

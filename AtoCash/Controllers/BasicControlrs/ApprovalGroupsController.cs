@@ -104,6 +104,12 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalGroup>> PostApprovalGroup(ApprovalGroup approvalGroup)
         {
+            var aprGrpCode = _context.ApprovalGroups.Where(a => a.ApprovalGroupCode == approvalGroup.ApprovalGroupCode).FirstOrDefault();
+            if (aprGrpCode != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Group Code Already Exists" });
+            }
+
             _context.ApprovalGroups.Add(approvalGroup);
             await _context.SaveChangesAsync();
 

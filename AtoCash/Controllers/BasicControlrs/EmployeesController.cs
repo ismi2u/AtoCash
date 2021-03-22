@@ -45,7 +45,7 @@ namespace AtoCash.Controllers
             return ListEmployeeVM;
 
         }
-            // GET: api/Employees
+        // GET: api/Employees
         [HttpGet]
         public async Task<ActionResult<IEnumerable<EmployeeDTO>>> GetEmployees()
         {
@@ -135,14 +135,14 @@ namespace AtoCash.Controllers
 
             var emp = _context.Employees.Find(employeeDto.Id);
 
-            int testEmpId =  _context.Employees.Where(e => e.MobileNumber == employeeDto.MobileNumber).Select(x => x.Id).FirstOrDefault();
+            int testEmpId = _context.Employees.Where(e => e.MobileNumber == employeeDto.MobileNumber).Select(x => x.Id).FirstOrDefault();
 
-            if(employeeDto.Id != testEmpId)
+            if (employeeDto.Id != testEmpId)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Mobile Number should be unique" });
             }
 
-           
+
             var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
             if (emplye != null)
             {
@@ -200,10 +200,13 @@ namespace AtoCash.Controllers
         public async Task<ActionResult<Employee>> PostEmployee(EmployeeDTO employeeDto)
         {
 
-            var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
+            //var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
+
+            var emplye = _context.Employees.Where(e => e.Email == employeeDto.Email || e.EmpCode == employeeDto.EmpCode || e.Email == employeeDto.Email).FirstOrDefault();
+
             if (emplye != null)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Unique EmpCode/Mobile/Email required" });
             }
 
 
