@@ -35,7 +35,7 @@ namespace AtoCash.Controllers
         [ActionName("GetPettyCashRequests")]
         public async Task<ActionResult<IEnumerable<PettyCashRequestDTO>>> GetPettyCashRequests()
         {
-            List<PettyCashRequestDTO> ListPettyCashRequestDTO = new List<PettyCashRequestDTO>();
+            List<PettyCashRequestDTO> ListPettyCashRequestDTO = new();
 
             //var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(1);
 
@@ -43,7 +43,7 @@ namespace AtoCash.Controllers
 
             foreach (PettyCashRequest pettyCashRequest in pettyCashRequests)
             {
-                PettyCashRequestDTO pettyCashRequestsDTO = new PettyCashRequestDTO
+                PettyCashRequestDTO pettyCashRequestsDTO = new()
                 {
                     Id = pettyCashRequest.Id,
                     EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
@@ -77,7 +77,7 @@ namespace AtoCash.Controllers
             {
                 return NoContent();
             }
-            PettyCashRequestDTO pettyCashRequestDTO = new PettyCashRequestDTO();
+            PettyCashRequestDTO pettyCashRequestDTO = new();
 
             pettyCashRequestDTO.Id = pettyCashRequest.Id;
             pettyCashRequestDTO.EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName();
@@ -116,11 +116,11 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
-            List<PettyCashRequestDTO> PettyCashRequestDTOs = new List<PettyCashRequestDTO>();
+            List<PettyCashRequestDTO> PettyCashRequestDTOs = new();
 
             foreach (var pettyCashRequest in pettyCashRequests)
             {
-                PettyCashRequestDTO pettyCashRequestDTO = new PettyCashRequestDTO
+                PettyCashRequestDTO pettyCashRequestDTO = new()
                 {
                     Id = pettyCashRequest.Id,
                     EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
@@ -161,11 +161,11 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
-            List<PettyCashRequestDTO> PettyCashRequestDTOs = new List<PettyCashRequestDTO>();
+            List<PettyCashRequestDTO> PettyCashRequestDTOs = new();
 
             foreach (var pettyCashRequest in pettyCashRequests)
             {
-                PettyCashRequestDTO pettyCashRequestDTO = new PettyCashRequestDTO
+                PettyCashRequestDTO pettyCashRequestDTO = new()
                 {
                     Id = pettyCashRequest.Id,
                     EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
@@ -220,7 +220,7 @@ namespace AtoCash.Controllers
         public async Task<ActionResult<int>> GetPettyCashReqInPendingForAll()
         {
             //debug
-            var pettyCashRequests = _context.PettyCashRequests.Include("ClaimApprovalStatusTrackers").ToList();
+            var pettyCashRequests = await _context.PettyCashRequests.Include("ClaimApprovalStatusTrackers").ToListAsync();
 
 
             //var pettyCashRequests = await _context.ClaimApprovalStatusTrackers.Where(c => c.ApprovalStatusTypeId == ApprovalStatus.Pending).select( );
@@ -343,7 +343,7 @@ namespace AtoCash.Controllers
 
         private enum ApprovalStatus
         {
-            Pending = 1,
+            Pending,
             Approved,
             Rejected
 
@@ -351,7 +351,7 @@ namespace AtoCash.Controllers
 
         private enum ClaimType
         {
-            CashAdvance = 1,
+            CashAdvance,
             ExpenseReim
 
         }
@@ -455,7 +455,7 @@ namespace AtoCash.Controllers
             //get costcentreID based on project
             #region
 
-            ClaimApprovalStatusTracker claimAppStatusTrack = new ClaimApprovalStatusTracker
+            ClaimApprovalStatusTracker claimAppStatusTrack = new()
             {
                 EmployeeId = pettyCashRequestDto.EmployeeId,
                 PettyCashRequestId = pettyCashRequestDto.Id,
@@ -589,7 +589,7 @@ namespace AtoCash.Controllers
                 }
 
 
-                ClaimApprovalStatusTracker claimAppStatusTrack = new ClaimApprovalStatusTracker
+                ClaimApprovalStatusTracker claimAppStatusTrack = new()
                 {
                     EmployeeId = pettyCashRequestDto.EmployeeId,
                     PettyCashRequestId = pettyCashRequestDto.Id,
@@ -624,7 +624,7 @@ namespace AtoCash.Controllers
 
             //##### STEP 5. Adding a SINGLE entry in DisbursementsAndClaimsMaster table for records
             #region
-            DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new DisbursementsAndClaimsMaster();
+            DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new();
 
             disbursementsAndClaimsMaster.EmployeeId = reqEmpid;
             disbursementsAndClaimsMaster.PettyCashRequestId = pcrq.Id;

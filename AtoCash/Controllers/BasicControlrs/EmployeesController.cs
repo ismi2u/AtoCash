@@ -133,6 +133,16 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var emp = _context.Employees.Find(employeeDto.Id);
+
+            int testEmpId =  _context.Employees.Where(e => e.MobileNumber == employeeDto.MobileNumber).Select(x => x.Id).FirstOrDefault();
+
+            if(employeeDto.Id != testEmpId)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Mobile Number should be unique" });
+            }
+
+           
             var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
             if (emplye != null)
             {

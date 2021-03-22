@@ -29,13 +29,13 @@ namespace AtoCash.Controllers
         public async Task<ActionResult<IEnumerable<ApprovalLevelDTO>>> GetApprovalLevels()
         {
 
-            List<ApprovalLevelDTO> ListApprovalLevelDTO = new List<ApprovalLevelDTO>();
+            List<ApprovalLevelDTO> ListApprovalLevelDTO = new();
 
             var approvalLevels = await _context.ApprovalLevels.ToListAsync();
 
             foreach (ApprovalLevel approvalLevel in approvalLevels)
             {
-                ApprovalLevelDTO approvalLevelDTO = new ApprovalLevelDTO
+                ApprovalLevelDTO approvalLevelDTO = new()
                 {
                     Id = approvalLevel.Id,
                     Level = approvalLevel.Level,
@@ -54,7 +54,7 @@ namespace AtoCash.Controllers
         public async Task<ActionResult<ApprovalLevelDTO>> GetApprovalLevel(int id)
         {
 
-            ApprovalLevelDTO approvalLevelDTO = new ApprovalLevelDTO();
+            ApprovalLevelDTO approvalLevelDTO = new();
 
             var approvalLevel = await _context.ApprovalLevels.FindAsync(id);
 
@@ -114,7 +114,7 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalLevel>> PostApprovalLevel(ApprovalLevelDTO approvalLevelDto)
         {
-            ApprovalLevel approvalLevel = new ApprovalLevel
+            ApprovalLevel approvalLevel = new()
             {
                 Level = approvalLevelDto.Level,
                 LevelDesc = approvalLevelDto.LevelDesc

@@ -7,7 +7,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtoCash.Models
 {
-    [ComplexType]
     public class Department
     {
 

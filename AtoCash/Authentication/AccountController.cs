@@ -59,7 +59,7 @@ namespace AtoCash.Authentication
                 return Conflict(new RespStatus { Status = "Failure", Message = "Email is already taken" });
             }
 
-            MailAddress mailAddress = new MailAddress(model.Email);
+            MailAddress mailAddress = new(model.Email);
             
             //MODIFY HOST DOMAIN NAME HERE => CURRENTLY only GMAIL and MAILINATOR
             if ( (mailAddress.Host.ToUpper() != "MAILINATOR.COM") && mailAddress.Host.ToUpper() != "GMAIL.COM")
@@ -80,7 +80,7 @@ namespace AtoCash.Authentication
                 return Ok(new RespStatus { Status = "Success", Message = "User Registered Successfully" });
             }
 
-            RespStatus respStatus = new RespStatus();
+            RespStatus respStatus = new();
 
             foreach (IdentityError error in result.Errors)
             {
@@ -217,7 +217,7 @@ namespace AtoCash.Authentication
                         return Ok(user);
                     }
 
-                    List<object> errResp = new List<object>();
+                    List<object> errResp = new();
                     foreach (var error in result.Errors)
                     {
                         errResp.Add(error.Description);

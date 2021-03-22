@@ -29,12 +29,12 @@ namespace AtoCash.Controllers
         [ActionName("ApprovalGroupsForDropdown")]
         public async Task<ActionResult<IEnumerable<ApprovalGroupVM>>> GetApprovalGroupsForDropDown()
         {
-            List<ApprovalGroupVM> ListApprovalGroupVM = new List<ApprovalGroupVM>();
+            List<ApprovalGroupVM> ListApprovalGroupVM = new();
 
             var approvalGroups = await _context.ApprovalGroups.ToListAsync();
             foreach (ApprovalGroup approvalGroup in approvalGroups)
             {
-                ApprovalGroupVM approvalGroupVM = new ApprovalGroupVM
+                ApprovalGroupVM approvalGroupVM = new()
                 {
                     Id = approvalGroup.Id,
                     ApprovalGroupCode = approvalGroup.ApprovalGroupCode
@@ -68,7 +68,6 @@ namespace AtoCash.Controllers
         }
 
         // PUT: api/ApprovalGroups/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> PutApprovalGroup(int id, ApprovalGroup approvalGroup)
