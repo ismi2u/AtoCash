@@ -69,7 +69,7 @@ namespace AtoCash.Controllers
         [ActionName("GetPettyCashRequest")]
         public async Task<ActionResult<PettyCashRequestDTO>> GetPettyCashRequest(int id)
         {
-            
+
 
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
 
@@ -84,11 +84,11 @@ namespace AtoCash.Controllers
             pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
             pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
             pettyCashRequestDTO.ProjectId = pettyCashRequest.ProjectId;
-            pettyCashRequestDTO.Project = pettyCashRequest.ProjectId!=null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName:null;
+            pettyCashRequestDTO.Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null;
             pettyCashRequestDTO.SubProjectId = pettyCashRequest.SubProjectId;
-            pettyCashRequestDTO.SubProject = pettyCashRequest.SubProjectId !=null ?_context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName: null;
+            pettyCashRequestDTO.SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null;
             pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
-            pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId!= null? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName: null;
+            pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null;
 
 
             return pettyCashRequestDTO;
@@ -123,10 +123,13 @@ namespace AtoCash.Controllers
                 PettyCashRequestDTO pettyCashRequestDTO = new()
                 {
                     Id = pettyCashRequest.Id,
+                    EmployeeId = pettyCashRequest.EmployeeId,
                     EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
                     PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
                     PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
                     CashReqDate = pettyCashRequest.CashReqDate,
+                    DepartmentId = pettyCashRequest.DepartmentId,
+                    Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode + _context.Departments.Find(pettyCashRequest.DepartmentId).DeptName : null,
                     ProjectId = pettyCashRequest.ProjectId,
                     Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null,
                     SubProjectId = pettyCashRequest.SubProjectId,
@@ -136,7 +139,7 @@ namespace AtoCash.Controllers
                 };
                 PettyCashRequestDTOs.Add(pettyCashRequestDTO);
             }
-            
+
 
             return Ok(PettyCashRequestDTOs);
         }
@@ -178,7 +181,7 @@ namespace AtoCash.Controllers
                     SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null,
                     WorkTaskId = pettyCashRequest.WorkTaskId,
                     WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null
-            };
+                };
                 PettyCashRequestDTOs.Add(pettyCashRequestDTO);
             }
 
@@ -202,14 +205,22 @@ namespace AtoCash.Controllers
             //(int)ApprovalStatus.Pending
             List<ClaimApprovalStatusTracker> lists = _context.ClaimApprovalStatusTrackers.Where(c => c.EmployeeId == id).ToList();
 
-            var pettyCashRequests = await _context.ClaimApprovalStatusTrackers.Where(c => c.EmployeeId == id).Select(p => p.PettyCashRequestId).Distinct().ToListAsync();
+            var claimApprovalsOfEmployee = await _context.ClaimApprovalStatusTrackers.Where(c => c.EmployeeId == id).Select(p => p.PettyCashRequestId).Distinct().ToListAsync();
 
-            if (pettyCashRequests == null)
+            foreach (var item in claimApprovalsOfEmployee)
+            {
+                string test = item.ToString();
+
+            }
+
+            if (claimApprovalsOfEmployee == null)
             {
                 return NoContent();
             }
 
-            return Ok(/*pettyCashRequests.Count*/);
+
+
+            return Ok(claimApprovalsOfEmployee.Count);
 
         }
 
@@ -341,30 +352,16 @@ namespace AtoCash.Controllers
 
 
 
-        private enum ApprovalStatus
-        {
-            Pending,
-            Approved,
-            Rejected
-
-        }
-
-        private enum ClaimType
-        {
-            CashAdvance,
-            ExpenseReim
-
-        }
 
         private Double GetEmpCurrentAvailablePettyCashBalance(PettyCashRequestDTO pettyCashRequest)
         {
             //If Employee has no previous record of requesting the Cash so add a new record with full balance to amount to "EmpCurrentPettyCashBalance"
             //<<<-----------
-         
+
 
             Double empPettyCashAmountEligible = _context.JobRoles.Find(_context.Employees.Find(pettyCashRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
 
-           
+
             //Check if employee cash balance is availabel in the EmpCurrentPettyCashBalance table, if NOT then ADD
             if (!_context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Any())
             {
@@ -380,7 +377,7 @@ namespace AtoCash.Controllers
                 return empPettyCashAmountEligible;
             }
 
-            return _context.EmpCurrentPettyCashBalances.Where( e=> e.EmployeeId == pettyCashRequest.EmployeeId).Select( b => b.CurBalance).FirstOrDefault();
+            return _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Select(b => b.CurBalance).FirstOrDefault();
 
 
         }
@@ -410,7 +407,7 @@ namespace AtoCash.Controllers
         /// </summary>
         /// <param name="pettyCashRequestDto"></param>
         /// <param name="empCurAvailBal"></param>
-        private async Task ProjectCashRequest(PettyCashRequestDTO pettyCashRequestDto, Double empCurAvailBal)
+        private async Task<IActionResult> ProjectCashRequest(PettyCashRequestDTO pettyCashRequestDto, Double empCurAvailBal)
         {
 
             //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
@@ -425,7 +422,12 @@ namespace AtoCash.Controllers
             Double empReqAmount = pettyCashRequestDto.PettyClaimAmount;
             int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
             double maxCashAllowedForRole = (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed);
-            
+
+            if (pettyCashRequestDto.PettyClaimAmount > maxCashAllowedForRole)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Advance Amount is not eligibile" });
+            }
+
             var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == empid).FirstOrDefault();
             curPettyCashBal.Id = curPettyCashBal.Id;
             curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount <= maxCashAllowedForRole ? empCurAvailBal - empReqAmount : maxCashAllowedForRole;
@@ -467,7 +469,7 @@ namespace AtoCash.Controllers
                 //ApprovalLevelId = ApprMap.ApprovalLevelId, 
                 ReqDate = DateTime.Now,
                 FinalApprovedDate = null,
-                ApprovalStatusTypeId = (int)ApprovalStatus.Pending//1-Pending, 2-Approved, 3-Rejected
+                ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
             };
 
 
@@ -505,10 +507,12 @@ namespace AtoCash.Controllers
                 RecordDate = DateTime.Now,
                 Amount = pettyCashRequestDto.PettyClaimAmount,
                 CostCentreId = _context.Departments.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId).CostCentreId,
-                ApprovalStatusId = (int)ApprovalStatus.Pending
+                ApprovalStatusId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
             });
             await _context.SaveChangesAsync();
             #endregion
+
+            return Ok(new RespStatus { Status = "Success", Message = "Advance Request Created!" });
         }
 
         /// <summary>
@@ -529,13 +533,13 @@ namespace AtoCash.Controllers
             var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == reqEmpid).FirstOrDefault();
             curPettyCashBal.Id = curPettyCashBal.Id;
             if (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed <= empCurAvailBal - empReqAmount)
-            { 
-            curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount;
+            {
+                curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount;
             }
             else
-            { 
-            
-}
+            {
+
+            }
             curPettyCashBal.EmployeeId = reqEmpid;
             _context.Update(curPettyCashBal);
             await _context.SaveChangesAsync();
@@ -553,7 +557,7 @@ namespace AtoCash.Controllers
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
-                DepartmentId = pettyCashRequestDto.DepartmentId
+                DepartmentId = _context.Employees.Find(reqEmpid).Department.Id
 
 
 
@@ -576,7 +580,7 @@ namespace AtoCash.Controllers
 
             var ReqEmpRoleId = _context.Employees.Where(e => e.Id == reqEmpid).FirstOrDefault().RoleId;
             var ReqEmpHisOwnApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == ReqEmpRoleId);
-
+            bool isFirstApprover = true;
             foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
             {
 
@@ -587,6 +591,7 @@ namespace AtoCash.Controllers
                 {
                     continue;
                 }
+
 
 
                 ClaimApprovalStatusTracker claimAppStatusTrack = new()
@@ -600,13 +605,15 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = ApprMap.ApprovalLevelId,
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = null,
-                    ApprovalStatusTypeId = (int)ApprovalStatus.Pending//1-Pending, 2-Approved, 3-Rejected
+                    ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
 
 
                 _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
                 await _context.SaveChangesAsync();
 
+                //first approver will be added as Pending, other approvers will be with In Approval Queue
+                isFirstApprover = false;
 
                 //##### 4. Send email to the Approver
                 //####################################
@@ -646,6 +653,22 @@ namespace AtoCash.Controllers
         }
 
 
+        private enum ApprovalStatus
+        {
+            Initiating = 1,
+            Pending,
+            InReview,
+            Approved,
+            Rejected
+
+        }
+
+        private enum ClaimType
+        {
+            CashAdvance = 1,
+            ExpenseReim
+
+        }
 
     }
 }

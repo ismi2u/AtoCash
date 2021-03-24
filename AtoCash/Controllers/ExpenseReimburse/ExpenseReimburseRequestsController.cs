@@ -308,20 +308,8 @@ namespace AtoCash.Controllers
 
 
 
-        private enum RequestType
-        {
-            CashAdvance = 1,
-            ExpenseReim
+     
 
-        }
-
-        private enum ApprovalStatus
-        {
-            Pending = 1,
-            Approved,
-            Rejected
-
-        }
 
 
 
@@ -405,6 +393,23 @@ namespace AtoCash.Controllers
         }
 
 
+        private enum RequestType
+        {
+            CashAdvance = 1,
+            ExpenseReim
 
+        }
+
+
+        private enum ApprovalStatus
+        {
+            Initiating = 1,
+            Pending,
+            InReview,
+            Approved,
+            Rejected
+
+        }
+        //
     }
 }

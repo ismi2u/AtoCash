@@ -83,6 +83,12 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ApprovalStatusType>> PostApprovalStatusType(ApprovalStatusType approvalStatusType)
         {
+            var aStatus = _context.ApprovalStatusTypes.Where(a => a.Status == approvalStatusType.Status).FirstOrDefault();
+            if (aStatus != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Status Already Exists" });
+            }
+
             _context.ApprovalStatusTypes.Add(approvalStatusType);
             await _context.SaveChangesAsync();
 
