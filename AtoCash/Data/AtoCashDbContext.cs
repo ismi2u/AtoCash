@@ -56,5 +56,7 @@ namespace AtoCash.Data
         public DbSet<TravelApprovalRequest> TravelApprovalRequests { get; set; }
 
         public DbSet<TravelApprovalStatusTracker> TravelApprovalStatusTrackers { get; set; }
+
+        public DbSet<EmployeeStatus> EmployeeStatus { get; set; }
     }
 }

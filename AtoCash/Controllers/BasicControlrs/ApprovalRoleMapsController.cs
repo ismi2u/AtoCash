@@ -84,15 +84,8 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            var AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.RoleId == approvalRoleMapDto.RoleId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
-            if (AprvRolMap != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Role Map Already Exists" });
-            }
-
+ 
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);
-
-
 
             approvalRoleMap.Id = approvalRoleMapDto.Id;
             approvalRoleMap.ApprovalGroupId = approvalRoleMapDto.ApprovalGroupId;
@@ -111,7 +104,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalRoleMapExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "RoleMap is invalid" });
                 }
                 else
                 {
@@ -119,7 +112,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Role Map Updated!" });
         }
 
         // POST: api/ApprovalRoleMaps

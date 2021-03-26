@@ -8,35 +8,30 @@ CREATE DATABASE [AtoCashDB]
 USE [AtoCashDB]
 GO
 	
-  
 CREATE TABLE [dbo].[ApprovalGroups](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[ApprovalGroupCode] [nvarchar](10) NOT NULL,
+	[ApprovalGroupCode] [nvarchar](20) NOT NULL,
 	[ApprovalGroupDesc] [nvarchar](150) NOT NULL)
-		  
+ 
 GO
-
+	
 CREATE TABLE [dbo].[ApprovalLevels](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[Level] [nvarchar](10) NOT NULL,
+	[Level] [int] NOT NULL,
 	[LevelDesc] [nvarchar](150) NULL)
 	  
 GO
-
 CREATE TABLE [dbo].[ApprovalRoleMaps](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[ApprovalGroupId] [int] NOT NULL,
 	[RoleId] [int] NOT NULL,
 	[ApprovalLevelId] [int] NOT NULL)
-			
-GO
 CREATE TABLE [dbo].[ApprovalStatusTypes](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[Status] [nvarchar](25) NOT NULL,
 	[StatusDesc] [nvarchar](100) NULL)
-  
+ 
 GO
-
 CREATE TABLE [dbo].[AspNetRoleClaims](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[RoleId] [nvarchar](450) NOT NULL,
@@ -49,31 +44,26 @@ CREATE TABLE [dbo].[AspNetRoles](
 	[Name] [nvarchar](256) NULL,
 	[NormalizedName] [nvarchar](256) NULL,
 	[ConcurrencyStamp] [nvarchar](max) NULL)
-
 GO
+
 CREATE TABLE [dbo].[AspNetUserClaims](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[UserId] [nvarchar](450) NOT NULL,
 	[ClaimType] [nvarchar](max) NULL,
 	[ClaimValue] [nvarchar](max) NULL)
-
-GO
+	
 CREATE TABLE [dbo].[AspNetUserLogins](
 	[LoginProvider] [nvarchar](450) NOT NULL,
 	[ProviderKey] [nvarchar](450) NOT NULL,
 	[ProviderDisplayName] [nvarchar](max) NULL,
-	[UserId] [nvarchar](450) NOT NULL
+	[UserId] [nvarchar](450) NOT NULL	
 	PRIMARY KEY ([LoginProvider] , [ProviderKey]))
-
 GO
 CREATE TABLE [dbo].[AspNetUserRoles](
 	[UserId] [nvarchar](450) NOT NULL,
 	[RoleId] [nvarchar](450) NOT NULL
 	PRIMARY KEY ([UserId], [RoleId]))
- 
 GO
-						
-  
 CREATE TABLE [dbo].[AspNetUsers](
 	[Id] [nvarchar](450) NOT NULL PRIMARY KEY,
 	[EmployeeId] [int] NOT NULL,
@@ -91,50 +81,38 @@ CREATE TABLE [dbo].[AspNetUsers](
 	[LockoutEnd] [datetimeoffset](7) NULL,
 	[LockoutEnabled] [bit] NOT NULL,
 	[AccessFailedCount] [int] NOT NULL)
-
 GO
-
-  
 CREATE TABLE [dbo].[AspNetUserTokens](
 	[UserId] [nvarchar](450) NOT NULL,
 	[LoginProvider] [nvarchar](450) NOT NULL,
 	[Name] [nvarchar](450) NOT NULL,
 	[Value] [nvarchar](max) NULL
-	PRIMARY KEY ([UserId], [LoginProvider], [Name]))
- 
+		PRIMARY KEY ([UserId], [LoginProvider], [Name]))
 GO
 CREATE TABLE [dbo].[ClaimApprovalStatusTrackers](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[EmployeeId] [int] NOT NULL,
-	[PettyCashRequestId] [int] NOT NULL,
-	[ExpenseReimburseRequestId] [int] NOT NULL,
-	[DepartmentId] [int] NOT NULL,
-	[ProjectId] [int] NOT NULL,
+	[PettyCashRequestId] [int] NULL,
+	[ExpenseReimburseRequestId] [int] NULL,
+	[DepartmentId] [int] NULL,
+	[ProjectId] [int] NULL,
 	[RoleId] [int] NOT NULL,
 	[ApprovalLevelId] [int] NOT NULL,
 	[ReqDate] [datetime2](7) NOT NULL,
 	[FinalApprovedDate] [datetime2](7) NULL,
 	[ApprovalStatusTypeId] [int] NOT NULL)
-
 GO
-  
 CREATE TABLE [dbo].[CostCentres](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[CostCentreCode] [nvarchar](10) NOT NULL,
+	[CostCentreCode] [nvarchar](20) NOT NULL,
 	[CostCentreDesc] [nvarchar](150) NOT NULL)
-
 GO
-
-  
 CREATE TABLE [dbo].[Departments](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[DeptCode] [nvarchar](10) NOT NULL,
+	[DeptCode] [nvarchar](20) NOT NULL,
 	[DeptName] [nvarchar](30) NOT NULL,
 	[CostCentreId] [int] NOT NULL)
-
 GO
-
-  
 CREATE TABLE [dbo].[DisbursementsAndClaimsMasters](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[EmployeeId] [int] NOT NULL,
@@ -149,14 +127,12 @@ CREATE TABLE [dbo].[DisbursementsAndClaimsMasters](
 	[Amount] [float] NOT NULL,
 	[CostCentreId] [int] NOT NULL,
 	[ApprovalStatusId] [int] NOT NULL)
-
 GO
 CREATE TABLE [dbo].[EmpCurrentPettyCashBalances](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[EmployeeId] [int] NOT NULL,
 	[CurBalance] [float] NOT NULL,
 	[UpdatedOn] [datetime2](7) NOT NULL)
-
 GO
 CREATE TABLE [dbo].[Employees](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -178,14 +154,19 @@ CREATE TABLE [dbo].[Employees](
 	[EmploymentTypeId] [int] NOT NULL,
 	[DepartmentId] [int] NOT NULL,
 	[RoleId] [int] NOT NULL,
-	[ApprovalGroupId] [int] NOT NULL)
-
+	[ApprovalGroupId] [int] NOT NULL,
+	[EmployeeStatusId] [int] NOT NULL)
 GO
+
+CREATE TABLE [dbo].[EmployeeStatus](
+	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
+	[EmpStatus] [nvarchar](20) NOT NULL,
+	[StatusDesc] [nvarchar](150) NOT NULL)
+
 CREATE TABLE [dbo].[EmploymentTypes](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[EmpJobTypeCode] [nvarchar](10) NOT NULL,
+	[EmpJobTypeCode] [nvarchar](20) NOT NULL,
 	[EmpJobTypeDesc] [nvarchar](150) NOT NULL)
-
 GO
 CREATE TABLE [dbo].[ExpenseReimburseRequests](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -197,22 +178,17 @@ CREATE TABLE [dbo].[ExpenseReimburseRequests](
 	[ProjectId] [int] NULL,
 	[SubProjectId] [int] NULL,
 	[WorkTaskId] [int] NULL)
-			 
 GO
-
-  
 CREATE TABLE [dbo].[ExpenseTypes](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[ExpenseTypeName] [nvarchar](50) NOT NULL,
 	[ExpenseTypeDesc] [nvarchar](150) NOT NULL)
-
 GO
 CREATE TABLE [dbo].[JobRoles](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[RoleCode] [nvarchar](10) NOT NULL,
+	[RoleCode] [nvarchar](20) NOT NULL,
 	[RoleName] [nvarchar](20) NOT NULL,
 	[MaxPettyCashAllowed] [float] NOT NULL)
-
 GO
 CREATE TABLE [dbo].[PettyCashRequests](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -223,15 +199,12 @@ CREATE TABLE [dbo].[PettyCashRequests](
 	[DepartmentId] [int] NULL,
 	[ProjectId] [int] NULL,
 	[SubProjectId] [int] NULL,
-	[WorkTaskId] [int] NULL,
-	[ApprovalStatusTypeId] [int] NULL)
-
+	[WorkTaskId] [int] NULL)
 GO
 CREATE TABLE [dbo].[ProjectManagements](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[ProjectId] [int] NOT NULL,
 	[EmployeeId] [int] NOT NULL)
-
 GO
 CREATE TABLE [dbo].[Projects](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
@@ -239,22 +212,17 @@ CREATE TABLE [dbo].[Projects](
 	[CostCentreId] [int] NOT NULL,
 	[ProjectDesc] [nvarchar](200) NOT NULL)
 GO
-  
 CREATE TABLE [dbo].[RequestTypes](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[RequestName] [nvarchar](50) NOT NULL,
 	[RequestTypeDesc] [nvarchar](150) NOT NULL)
-	
 GO
-
 CREATE TABLE [dbo].[SubProjects](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[ProjectId] [int] NOT NULL,
 	[SubProjectName] [nvarchar](25) NOT NULL,
 	[SubProjectDesc] [nvarchar](200) NOT NULL)
- 
 GO
- 
 CREATE TABLE [dbo].[TravelApprovalRequests](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[EmployeeId] [int] NOT NULL,
@@ -267,9 +235,7 @@ CREATE TABLE [dbo].[TravelApprovalRequests](
 	[ProjectId] [int] NULL,
 	[SubProjectId] [int] NULL,
 	[WorkTaskId] [int] NULL)
- 
 GO
-
 CREATE TABLE [dbo].[TravelApprovalStatusTrackers](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[EmployeeId] [int] NOT NULL,
@@ -282,17 +248,13 @@ CREATE TABLE [dbo].[TravelApprovalStatusTrackers](
 	[ReqDate] [datetime2](7) NOT NULL,
 	[FinalApprovedDate] [datetime2](7) NULL,
 	[ApprovalStatusTypeId] [int] NOT NULL)
-
 GO
 CREATE TABLE [dbo].[WorkTasks](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[SubProjectId] [int] NOT NULL,
 	[TaskName] [nvarchar](25) NOT NULL,
 	[TaskDesc] [nvarchar](200) NOT NULL)
-  
 GO
-
-  
 ALTER TABLE [dbo].[ApprovalRoleMaps]  WITH CHECK ADD  CONSTRAINT [FK_ApprovalRoleMaps_ApprovalGroups_ApprovalGroupId] FOREIGN KEY([ApprovalGroupId])
 REFERENCES [dbo].[ApprovalGroups] ([Id])
 ON DELETE CASCADE
@@ -347,7 +309,7 @@ ON DELETE CASCADE
 GO
 ALTER TABLE [dbo].[AspNetUserTokens] CHECK CONSTRAINT [FK_AspNetUserTokens_AspNetUsers_UserId]
 GO
-	ALTER TABLE [dbo].[ClaimApprovalStatusTrackers]  WITH CHECK ADD  CONSTRAINT [FK_ClaimApprovalStatusTrackers_ApprovalLevels_ApprovalLevelId] FOREIGN KEY([ApprovalLevelId])
+ALTER TABLE [dbo].[ClaimApprovalStatusTrackers]  WITH CHECK ADD  CONSTRAINT [FK_ClaimApprovalStatusTrackers_ApprovalLevels_ApprovalLevelId] FOREIGN KEY([ApprovalLevelId])
 REFERENCES [dbo].[ApprovalLevels] ([Id])
 GO
 ALTER TABLE [dbo].[ClaimApprovalStatusTrackers] CHECK CONSTRAINT [FK_ClaimApprovalStatusTrackers_ApprovalLevels_ApprovalLevelId]
@@ -395,7 +357,6 @@ ALTER TABLE [dbo].[Departments] CHECK CONSTRAINT [FK_Departments_CostCentres_Cos
 GO
 ALTER TABLE [dbo].[DisbursementsAndClaimsMasters]  WITH CHECK ADD  CONSTRAINT [FK_DisbursementsAndClaimsMasters_ApprovalStatusTypes_ApprovalStatusId] FOREIGN KEY([ApprovalStatusId])
 REFERENCES [dbo].[ApprovalStatusTypes] ([Id])
-
 GO
 ALTER TABLE [dbo].[DisbursementsAndClaimsMasters] CHECK CONSTRAINT [FK_DisbursementsAndClaimsMasters_ApprovalStatusTypes_ApprovalStatusId]
 GO
@@ -466,6 +427,19 @@ ALTER TABLE [dbo].[Employees]  WITH CHECK ADD  CONSTRAINT [FK_Employees_Employme
 REFERENCES [dbo].[EmploymentTypes] ([Id])
 ON DELETE CASCADE
 GO
+
+
+ALTER TABLE [dbo].[Employees]  WITH CHECK ADD  CONSTRAINT [FK_Employees_EmployeeStatus_EmployeeStatusId] FOREIGN KEY([EmployeeStatusId])
+REFERENCES [dbo].[EmployeeStatus] ([Id])
+GO
+ALTER TABLE [dbo].[Employees] CHECK CONSTRAINT [FK_Employees_EmployeeStatus_EmployeeStatusId]
+GO
+
+
+
+
+
+
 ALTER TABLE [dbo].[Employees] CHECK CONSTRAINT [FK_Employees_EmploymentTypes_EmploymentTypeId]
 GO
 ALTER TABLE [dbo].[Employees]  WITH CHECK ADD  CONSTRAINT [FK_Employees_JobRoles_RoleId] FOREIGN KEY([RoleId])
@@ -499,11 +473,6 @@ ALTER TABLE [dbo].[ExpenseReimburseRequests]  WITH CHECK ADD  CONSTRAINT [FK_Exp
 REFERENCES [dbo].[WorkTasks] ([Id])
 GO
 ALTER TABLE [dbo].[ExpenseReimburseRequests] CHECK CONSTRAINT [FK_ExpenseReimburseRequests_WorkTasks_WorkTaskId]
-GO
-ALTER TABLE [dbo].[PettyCashRequests]  WITH CHECK ADD  CONSTRAINT [FK_PettyCashRequests_ApprovalStatusTypes_ApprovalStatusTypeId] FOREIGN KEY([ApprovalStatusTypeId])
-REFERENCES [dbo].[ApprovalStatusTypes] ([Id])
-GO
-ALTER TABLE [dbo].[PettyCashRequests] CHECK CONSTRAINT [FK_PettyCashRequests_ApprovalStatusTypes_ApprovalStatusTypeId]
 GO
 ALTER TABLE [dbo].[PettyCashRequests]  WITH CHECK ADD  CONSTRAINT [FK_PettyCashRequests_Departments_DepartmentId] FOREIGN KEY([DepartmentId])
 REFERENCES [dbo].[Departments] ([Id])
@@ -626,6 +595,13 @@ GO
 /*	}											*/
 /* /////////////////////////////////////////////// */
 GO
+SET IDENTITY_INSERT [dbo].[RequestTypes] ON 
+
+INSERT [dbo].[RequestTypes] ([Id], [RequestName], [RequestTypeDesc]) VALUES (1, N'Cash Advance Request', N'Petty Cash Advance Request')
+INSERT [dbo].[RequestTypes] ([Id], [RequestName], [RequestTypeDesc]) VALUES (2, N'Expense Reimbursement', N'Expense Remimbursement Claim Request')
+SET IDENTITY_INSERT [dbo].[RequestTypes] OFF
+GO
+
 SET IDENTITY_INSERT [dbo].[ApprovalGroups] ON 
 
 INSERT [dbo].[ApprovalGroups] ([Id], [ApprovalGroupCode], [ApprovalGroupDesc]) VALUES (1, N'APPGRP-01', N'APPROVER GROUP 1')
@@ -637,14 +613,15 @@ SET IDENTITY_INSERT [dbo].[CostCentres] ON
 
 INSERT [dbo].[CostCentres] ([Id], [CostCentreCode], [CostCentreDesc]) VALUES (1, N'CC1001', N'COST CENTRE FOR EXP')
 INSERT [dbo].[CostCentres] ([Id], [CostCentreCode], [CostCentreDesc]) VALUES (2, N'CC1002', N'COST EXPENSE TRACKING')
+INSERT [dbo].[CostCentres] ([Id], [CostCentreCode], [CostCentreDesc]) VALUES (3, N'NW1002', N'OVERSEAS COST TRACKING')
 SET IDENTITY_INSERT [dbo].[CostCentres] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Departments] ON 
 
 INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId]) VALUES (1, N'MFGDEPT-01', N'MANUFACTURING', 1)
 INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId]) VALUES (2, N'MFGDEPT-02', N'MANUFACT UNIT 2', 2)
-INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId]) VALUES (3, N'ggg', N'ggg', 2)
-INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId]) VALUES (4, N'ggg', N'ggg', 2)
+INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId]) VALUES (3, N'FINDEPT-01', N'CHENNAI FINANCE DEPT', 3)
+INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId]) VALUES (4, N'FINDEPT-02', N'DUBAI FINANCE DEPT', 3)
 SET IDENTITY_INSERT [dbo].[Departments] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmploymentTypes] ON 
@@ -655,6 +632,17 @@ INSERT [dbo].[EmploymentTypes] ([Id], [EmpJobTypeCode], [EmpJobTypeDesc]) VALUES
 INSERT [dbo].[EmploymentTypes] ([Id], [EmpJobTypeCode], [EmpJobTypeDesc]) VALUES (4, N'DEPUTEMP', N'DEPUTED EMPLOYEE')
 SET IDENTITY_INSERT [dbo].[EmploymentTypes] OFF
 GO
+
+
+SET IDENTITY_INSERT [dbo].[EmployeeStatus] ON 
+
+INSERT INTO [dbo].[EmployeeStatus] ([Id],[EmpStatus] ,[StatusDesc]) VALUES (1, N'Active', N'Employee Hired')
+INSERT INTO [dbo].[EmployeeStatus] ([Id],[EmpStatus] ,[StatusDesc]) VALUES (2, N'Inactive', N'Terminated/Resigned')
+SET IDENTITY_INSERT [dbo].[EmployeeStatus] OFF
+GO
+
+
+
 SET IDENTITY_INSERT [dbo].[JobRoles] ON 
 
 INSERT [dbo].[JobRoles] ([Id], [RoleCode], [RoleName], [MaxPettyCashAllowed]) VALUES (1, N'BASEEMP', N'EMPLOYEE', 10000)
@@ -665,9 +653,9 @@ SET IDENTITY_INSERT [dbo].[JobRoles] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Employees] ON 
 
-INSERT [dbo].[Employees] ([Id], [FirstName], [MiddleName], [LastName], [EmpCode], [BankAccount], [BankCardNo], [NationalID], [PassportNo], [TaxNumber], [Nationality], [DOB], [DOJ], [Gender], [Email], [MobileNumber], [EmploymentTypeId], [DepartmentId], [RoleId], [ApprovalGroupId]) VALUES (1, N'EMPFNAME', N'EMPMNAME', N'EMPLNAME', N'CEMP001', N'7098080', N'0808080', N'8080808', N'808080', N'09800800', N'Indian', CAST(N'2021-03-24T04:13:08.1230000' AS DateTime2), CAST(N'2021-03-19T04:13:08.0560000' AS DateTime2), N'male', N'user@mailinator.com', N'8297333325', 1, 1, 1, 1)
-INSERT [dbo].[Employees] ([Id], [FirstName], [MiddleName], [LastName], [EmpCode], [BankAccount], [BankCardNo], [NationalID], [PassportNo], [TaxNumber], [Nationality], [DOB], [DOJ], [Gender], [Email], [MobileNumber], [EmploymentTypeId], [DepartmentId], [RoleId], [ApprovalGroupId]) VALUES (2, N'Mamanger', N'Mgr', N'MgrLNAME', N'080', N'808080808', N'80808080', N'89080980980', N'809809809', N'98098098', N'Indian', CAST(N'2021-03-16T04:40:14.2760000' AS DateTime2), CAST(N'2021-03-16T04:40:14.1460000' AS DateTime2), N'male', N'manager@mailinator.com', N'80808080', 1, 1, 3, 1)
-INSERT [dbo].[Employees] ([Id], [FirstName], [MiddleName], [LastName], [EmpCode], [BankAccount], [BankCardNo], [NationalID], [PassportNo], [TaxNumber], [Nationality], [DOB], [DOJ], [Gender], [Email], [MobileNumber], [EmploymentTypeId], [DepartmentId], [RoleId], [ApprovalGroupId]) VALUES (3, N'Supervisor', N'Super', N'SLNAME', N'8080', N'8080808', N'80980808', N'80808080', N'80808080', N'808080', N'Indian', CAST(N'2021-03-17T04:43:09.2680000' AS DateTime2), CAST(N'2021-03-23T04:43:09.2170000' AS DateTime2), N'male', N'super@mailinator.com', N'808088080', 1, 1, 2, 1)
+INSERT [dbo].[Employees] ([Id], [FirstName], [MiddleName], [LastName], [EmpCode], [BankAccount], [BankCardNo], [NationalID], [PassportNo], [TaxNumber], [Nationality], [DOB], [DOJ], [Gender], [Email], [MobileNumber], [EmploymentTypeId], [DepartmentId], [RoleId], [ApprovalGroupId], [EmployeeStatusId]) VALUES (1, N'EMPFNAME', N'EMPMNAME', N'EMPLNAME', N'CEMP001', N'7098080', N'0808080', N'8080808', N'808080', N'09800800', N'Indian', CAST(N'2021-03-24T04:13:08.1230000' AS DateTime2), CAST(N'2021-03-19T04:13:08.0560000' AS DateTime2), N'male', N'user@mailinator.com', N'8297333325', 1, 1, 1, 1, 1)
+INSERT [dbo].[Employees] ([Id], [FirstName], [MiddleName], [LastName], [EmpCode], [BankAccount], [BankCardNo], [NationalID], [PassportNo], [TaxNumber], [Nationality], [DOB], [DOJ], [Gender], [Email], [MobileNumber], [EmploymentTypeId], [DepartmentId], [RoleId], [ApprovalGroupId], [EmployeeStatusId]) VALUES (2, N'Mamanger', N'Mgr', N'MgrLNAME', N'080', N'808080808', N'80808080', N'89080980980', N'809809809', N'98098098', N'Indian', CAST(N'2021-03-16T04:40:14.2760000' AS DateTime2), CAST(N'2021-03-16T04:40:14.1460000' AS DateTime2), N'male', N'manager@mailinator.com', N'80808080', 1, 1, 3, 1, 1)
+INSERT [dbo].[Employees] ([Id], [FirstName], [MiddleName], [LastName], [EmpCode], [BankAccount], [BankCardNo], [NationalID], [PassportNo], [TaxNumber], [Nationality], [DOB], [DOJ], [Gender], [Email], [MobileNumber], [EmploymentTypeId], [DepartmentId], [RoleId], [ApprovalGroupId], [EmployeeStatusId]) VALUES (3, N'Supervisor', N'Super', N'SLNAME', N'8080', N'8080808', N'80980808', N'80808080', N'80808080', N'808080', N'Indian', CAST(N'2021-03-17T04:43:09.2680000' AS DateTime2), CAST(N'2021-03-23T04:43:09.2170000' AS DateTime2), N'male', N'super@mailinator.com', N'808088080', 1, 1, 2, 1, 1)
 SET IDENTITY_INSERT [dbo].[Employees] OFF
 GO
 SET IDENTITY_INSERT [dbo].[ApprovalLevels] ON 
@@ -686,11 +674,18 @@ SET IDENTITY_INSERT [dbo].[ApprovalRoleMaps] OFF
 GO
 SET IDENTITY_INSERT [dbo].[ApprovalStatusTypes] ON 
 
-INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (1, N'Pending', N'Request is Initiated but Pending Approval')
-INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (2, N'Approved', N'Request Approved')
-INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (3, N'Rejected', N'Request is Rejected')
+INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (1, N'Initiating', N'Request Initiated')
+INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (2, N'Pending', N'Awaiting Approval')
+INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (3, N'In Review', N'Request is in Process')
+INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (4, N'Approved', N'Request Approved')
+INSERT [dbo].[ApprovalStatusTypes] ([Id], [Status], [StatusDesc]) VALUES (5, N'Rejected', N'Request is Rejected')
 SET IDENTITY_INSERT [dbo].[ApprovalStatusTypes] OFF
 GO
+
+
+
+
+
 INSERT [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (N'2abf2af3-dc89-4f3f-adaa-6c136358e9b0', N'Admin', N'ADMIN', N'a582bbb7-3421-4de7-a375-801b9ab0227d')
 INSERT [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (N'3ccf2af3-dc89-4f3f-adaa-6c136358e8c0', N'Manager', N'MANAGER', N'f582bbb7-3421-4de7-a375-801b9ab0227d')
 INSERT [dbo].[AspNetRoles] ([Id], [Name], [NormalizedName], [ConcurrencyStamp]) VALUES (N'4fff2af3-dc89-4f3f-adaa-6c136358e8c0', N'User', N'USER', N'4fffbbb7-3421-4de7-a375-801b9ab0227d')
@@ -716,3 +711,4 @@ SET IDENTITY_INSERT [dbo].[EmpCurrentPettyCashBalances] ON
 INSERT [dbo].[EmpCurrentPettyCashBalances] ([Id], [EmployeeId], [CurBalance], [UpdatedOn]) VALUES (1, 1, 10000, CAST(N'0001-01-01T00:00:00.0000000' AS DateTime2))
 SET IDENTITY_INSERT [dbo].[EmpCurrentPettyCashBalances] OFF
 GO
+

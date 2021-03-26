@@ -61,7 +61,8 @@ namespace AtoCash.Controllers
                     Id = department.Id,
                     DeptCode = department.DeptCode,
                     DeptName = department.DeptName,
-                    CostCentreId = department.CostCentreId
+                    CostCentreId = department.CostCentreId,
+                    CostCentre = _context.CostCentres.Find(department.CostCentreId).CostCentreCode
                 };
 
                 ListDepartmentDTO.Add(departmentDTO);
@@ -88,6 +89,7 @@ namespace AtoCash.Controllers
             departmentDTO.DeptCode = department.DeptCode;
             departmentDTO.DeptName = department.DeptName;
             departmentDTO.CostCentreId = department.CostCentreId;
+            departmentDTO.CostCentre = _context.CostCentres.Find(department.CostCentreId).CostCentreCode;
 
             return departmentDTO;
         }
@@ -100,19 +102,11 @@ namespace AtoCash.Controllers
         {
             if (id != departmentDto.Id)
             {
-                return Ok(new Authentication.RespStatus { Status = "Failure", Message = "Id not Valid for Department" });
-            }
-
-            var dept = _context.Departments.Where(c => c.DeptCode == departmentDto.DeptCode).FirstOrDefault();
-            if (dept != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Department Already Exists" });
+                return Conflict(new Authentication.RespStatus { Status = "Failure", Message = "Id not Valid for Department" });
             }
 
             var department = await _context.Departments.FindAsync(id);
 
-            department.Id = departmentDto.Id;
-            department.DeptCode = departmentDto.DeptCode;
             department.DeptName = departmentDto.DeptName;
             department.CostCentreId = departmentDto.CostCentreId;
 
@@ -127,7 +121,7 @@ namespace AtoCash.Controllers
             {
                 if (!DepartmentExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Department is invalid" });
                 }
                 else
                 {
@@ -135,7 +129,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Department Details Updated!" });
         }
 
         // POST: api/Departments
@@ -167,6 +161,15 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
+
+           var emp =  _context.Employees.Where(e => e.DepartmentId == id).FirstOrDefault();
+
+            if (emp !=null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Department in Use - Can't delete" });
+            }
+
+
             var department = await _context.Departments.FindAsync(id);
             if (department == null)
             {

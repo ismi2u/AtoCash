@@ -49,20 +49,20 @@ namespace AtoCash.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin")]
-        public async Task<IActionResult> PutEmploymentType(int id, EmploymentType employmentType)
+        public async Task<IActionResult> PutEmploymentType(int id, EmploymentTypeDTO employmentType)
         {
             if (id != employmentType.Id)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            var emplymtTypes = _context.EmploymentTypes.Where(e => e.EmpJobTypeCode == employmentType.EmpJobTypeCode).FirstOrDefault();
-            if (emplymtTypes != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "EmploymentType Already Exists" });
-            }
 
-            _context.Entry(employmentType).State = EntityState.Modified;
+            var empTypes = await _context.EmploymentTypes.FindAsync(id);
+            empTypes.EmpJobTypeDesc = employmentType.EmpJobTypeDesc;
+
+            _context.EmploymentTypes.Update(empTypes);
+
+            //_context.Entry(employmentType).State = EntityState.Modified;
 
             try
             {

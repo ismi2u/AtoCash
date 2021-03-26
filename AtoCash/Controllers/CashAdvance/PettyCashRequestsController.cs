@@ -43,20 +43,21 @@ namespace AtoCash.Controllers
 
             foreach (PettyCashRequest pettyCashRequest in pettyCashRequests)
             {
-                PettyCashRequestDTO pettyCashRequestsDTO = new()
-                {
-                    Id = pettyCashRequest.Id,
-                    EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
-                    PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
-                    PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
-                    CashReqDate = pettyCashRequest.CashReqDate,
-                    Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptName : String.Empty,
-                    Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : String.Empty,
-                    SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : String.Empty,
-                    WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : String.Empty
-                };
+                PettyCashRequestDTO pettyCashRequestDTO = new();
 
-                ListPettyCashRequestDTO.Add(pettyCashRequestsDTO);
+                pettyCashRequestDTO.Id = pettyCashRequest.Id;
+                pettyCashRequestDTO.EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName();
+                pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
+                pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
+                pettyCashRequestDTO.Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode : null;
+                pettyCashRequestDTO.ProjectId = pettyCashRequest.ProjectId;
+                pettyCashRequestDTO.Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null;
+                pettyCashRequestDTO.SubProjectId = pettyCashRequest.SubProjectId;
+                pettyCashRequestDTO.SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null;
+                pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
+                pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null;
+
+                ListPettyCashRequestDTO.Add(pettyCashRequestDTO);
             }
 
             return ListPettyCashRequestDTO;
@@ -83,6 +84,7 @@ namespace AtoCash.Controllers
             pettyCashRequestDTO.EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName();
             pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
             pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
+            pettyCashRequestDTO.Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode : null;
             pettyCashRequestDTO.ProjectId = pettyCashRequest.ProjectId;
             pettyCashRequestDTO.Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null;
             pettyCashRequestDTO.SubProjectId = pettyCashRequest.SubProjectId;
@@ -321,7 +323,7 @@ namespace AtoCash.Controllers
             }
             else
             {
-                return Ok(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
+                return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
             }
 
 
@@ -557,7 +559,7 @@ namespace AtoCash.Controllers
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
-                DepartmentId = _context.Employees.Find(reqEmpid).Department.Id
+                DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId
 
 
 

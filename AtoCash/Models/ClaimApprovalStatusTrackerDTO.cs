@@ -39,6 +39,7 @@ namespace AtoCash.Models
         public DateTime? FinalApprovedDate { get; set; }
 
         public int ApprovalStatusTypeId { get; set; }
+        public string ApprovalStatusType { get; set; }
 
     }
 }

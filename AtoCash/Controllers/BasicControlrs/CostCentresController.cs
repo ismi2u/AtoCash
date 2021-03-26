@@ -71,20 +71,18 @@ namespace AtoCash.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin")]
-        public async Task<IActionResult> PutCostCentre(int id, CostCentre costCentre)
+        public async Task<IActionResult> PutCostCentre(int id, CostCentreDTO costCentre)
         {
             if (id != costCentre.Id)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            var ccentre = _context.CostCentres.Where(c => c.CostCentreCode == costCentre.CostCentreCode).FirstOrDefault();
-            if (ccentre != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
-            }
+            var ccentre = await _context.CostCentres.FindAsync(id);
+            ccentre.CostCentreDesc = costCentre.CostCentreDesc;
+            _context.CostCentres.Update(ccentre);
 
-            _context.Entry(costCentre).State = EntityState.Modified;
+            //_context.Entry(costCentre).State = EntityState.Modified;
 
             try
             {
@@ -94,7 +92,7 @@ namespace AtoCash.Controllers
             {
                 if (!CostCentreExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Costcentre is invalid" });
                 }
                 else
                 {
@@ -102,7 +100,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "CostCentre Details Updated!" });
         }
 
         // POST: api/CostCentres
@@ -127,6 +125,18 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteCostCentre(int id)
         {
+            var dept = _context.Departments.Where(d => d.CostCentreId == id).FirstOrDefault();
+            var proj = _context.Projects.Where(p => p.CostCentreId == id).FirstOrDefault();
+
+            if (dept != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cost-Centre in use for Department" });
+            }
+            if (dept != null || proj != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cost-Centre in use for Project" });
+            }
+
             var costCentre = await _context.CostCentres.FindAsync(id);
             if (costCentre == null)
             {
@@ -136,7 +146,7 @@ namespace AtoCash.Controllers
             _context.CostCentres.Remove(costCentre);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Cost-Centre Deleted!" });
         }
 
         private bool CostCentreExists(int id)

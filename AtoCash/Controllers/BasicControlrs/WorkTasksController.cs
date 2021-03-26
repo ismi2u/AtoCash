@@ -112,6 +112,7 @@ namespace AtoCash.Controllers
                 {
                     Id = worktask.Id,
                     SubProjectId = worktask.SubProjectId,
+                    SubProject = _context.SubProjects.Find(worktask.SubProjectId).SubProjectName,
                     TaskName = worktask.TaskName,
                     TaskDesc = worktask.TaskDesc
                 };
@@ -127,7 +128,7 @@ namespace AtoCash.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WorkTaskDTO>> GetWorkTask(int id)
         {
-            WorkTaskDTO workTaskDto = new WorkTaskDTO();
+           
 
             var worktask = await _context.WorkTasks.FindAsync(id);
 
@@ -135,11 +136,15 @@ namespace AtoCash.Controllers
             {
                 return NoContent();
             }
-
-            workTaskDto.Id = worktask.Id;
-            workTaskDto.SubProjectId = worktask.SubProjectId;
-            workTaskDto.TaskName = worktask.TaskName;
-            workTaskDto.TaskDesc = worktask.TaskDesc;
+            WorkTaskDTO workTaskDto = new WorkTaskDTO
+            {
+                Id = worktask.Id,
+                SubProjectId = worktask.SubProjectId,
+                SubProject = _context.SubProjects.Find(worktask.SubProjectId).SubProjectName,
+                TaskName = worktask.TaskName,
+                TaskDesc = worktask.TaskDesc
+            };
+           
 
             return workTaskDto;
         }
@@ -156,8 +161,6 @@ namespace AtoCash.Controllers
 
             var workTask = await _context.WorkTasks.FindAsync(id);
 
-            workTask.Id = workTaskDto.Id;
-            workTask.SubProjectId = workTaskDto.SubProjectId;
             workTask.TaskName = workTaskDto.TaskName;
             workTask.TaskDesc = workTaskDto.TaskDesc;
 

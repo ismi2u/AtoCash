@@ -61,8 +61,9 @@ namespace AtoCash.Models
         public int RoleId { get; set; }
 
 
-
         public int ApprovalGroupId { get; set; }
+
+        public int EmployeeStatusId { get; set; }
 
     }
 }

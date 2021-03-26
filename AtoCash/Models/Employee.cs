@@ -88,6 +88,13 @@ namespace AtoCash.Models
         public int ApprovalGroupId { get; set; }
 
 
+        [Required]
+        [ForeignKey("EmployeeStatusId")]
+        public virtual EmployeeStatus EmployeeStatus { get; set; }
+        public int EmployeeStatusId { get; set; }
+
+
+
         public string GetFullName()
         {
 

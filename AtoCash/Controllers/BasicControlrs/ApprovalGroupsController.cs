@@ -77,6 +77,11 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is Invalid" });
             }
 
+            var agroup = await _context.ApprovalGroups.FindAsync(id);
+            agroup.ApprovalGroupDesc = approvalGroup.ApprovalGroupDesc;
+
+            _context.ApprovalGroups.Update(agroup);
+
             _context.Entry(approvalGroup).State = EntityState.Modified;
 
             try
@@ -87,7 +92,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalGroupExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "ApprovalGroup is invalid" });
                 }
                 else
                 {
@@ -95,7 +100,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "ApprovalGroup Details Updated!" });
         }
 
         // POST: api/ApprovalGroups

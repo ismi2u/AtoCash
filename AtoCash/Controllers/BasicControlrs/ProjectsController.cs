@@ -132,12 +132,6 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            var project = _context.Projects.Where(c => c.ProjectName == projectDto.ProjectName).FirstOrDefault();
-            if (project != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "ProjectName Already Exists" });
-            }
-
             var proj = await _context.Projects.FindAsync(id);
 
             proj.Id = projectDto.Id;
@@ -196,6 +190,12 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteProject(int id)
         {
+            var subProj = _context.SubProjects.Where(s => s.ProjectId == id).FirstOrDefault();
+            if (subProj != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cant Delete the Project in Use" });
+            }
+
             var project = await _context.Projects.FindAsync(id);
             if (project == null)
             {

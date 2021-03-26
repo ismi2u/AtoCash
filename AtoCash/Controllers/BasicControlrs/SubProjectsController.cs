@@ -210,6 +210,12 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> DeleteSubProject(int id)
         {
+            var wrktask = _context.WorkTasks.Where(w => w.SubProjectId == id).FirstOrDefault();
+            if (wrktask != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cant Delete the SubProject in Use" });
+            }
+
             var subProject = await _context.SubProjects.FindAsync(id);
             if (subProject == null)
             {

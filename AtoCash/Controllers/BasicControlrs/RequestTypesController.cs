@@ -79,11 +79,9 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            var ReqType = _context.RequestTypes.Where(r => r.RequestName == requestType.RequestName).FirstOrDefault();
-            if (ReqType != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "RequestType Already Exists" });
-            }
+            var rType = await _context.RequestTypes.FindAsync(id);
+            rType.RequestTypeDesc = requestType.RequestTypeDesc;
+            _context.RequestTypes.Update(rType);
 
             _context.Entry(requestType).State = EntityState.Modified;
 

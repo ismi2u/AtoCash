@@ -12,6 +12,7 @@ namespace AtoCash.Models
     {
         public int Id { get; set; }
         public int SubProjectId { get; set; }
+        public string SubProject { get; set; }
         public string TaskName { get; set; }
         public string TaskDesc { get; set; }
 

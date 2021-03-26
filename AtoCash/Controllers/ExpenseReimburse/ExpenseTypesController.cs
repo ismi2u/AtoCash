@@ -83,6 +83,12 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<ActionResult<ExpenseType>> PostExpenseType(ExpenseType expenseType)
         {
+            var eType = _context.ExpenseTypes.Where(e => e.ExpenseTypeName == expenseType.ExpenseTypeName).FirstOrDefault();
+            if (eType != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense Type Already Exists" });
+            }
+
             _context.ExpenseTypes.Add(expenseType);
             await _context.SaveChangesAsync();
 

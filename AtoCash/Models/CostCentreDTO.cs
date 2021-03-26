@@ -7,18 +7,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtoCash.Models
 {
-    public class DepartmentDTO
+    public class CostCentreDTO
     {
 
         public int Id { get; set; }
-
-        public string DeptCode { get; set; }
-
-        public string DeptName { get; set; }
-
-        public int CostCentreId { get; set; }
-
-        public string CostCentre { get; set; }
+        public string CostCentreCode { get; set; }
+        public string CostCentreDesc{ get; set; }
 
     }
 }

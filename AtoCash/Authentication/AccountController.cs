@@ -106,6 +106,20 @@ namespace AtoCash.Authentication
                 return Unauthorized(new RespStatus { Status = "Failure", Message = "Username or Password Incorrect" });
             }
 
+            if (user.EmployeeId!=0)
+            {
+                var empleeee = context.Employees.Find(user.EmployeeId);
+                bool isEmpActive = empleeee.EmployeeStatusId == 1 ? true : false;
+                if (!isEmpActive)
+                {
+                    return Unauthorized(new RespStatus { Status = "Failure", Message = "Employee is Inactive" });
+                }
+
+            }
+
+            //check if the employee is 1. active or 2.inactive to deny login
+          
+
            var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, false);
             
 

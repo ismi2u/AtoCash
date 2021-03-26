@@ -140,7 +140,7 @@ namespace AtoCash.Controllers
                     return GetExcel("CashReimburseReportByEmployee", dt);
                 }
             }
-            return Ok(new RespStatus() { Status = "Failure", Message = "User Id not valid" });
+            return Conflict(new RespStatus() { Status = "Failure", Message = "User Id not valid" });
         }
 
 
@@ -220,7 +220,7 @@ namespace AtoCash.Controllers
                 return GetExcel("CashReimburseReportByAdmin", dt);
             }
 
-            return Ok(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
+            return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
 
         }
 
@@ -303,7 +303,7 @@ namespace AtoCash.Controllers
                 return GetExcel("TravelRequestReportByEmployee", dt);
             }
 
-            return Ok(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
+            return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
 
         }
 
@@ -383,7 +383,7 @@ namespace AtoCash.Controllers
                 return GetExcel("TravelRequestReportByAdmin", dt);
             }
 
-            return Ok(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
+            return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
         }
 
 

@@ -119,6 +119,8 @@ namespace AtoCash.Controllers
             employeeDTO.DepartmentId = employee.DepartmentId;
             employeeDTO.RoleId = employee.RoleId;
             employeeDTO.ApprovalGroupId = employee.ApprovalGroupId;
+            employeeDTO.EmployeeStatusId = employee.EmployeeStatusId;
+
 
             return employeeDTO;
         }
@@ -135,19 +137,20 @@ namespace AtoCash.Controllers
 
             var emp = _context.Employees.Find(employeeDto.Id);
 
-            int testEmpId = _context.Employees.Where(e => e.MobileNumber == employeeDto.MobileNumber).Select(x => x.Id).FirstOrDefault();
+            int _testempId = _context.Employees.Where(e => e.MobileNumber == employeeDto.MobileNumber || e.EmpCode == employeeDto.EmpCode || e.Email == employeeDto.Email).Select(x => x.Id).FirstOrDefault();
 
-            if (employeeDto.Id != testEmpId)
+            if (employeeDto.Id != _testempId)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Mobile Number should be unique" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Unique EmpCode/Mobile/Email required" });
             }
+            
 
 
-            var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
-            if (emplye != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
-            }
+            //var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
+            //if (emplye != null)
+            //{
+            //    return Conflict(new RespStatus { Status = "Failure", Message = "Employee Already Exists" });
+            //}
 
             var employee = await _context.Employees.FindAsync(id);
 
@@ -171,6 +174,7 @@ namespace AtoCash.Controllers
             employee.DepartmentId = employeeDto.DepartmentId;
             employee.RoleId = employeeDto.RoleId;
             employee.ApprovalGroupId = employeeDto.ApprovalGroupId;
+            employee.EmployeeStatusId = employeeDto.EmployeeStatusId;
 
             _context.Employees.Update(employee);
             //_context.Entry(employeeDto).State = EntityState.Modified;
@@ -183,7 +187,7 @@ namespace AtoCash.Controllers
             {
                 if (!EmployeeExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Employee Doesnt Exist!" });
                 }
                 else
                 {
@@ -191,7 +195,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Employee Records Updated!" });
         }
 
         // POST: api/Employees
@@ -230,8 +234,9 @@ namespace AtoCash.Controllers
                 EmploymentTypeId = employeeDto.EmploymentTypeId,
                 DepartmentId = employeeDto.DepartmentId,
                 RoleId = employeeDto.RoleId,
-                ApprovalGroupId = employeeDto.ApprovalGroupId
-            };
+                ApprovalGroupId = employeeDto.ApprovalGroupId,
+                EmployeeStatusId = employeeDto.EmployeeStatusId
+        };
 
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();

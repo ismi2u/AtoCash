@@ -71,21 +71,19 @@ namespace AtoCash.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin")]
-        public async Task<IActionResult> PutRole(int id, JobRole role)
+        public async Task<IActionResult> PutRole(int id, JobRoleDTO role)
         {
             if (id != role.Id)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            var jRole = _context.JobRoles.Where(c => c.RoleCode == role.RoleCode).FirstOrDefault();
-            if (jRole != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "JobRole Already Exists" });
-            }
+            var jRole = await _context.JobRoles.FindAsync(id);
+            jRole.RoleName = role.RoleName;
+            jRole.MaxPettyCashAllowed = role.MaxPettyCashAllowed;
+            _context.JobRoles.Update(jRole);
 
-
-            _context.Entry(role).State = EntityState.Modified;
+            //_context.Entry(role).State = EntityState.Modified;
 
             try
             {

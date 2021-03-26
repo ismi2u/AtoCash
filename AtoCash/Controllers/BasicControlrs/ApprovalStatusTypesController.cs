@@ -56,6 +56,10 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var aStatusType = await _context.ApprovalStatusTypes.FindAsync(id);
+            aStatusType.StatusDesc = approvalStatusType.StatusDesc;
+            _context.ApprovalStatusTypes.Update(aStatusType);
+
             _context.Entry(approvalStatusType).State = EntityState.Modified;
 
             try
