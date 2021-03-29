@@ -13,6 +13,9 @@ namespace AtoCash.Models
         public int Id { get; set; }
         public string ProjectName { get; set; }
         public int CostCentreId { get; set; }
+        public string CostCentre { get; set; }
+        public int ProjectManagerId { get; set; }
+        public string ProjectManager { get; set; }
         public string ProjectDesc{ get; set; }
 
     }

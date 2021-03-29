@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class EmpCurrentPettyCashBalancesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -72,7 +72,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/EmpCurrentPettyCashBalances/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutEmpCurrentPettyCashBalance(int id, EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDto)
         {
             if (id != empCurrentPettyCashBalanceDto.Id)
@@ -111,7 +111,7 @@ namespace AtoCash.Controllers
 
         // POST: api/EmpCurrentPettyCashBalances
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<EmpCurrentPettyCashBalance>> PostEmpCurrentPettyCashBalance(EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDto)
         {
             EmpCurrentPettyCashBalance empCurrentPettyCashBalance = new EmpCurrentPettyCashBalance
@@ -146,7 +146,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/EmpCurrentPettyCashBalances/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteEmpCurrentPettyCashBalance(int id)
         {
             var empCurrentPettyCashBalance = await _context.EmpCurrentPettyCashBalances.FindAsync(id);

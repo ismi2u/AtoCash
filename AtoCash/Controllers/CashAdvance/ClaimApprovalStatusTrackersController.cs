@@ -15,7 +15,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, User, Manager")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User, Manager")]
     public class ClaimApprovalStatusTrackersController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -67,7 +67,7 @@ namespace AtoCash.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ClaimApprovalStatusTrackerDTO>> GetClaimApprovalStatusTracker(int id)
         {
-            
+
 
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
 
@@ -107,70 +107,152 @@ namespace AtoCash.Controllers
 
         // PUT: api/ClaimApprovalStatusTrackers/5
 
-        [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
-        public async Task<IActionResult> PutClaimApprovalStatusTracker(int id, ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto)
+        [HttpPut]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager")]
+        public async Task<IActionResult> PutClaimApprovalStatusTracker(List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDto)
         {
-            if (id != claimApprovalStatusTrackerDto.Id)
+
+            if (ListClaimApprovalStatusTrackerDto.Count == 0)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "No Request to Approve!" });
             }
 
-            var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
-
-            claimApprovalStatusTracker.Id = claimApprovalStatusTrackerDto.Id;
-            claimApprovalStatusTracker.EmployeeId = claimApprovalStatusTrackerDto.EmployeeId;
-            claimApprovalStatusTracker.PettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId;
-            claimApprovalStatusTracker.ExpenseReimburseRequestId = claimApprovalStatusTrackerDto.ExpenseReimburseRequestId;
-            claimApprovalStatusTracker.DepartmentId = claimApprovalStatusTrackerDto.DepartmentId;
-            claimApprovalStatusTracker.ProjectId = claimApprovalStatusTrackerDto.ProjectId;
-            claimApprovalStatusTracker.RoleId = claimApprovalStatusTrackerDto.RoleId;
-            claimApprovalStatusTracker.ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId;
-            claimApprovalStatusTracker.ReqDate = claimApprovalStatusTrackerDto.ReqDate;
-            claimApprovalStatusTracker.FinalApprovedDate = claimApprovalStatusTrackerDto.FinalApprovedDate;
-            claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
-
-            int empApprGroupId = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).ApprovalGroupId;
-
-            //if it is approved then trigger next approver level email
-            if (claimApprovalStatusTracker.ApprovalStatusTypeId == (int)ApprovalStatus.Pending &&
-                claimApprovalStatusTrackerDto.ApprovalStatusTypeId == (int)ApprovalStatus.Approved)
+            //if (id != claimApprovalStatusTrackerDto.Id)
+            //{
+            //    return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+            //}
+            bool isNextApproverAvailable = true;
+            foreach (ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto in ListClaimApprovalStatusTrackerDto)
             {
-                var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).ToList().OrderBy(a => a.ApprovalLevel);
+                var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(claimApprovalStatusTrackerDto.Id);
 
-                foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
+                //if same status continue to next loop, otherwise process
+                if (claimApprovalStatusTracker.ApprovalStatusTypeId == claimApprovalStatusTrackerDto.ApprovalStatusTypeId)
+                {
+                    continue;
+                }
+
+                claimApprovalStatusTracker.Id = claimApprovalStatusTrackerDto.Id;
+                claimApprovalStatusTracker.EmployeeId = claimApprovalStatusTrackerDto.EmployeeId;
+                claimApprovalStatusTracker.PettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId;
+                claimApprovalStatusTracker.ExpenseReimburseRequestId = claimApprovalStatusTrackerDto.ExpenseReimburseRequestId;
+                claimApprovalStatusTracker.DepartmentId = claimApprovalStatusTrackerDto.DepartmentId;
+                claimApprovalStatusTracker.ProjectId = claimApprovalStatusTrackerDto.ProjectId;
+                claimApprovalStatusTracker.RoleId = claimApprovalStatusTrackerDto.RoleId;
+                claimApprovalStatusTracker.ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId;
+                claimApprovalStatusTracker.ReqDate = claimApprovalStatusTrackerDto.ReqDate;
+                claimApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
+
+                ClaimApprovalStatusTracker claimitem;
+                if (claimApprovalStatusTrackerDto.DepartmentId != null)
+                {
+                    int empApprGroupId = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).ApprovalGroupId;
+
+                    //Check if the record is already approved
+                    //if it is not approved then trigger next approver level email & Change the status to approved
+                    if (claimApprovalStatusTrackerDto.ApprovalStatusTypeId == (int)ApprovalStatus.Approved)
+                    {
+                        //Get the next approval level (get its ID)
+                        int qPettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId ?? 0;
+
+                        isNextApproverAvailable = true;
+
+                        int CurClaimApprovalLevel = _context.ApprovalLevels.Find(claimApprovalStatusTrackerDto.ApprovalLevelId).Level;
+                        int nextClaimApprovalLevel = CurClaimApprovalLevel + 1;
+                        int qApprovalLevelId;
+                        if (_context.ApprovalLevels.Where(x => x.Level == nextClaimApprovalLevel).FirstOrDefault() != null)
+                        {
+                            qApprovalLevelId = _context.ApprovalLevels.Where(x => x.Level == nextClaimApprovalLevel).FirstOrDefault().Id;
+                        }
+                        else
+                        {
+                            qApprovalLevelId = _context.ApprovalLevels.Where(x => x.Level == CurClaimApprovalLevel).FirstOrDefault().Id;
+                            isNextApproverAvailable = false;
+                        }
+
+                        int qApprovalStatusTypeId = isNextApproverAvailable ? (int)ApprovalStatus.Initiating : (int)ApprovalStatus.Pending;
+
+                        //update the next level approver Track request to PENDING (from Initiating) 
+                        //if claimitem is not null change the status
+                        if (isNextApproverAvailable)
+                        {
+                            claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == qPettyCashRequestId &&
+                                c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
+                                c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
+                            claimitem.ApprovalStatusTypeId = (int)ApprovalStatus.Pending;
+
+                        }
+                        else
+                        {
+                            //final approver hence update PettyCashRequest
+                            claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == qPettyCashRequestId &&
+                               c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
+                               c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
+                            //claimitem.ApprovalStatusTypeId = (int)ApprovalStatus.Approved;
+                            claimitem.FinalApprovedDate = DateTime.Now;
+
+                            //DisbursementAndClaimsMaster update the record to Approved (ApprovalStatusId
+                            int disbAndClaimItemId = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == claimitem.PettyCashRequestId).FirstOrDefault().Id;
+                            var disbAndClaimItem = await _context.DisbursementsAndClaimsMasters.FindAsync(disbAndClaimItemId);
+
+                            disbAndClaimItem.ApprovalStatusId = (int)ApprovalStatus.Approved;
+                            _context.Update(disbAndClaimItem);
+                        }
+
+                        //Save to database
+                        _context.Update(claimitem);
+                        await _context.SaveChangesAsync();
+                        var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).OrderBy(a => a.ApprovalLevel).ToList();
+
+                        foreach (var ApprMap in getEmpClaimApproversAllLevels)
+                        {
+
+                            //only next level (level + 1) approver is considered here
+                            if (ApprMap.ApprovalLevelId == claimApprovalStatusTracker.ApprovalLevelId + 1)
+                            {
+                                int role_id = ApprMap.RoleId;
+                                var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
+
+                                //##### 4. Send email to the Approver
+                                //####################################
+                                var approverMailAddress = approver.Email;
+                                string subject = "Pettycash Request Approval " + claimApprovalStatusTracker.PettyCashRequestId.ToString();
+                                Employee emp = await _context.Employees.FindAsync(claimApprovalStatusTracker.EmployeeId);
+                                var pettycashreq = _context.PettyCashRequests.Find(claimApprovalStatusTracker.PettyCashRequestId);
+                                string content = "Petty Cash Approval sought by " + emp.FirstName + "<br/>Cash Request for the amount of " + pettycashreq.PettyClaimAmount + "<br/>towards " + pettycashreq.PettyClaimRequestDesc;
+                                var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+
+                                await _emailSender.SendEmailAsync(messagemail);
+
+                                break;
+
+                            }
+                        }
+                    }
+
+                    //if nothing else then just update the approval status
+                    claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
+
+
+                }
+                else
                 {
 
-                    //only next level (level + 1) approver is considered here
-                    if (ApprMap.ApprovalLevelId == claimApprovalStatusTracker.ApprovalLevelId + 1)
-                    {
-                        int role_id = ApprMap.RoleId;
-                        var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
+                    //final approver hence update PettyCashRequest
+                    claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == claimApprovalStatusTracker.PettyCashRequestId &&
+                                c.ApprovalStatusTypeId == (int)ApprovalStatus.Pending).FirstOrDefault();
+                    claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
+                    //DisbursementAndClaimsMaster update the record to Approved (ApprovalStatusId
+                    int disbAndClaimItemId = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == claimitem.PettyCashRequestId).FirstOrDefault().Id;
+                    var disbAndClaimItem = await _context.DisbursementsAndClaimsMasters.FindAsync(disbAndClaimItemId);
 
-                        //##### 4. Send email to the Approver
-                        //####################################
-                        var approverMailAddress = approver.Email;
-                        string subject = "Pettycash Request Approval " + claimApprovalStatusTracker.PettyCashRequestId.ToString();
-                        Employee emp = await _context.Employees.FindAsync(claimApprovalStatusTracker.EmployeeId);
-                        var pettycashreq = _context.PettyCashRequests.Find(claimApprovalStatusTracker.PettyCashRequestId);
-                        string content = "Petty Cash Approval sought by " + emp.FirstName + "/nCash Request for the amount of " + pettycashreq.PettyClaimAmount + "/ntowards " + pettycashreq.PettyClaimRequestDesc;
-                        var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+                    disbAndClaimItem.ApprovalStatusId = (int)ApprovalStatus.Approved;
+                    _context.Update(disbAndClaimItem);
 
-                        await _emailSender.SendEmailAsync(messagemail);
-
-                        break;
-
-                    }
                 }
+
+                _context.ClaimApprovalStatusTrackers.Update(claimApprovalStatusTracker);
             }
-
-
-            //if not then just update the approval status
-            claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
-
-
-            _context.ClaimApprovalStatusTrackers.Update(claimApprovalStatusTracker);
-            //_context.Entry(claimApprovalStatusTracker).State = EntityState.Modified;
 
             try
             {
@@ -178,23 +260,18 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ClaimApprovalStatusTrackerExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
         }
 
+
+
         // POST: api/ClaimApprovalStatusTrackers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<ClaimApprovalStatusTracker>> PostClaimApprovalStatusTracker(ClaimApprovalStatusTracker claimApprovalStatusTrackerDto)
         {
             ClaimApprovalStatusTracker claimApprovalStatusTracker = new ClaimApprovalStatusTracker
@@ -220,7 +297,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ClaimApprovalStatusTrackers/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteClaimApprovalStatusTracker(int id)
         {
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);

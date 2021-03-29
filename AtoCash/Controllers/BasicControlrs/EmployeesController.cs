@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager, User")]
     public class EmployeesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -36,7 +36,7 @@ namespace AtoCash.Controllers
                 EmployeeVM employeeVM = new EmployeeVM
                 {
                     Id = employee.Id,
-                    FullName = employee.FirstName + " " + employee.MiddleName + " " + employee.LastName
+                    FullName = employee.EmpCode + " " + employee.FirstName + " " + employee.MiddleName + " " + employee.LastName
                 };
 
                 ListEmployeeVM.Add(employeeVM);
@@ -127,7 +127,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/Employees/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutEmployee(int id, EmployeeDTO employeeDto)
         {
             if (id != employeeDto.Id)
@@ -200,7 +200,7 @@ namespace AtoCash.Controllers
 
         // POST: api/Employees
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<Employee>> PostEmployee(EmployeeDTO employeeDto)
         {
 
@@ -246,7 +246,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Employees/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
             var employee = await _context.Employees.FindAsync(id);

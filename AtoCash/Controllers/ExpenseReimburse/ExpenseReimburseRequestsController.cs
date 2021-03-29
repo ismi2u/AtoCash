@@ -18,7 +18,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class ExpenseReimburseRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -106,7 +106,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/ExpenseReimburseRequests/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutExpenseReimburseRequest(int id, ExpenseReimburseRequestDTO expenseReimburseRequestDto)
         {
             if (id != expenseReimburseRequestDto.Id)
@@ -152,7 +152,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ExpenseReimburseRequests
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<ExpenseReimburseRequest>> PostExpenseReimburseRequest(List<ExpenseReimburseRequestDTO> listExpenseReimburseRequestDto)
         {
             
@@ -282,7 +282,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ExpenseReimburseRequests/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteExpenseReimburseRequest(int id)
         {
             var expenseReimburseRequest = await _context.ExpenseReimburseRequests.FindAsync(id);

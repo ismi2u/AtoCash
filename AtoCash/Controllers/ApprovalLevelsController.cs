@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class ApprovalLevelsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -73,7 +73,7 @@ namespace AtoCash.Controllers
         // PUT: api/ApprovalLevels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutApprovalLevel(int id, ApprovalLevelDTO approvalLevelDTO)
         {
             if (id != approvalLevelDTO.Id)
@@ -111,7 +111,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ApprovalLevels
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<ApprovalLevel>> PostApprovalLevel(ApprovalLevelDTO approvalLevelDto)
         {
 
@@ -144,7 +144,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalLevels/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteApprovalLevel(int id)
         {
             var approvalLevel = await _context.ApprovalLevels.FindAsync(id);

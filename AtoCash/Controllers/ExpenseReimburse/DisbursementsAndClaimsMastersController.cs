@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class DisbursementsAndClaimsMastersController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -89,7 +89,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/DisbursementsAndClaimsMasters/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutDisbursementsAndClaimsMaster(int id, DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDto)
         {
             if (id != disbursementsAndClaimsMasterDto.Id)
@@ -138,7 +138,7 @@ namespace AtoCash.Controllers
 
         // POST: api/DisbursementsAndClaimsMasters
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<DisbursementsAndClaimsMaster>> PostDisbursementsAndClaimsMaster(DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDto)
         {
             DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new DisbursementsAndClaimsMaster
@@ -166,7 +166,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/DisbursementsAndClaimsMasters/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteDisbursementsAndClaimsMaster(int id)
         {
             var disbursementsAndClaimsMaster = await _context.DisbursementsAndClaimsMasters.FindAsync(id);

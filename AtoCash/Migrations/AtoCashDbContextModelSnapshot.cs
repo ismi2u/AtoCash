@@ -643,6 +643,9 @@ namespace AtoCash.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("ProjectManagerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProjectName")
                         .IsRequired()
                         .HasColumnType("nvarchar(25)");
@@ -650,6 +653,8 @@ namespace AtoCash.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CostCentreId");
+
+                    b.HasIndex("ProjectManagerId");
 
                     b.ToTable("Projects");
                 });
@@ -1287,7 +1292,15 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AtoCash.Models.Employee", "ProjectManager")
+                        .WithMany()
+                        .HasForeignKey("ProjectManagerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("CostCentre");
+
+                    b.Navigation("ProjectManager");
                 });
 
             modelBuilder.Entity("AtoCash.Models.ProjectManagement", b =>

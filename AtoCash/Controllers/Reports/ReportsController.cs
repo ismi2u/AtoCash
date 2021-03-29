@@ -20,7 +20,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, Users")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Users")]
     public class ReportsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -58,7 +58,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("CashReimburseReportByEmployee")]
-        [Authorize(Roles = "AtominosAdmin, Admin, User")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
         public async Task<IActionResult> GetCashAdvanceReportRequestByEmployee(CashAdvanceSearchModel searchModel)
         {
            //if (!LoggedInEmpid == searchModel.EmpId)
@@ -146,7 +146,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("CashReimburseReportByAdmin")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> GetCashAdvanceReportReqestByAdmin(CashAdvanceSearchModel searchModel)
         {
             int? empId = searchModel.EmpId;
@@ -229,7 +229,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("TravelRequestReportByEmployee")]
-        [Authorize(Roles = "AtominosAdmin, Admin, User")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
         public async Task<IActionResult> GetTravelRequestReportByEmployee(TravelRequestSearchModel searchModel)
         {
             //if (!LoggedInEmpid == searchModel.EmpId)
@@ -310,7 +310,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("TravelRequestReportByAdmin")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> GetTravelRequestReportByAdmin(TravelRequestSearchModel searchModel)
         {
             int? empId = searchModel.EmpId;

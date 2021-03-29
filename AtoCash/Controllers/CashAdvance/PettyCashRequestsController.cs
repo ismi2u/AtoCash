@@ -15,8 +15,8 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    //[Authorize(Roles = "AtominosAdmin, Admin, User")]
-    [Authorize(Roles = "AtominosAdmin, Admin, User")]
+    //[Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
 
     public class PettyCashRequestsController : ControllerBase
     {
@@ -258,7 +258,7 @@ namespace AtoCash.Controllers
         // PUT: api/PettyCashRequests/5
         [HttpPut("{id}")]
         [ActionName("PutPettyCashRequest")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutPettyCashRequest(int id, PettyCashRequestDTO pettyCashRequestDto)
         {
             if (id != pettyCashRequestDto.Id)
@@ -332,7 +332,7 @@ namespace AtoCash.Controllers
         // DELETE: api/PettyCashRequests/5
         [HttpDelete("{id}")]
         [ActionName("DeletePettyCashRequest")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeletePettyCashRequest(int id)
         {
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
@@ -416,13 +416,13 @@ namespace AtoCash.Controllers
             #region
             int costCentre = _context.Projects.Find(pettyCashRequestDto.ProjectId).CostCentreId;
 
-            int projManagerid = _context.ProjectManagements.Find(pettyCashRequestDto.ProjectId).EmployeeId;
+            int projManagerid = _context.Projects.Find(pettyCashRequestDto.ProjectId).ProjectManagerId;
 
             var approver = _context.Employees.Find(projManagerid);
             ////
             int empid = pettyCashRequestDto.EmployeeId;
             Double empReqAmount = pettyCashRequestDto.PettyClaimAmount;
-            int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
+            //int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
             double maxCashAllowedForRole = (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed);
 
             if (pettyCashRequestDto.PettyClaimAmount > maxCashAllowedForRole)
@@ -458,6 +458,8 @@ namespace AtoCash.Controllers
             //##### 3. Add an entry to ClaimApproval Status tracker
             //get costcentreID based on project
             #region
+            //get the saved record Id
+            pettyCashRequestDto.Id = pcrq.Id;
 
             ClaimApprovalStatusTracker claimAppStatusTrack = new()
             {
@@ -468,7 +470,7 @@ namespace AtoCash.Controllers
                 ProjectId = pettyCashRequestDto.ProjectId,
                 RoleId = approver.RoleId,
                 // get the next ProjectManager approval.
-                //ApprovalLevelId = ApprMap.ApprovalLevelId, 
+                ApprovalLevelId = 2, // default approval level is 2 for Project based request
                 ReqDate = DateTime.Now,
                 FinalApprovedDate = null,
                 ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
@@ -534,15 +536,13 @@ namespace AtoCash.Controllers
 
             var curPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(x => x.EmployeeId == reqEmpid).FirstOrDefault();
             curPettyCashBal.Id = curPettyCashBal.Id;
-            if (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed <= empCurAvailBal - empReqAmount)
+            if (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed >= empCurAvailBal - empReqAmount)
             {
                 curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount;
             }
-            else
-            {
 
-            }
             curPettyCashBal.EmployeeId = reqEmpid;
+            curPettyCashBal.UpdatedOn = DateTime.Now;
             _context.Update(curPettyCashBal);
             await _context.SaveChangesAsync();
 
@@ -589,7 +589,7 @@ namespace AtoCash.Controllers
                 int role_id = ApprMap.RoleId;
                 var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
 
-                if (ReqEmpRoleId == approver.RoleId)
+                if (ReqEmpRoleId >= approver.RoleId)
                 {
                     continue;
                 }
@@ -607,26 +607,31 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = ApprMap.ApprovalLevelId,
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = null,
-                    ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating 
+                    //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
 
 
                 _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
                 await _context.SaveChangesAsync();
 
-                //first approver will be added as Pending, other approvers will be with In Approval Queue
-                isFirstApprover = false;
-
+               
+                if (isFirstApprover)
+                { 
                 //##### 4. Send email to the Approver
                 //####################################
                 var approverMailAddress = approver.Email;
                 string subject = "Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
                 Employee emp = await _context.Employees.FindAsync(pettyCashRequestDto.EmployeeId);
                 var pettycashreq = _context.PettyCashRequests.Find(pettyCashRequestDto.Id);
-                string content = "Petty Cash Approval sought by " + emp.FirstName + "@/nCash Request for the amount of " + pettycashreq.PettyClaimAmount + "@/ntowards " + pettycashreq.PettyClaimRequestDesc;
+                string content = "Petty Cash Approval sought by " + emp.FirstName + "@<br/>Cash Request for the amount of " + pettycashreq.PettyClaimAmount + "@<br/>towards " + pettycashreq.PettyClaimRequestDesc;
                 var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
 
                 await _emailSender.SendEmailAsync(messagemail);
+                }
+
+                //first approver will be added as Pending, other approvers will be with In Approval Queue
+                isFirstApprover = false;
 
             }
             #endregion

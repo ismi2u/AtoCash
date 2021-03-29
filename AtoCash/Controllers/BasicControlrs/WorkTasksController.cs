@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager, User")]
     public class WorkTasksController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -151,7 +151,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/WorkTasks/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutWorkTask(int id, WorkTaskDTO workTaskDto)
         {
             if (id != workTaskDto.Id)
@@ -188,7 +188,7 @@ namespace AtoCash.Controllers
 
         // POST: api/WorkTasks
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<WorkTask>> PostWorkTask(WorkTaskDTO workTaskDto)
         {
 
@@ -215,7 +215,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/WorkTasks/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteWorkTask(int id)
         {
             var workTask = await _context.WorkTasks.FindAsync(id);

@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class ApprovalRoleMapsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -76,7 +76,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/ApprovalRoleMaps/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutApprovalRoleMap(int id, ApprovalRoleMapDTO approvalRoleMapDto)
         {
             if (id != approvalRoleMapDto.Id)
@@ -117,7 +117,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ApprovalRoleMaps
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<ApprovalRoleMap>> PostApprovalRoleMap(ApprovalRoleMapDTO approvalRoleMapDto)
         {
             var AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.RoleId == approvalRoleMapDto.RoleId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
@@ -143,7 +143,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalRoleMaps/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteApprovalRoleMap(int id)
         {
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);

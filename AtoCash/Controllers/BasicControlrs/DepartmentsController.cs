@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Admin, Manager, User")]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager, User")]
     public class DepartmentsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -97,7 +97,7 @@ namespace AtoCash.Controllers
         // PUT: api/Departments/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutDepartment(int id, DepartmentDTO departmentDto)
         {
             if (id != departmentDto.Id)
@@ -134,7 +134,7 @@ namespace AtoCash.Controllers
 
         // POST: api/Departments
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<Department>> PostDepartment(DepartmentDTO departmentDto)
         {
             var dept = _context.Departments.Where(c => c.DeptCode == departmentDto.DeptCode).FirstOrDefault();
@@ -158,7 +158,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Departments/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteDepartment(int id)
         {
 

@@ -24,6 +24,11 @@ namespace AtoCash.Models
         public int CostCentreId { get; set; }
 
         [Required]
+        [ForeignKey("ProjectManagerId")]
+        public virtual Employee ProjectManager { get; set; }
+        public int ProjectManagerId { get; set; }
+
+        [Required]
         [Column(TypeName = "nvarchar(200)")]
         public string ProjectDesc{ get; set; }
 
