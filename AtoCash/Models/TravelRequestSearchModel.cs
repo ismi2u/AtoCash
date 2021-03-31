@@ -21,6 +21,6 @@ namespace AtoCash.Models
 
         public DateTime? ReqRaisedDateTo{ get; set; }
 
-        public string CurrentStatus { get; set; }
+        public int CurrentStatus { get; set; }
     }
 }

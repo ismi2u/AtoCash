@@ -138,6 +138,7 @@ namespace AtoCash.Controllers
 
             subProjectDTO.Id = SubProj.Id;
             subProjectDTO.SubProjectName = SubProj.SubProjectName;
+            subProjectDTO.ProjectId = SubProj.ProjectId;
             subProjectDTO.SubProjectDesc = SubProj.SubProjectDesc;
 
             return subProjectDTO;

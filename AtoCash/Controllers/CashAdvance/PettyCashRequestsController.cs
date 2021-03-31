@@ -452,48 +452,83 @@ namespace AtoCash.Controllers
                 PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc
             };
             _context.PettyCashRequests.Add(pcrq);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); 
+            
+            pettyCashRequestDto.Id = pcrq.Id;
             #endregion
 
             //##### 3. Add an entry to ClaimApproval Status tracker
             //get costcentreID based on project
             #region
-            //get the saved record Id
-            pettyCashRequestDto.Id = pcrq.Id;
 
-            ClaimApprovalStatusTracker claimAppStatusTrack = new()
+            ///////////////////////////// Check if self Approved Request /////////////////////////////
+            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
+            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(empid).RoleId).FirstOrDefault().Id;
+            bool isSelfApprovedRequest = false;
+            //if highest approver is requesting Petty cash request himself
+            if (maxApprLevel == empApprLevel)
             {
-                EmployeeId = pettyCashRequestDto.EmployeeId,
-                PettyCashRequestId = pettyCashRequestDto.Id,
-                ExpenseReimburseRequestId = null,
-                DepartmentId = null,
-                ProjectId = pettyCashRequestDto.ProjectId,
-                RoleId = approver.RoleId,
-                // get the next ProjectManager approval.
-                ApprovalLevelId = 2, // default approval level is 2 for Project based request
-                ReqDate = DateTime.Now,
-                FinalApprovedDate = null,
-                ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
-            };
+                isSelfApprovedRequest = true;
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////
+            if (isSelfApprovedRequest)
+            {
+                ClaimApprovalStatusTracker claimAppStatusTrack = new()
+                {
+                    EmployeeId = pettyCashRequestDto.EmployeeId,
+                    PettyCashRequestId = pettyCashRequestDto.Id,
+                    ExpenseReimburseRequestId = null,
+                    DepartmentId = null,
+                    ProjectId = pettyCashRequestDto.ProjectId,
+                    RoleId = approver.RoleId,
+                    // get the next ProjectManager approval.
+                    ApprovalLevelId = empApprLevel, // default approval level is 2 for Project based request
+                    ReqDate = DateTime.Now,
+                    FinalApprovedDate = DateTime.Now,
+                    ApprovalStatusTypeId = (int)ApprovalStatus.Approved //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                };
 
 
-            _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
-            await _context.SaveChangesAsync();
-            #endregion
+                _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                ClaimApprovalStatusTracker claimAppStatusTrack = new()
+                {
+                    EmployeeId = pettyCashRequestDto.EmployeeId,
+                    PettyCashRequestId = pettyCashRequestDto.Id,
+                    ExpenseReimburseRequestId = null,
+                    DepartmentId = null,
+                    ProjectId = pettyCashRequestDto.ProjectId,
+                    RoleId = approver.RoleId,
+                    // get the next ProjectManager approval.
+                    ApprovalLevelId = 2, // default approval level is 2 for Project based request
+                    ReqDate = DateTime.Now,
+                    FinalApprovedDate = null,
+                    ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                };
 
 
-            //##### 4. Send email to the user
-            //####################################
-            #region
-            var approverMailAddress = approver.Email;
-            string subject = "Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
-            Employee emp = await _context.Employees.FindAsync(pettyCashRequestDto.EmployeeId);
-            var pettycashreq = _context.PettyCashRequests.Find(pettyCashRequestDto.Id);
-            string content = "Petty Cash Approval sought by " + emp.FirstName + "/nCash Request for the amount of " + pettycashreq.PettyClaimAmount + "/ntowards " + pettycashreq.PettyClaimRequestDesc;
-            var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+                _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
+                await _context.SaveChangesAsync();
+                #endregion
 
-            await _emailSender.SendEmailAsync(messagemail);
-            #endregion
+
+                //##### 4. Send email to the user
+                //####################################
+                #region
+                var approverMailAddress = approver.Email;
+                string subject = "Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
+                Employee emp = await _context.Employees.FindAsync(pettyCashRequestDto.EmployeeId);
+                var pettycashreq = _context.PettyCashRequests.Find(pettyCashRequestDto.Id);
+                string content = "Petty Cash Approval sought by " + emp.FirstName + "/nCash Request for the amount of " + pettycashreq.PettyClaimAmount + "/ntowards " + pettycashreq.PettyClaimRequestDesc;
+                var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+
+                await _emailSender.SendEmailAsync(messagemail);
+                #endregion
+            }
+
 
 
             //##### 5. Adding a entry in DisbursementsAndClaimsMaster table for records
@@ -504,7 +539,7 @@ namespace AtoCash.Controllers
                 PettyCashRequestId = pettyCashRequestDto.Id,
                 ExpenseReimburseReqId = null,
                 RequestTypeId = (int)ClaimType.CashAdvance,
-                DepartmentId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId,
+                DepartmentId = null,
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
@@ -573,68 +608,99 @@ namespace AtoCash.Controllers
             #endregion
 
             //##### STEP 3. ClaimsApprovalTracker to be updated for all the allowed Approvers
-            //##### STEP 4. Send email to all the allowed Approvers
-            #region
 
 
-
-            var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).ToList().OrderBy(o => o.ApprovalLevel.Level);
-
-            var ReqEmpRoleId = _context.Employees.Where(e => e.Id == reqEmpid).FirstOrDefault().RoleId;
-            var ReqEmpHisOwnApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == ReqEmpRoleId);
-            bool isFirstApprover = true;
-            foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
+            ///////////////////////////// Check if self Approved Request /////////////////////////////
+            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
+            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(reqEmpid).RoleId).FirstOrDefault().Id;
+            bool isSelfApprovedRequest = false;
+            //if highest approver is requesting Petty cash request himself
+            if (maxApprLevel == empApprLevel)
             {
+                isSelfApprovedRequest = true;
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////
 
-                int role_id = ApprMap.RoleId;
-                var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
-
-                if (ReqEmpRoleId >= approver.RoleId)
-                {
-                    continue;
-                }
-
-
+            if (isSelfApprovedRequest)
+            {
 
                 ClaimApprovalStatusTracker claimAppStatusTrack = new()
                 {
                     EmployeeId = pettyCashRequestDto.EmployeeId,
                     PettyCashRequestId = pettyCashRequestDto.Id,
                     ExpenseReimburseRequestId = null,
-                    DepartmentId = approver.DepartmentId,
+                    DepartmentId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId,
                     ProjectId = null,
-                    RoleId = approver.RoleId,
-                    ApprovalLevelId = ApprMap.ApprovalLevelId,
+                    RoleId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId,
+                    ApprovalLevelId = empApprLevel,
                     ReqDate = DateTime.Now,
-                    FinalApprovedDate = null,
-                    ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating 
+                    FinalApprovedDate = DateTime.Now,
+                    ApprovalStatusTypeId =  (int)ApprovalStatus.Approved
                     //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
-
-
                 _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).ToList().OrderBy(o => o.ApprovalLevel.Level);
 
-               
-                if (isFirstApprover)
-                { 
-                //##### 4. Send email to the Approver
-                //####################################
-                var approverMailAddress = approver.Email;
-                string subject = "Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
-                Employee emp = await _context.Employees.FindAsync(pettyCashRequestDto.EmployeeId);
-                var pettycashreq = _context.PettyCashRequests.Find(pettyCashRequestDto.Id);
-                string content = "Petty Cash Approval sought by " + emp.FirstName + "@<br/>Cash Request for the amount of " + pettycashreq.PettyClaimAmount + "@<br/>towards " + pettycashreq.PettyClaimRequestDesc;
-                var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+                var ReqEmpRoleId = _context.Employees.Where(e => e.Id == reqEmpid).FirstOrDefault().RoleId;
+                var ReqEmpHisOwnApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == ReqEmpRoleId);
+                bool isFirstApprover = true;
+                foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
+                {
 
-                await _emailSender.SendEmailAsync(messagemail);
+                    int role_id = ApprMap.RoleId;
+                    var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
+
+                    if (ReqEmpRoleId >= approver.RoleId)
+                    {
+                        continue;
+                    }
+
+
+
+                    ClaimApprovalStatusTracker claimAppStatusTrack = new()
+                    {
+                        EmployeeId = pettyCashRequestDto.EmployeeId,
+                        PettyCashRequestId = pettyCashRequestDto.Id,
+                        ExpenseReimburseRequestId = null,
+                        DepartmentId = approver.DepartmentId,
+                        ProjectId = null,
+                        RoleId = approver.RoleId,
+                        ApprovalLevelId = ApprMap.ApprovalLevelId,
+                        ReqDate = DateTime.Now,
+                        FinalApprovedDate = null,
+                        ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating
+                        //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    };
+
+
+                    _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
+                    await _context.SaveChangesAsync();
+
+
+                    if (isFirstApprover)
+                    {
+                        //##### 4. Send email to the Approver
+                        //####################################
+                        var approverMailAddress = approver.Email;
+                        string subject = "Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
+                        Employee emp = await _context.Employees.FindAsync(pettyCashRequestDto.EmployeeId);
+                        var pettycashreq = _context.PettyCashRequests.Find(pettyCashRequestDto.Id);
+                        string content = "Petty Cash Approval sought by " + emp.FirstName + "@<br/>Cash Request for the amount of " + pettycashreq.PettyClaimAmount + "@<br/>towards " + pettycashreq.PettyClaimRequestDesc;
+                        var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+
+                        await _emailSender.SendEmailAsync(messagemail);
+                    }
+
+                    //first approver will be added as Pending, other approvers will be with In Approval Queue
+                    isFirstApprover = false;
+
                 }
 
-                //first approver will be added as Pending, other approvers will be with In Approval Queue
-                isFirstApprover = false;
-
             }
-            #endregion
 
             //##### STEP 5. Adding a SINGLE entry in DisbursementsAndClaimsMaster table for records
             #region
@@ -645,13 +711,13 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.ExpenseReimburseReqId = null;
             disbursementsAndClaimsMaster.RequestTypeId = (int)ClaimType.CashAdvance;
             disbursementsAndClaimsMaster.DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId;
-            disbursementsAndClaimsMaster.ProjectId = pettyCashRequestDto.ProjectId;
-            disbursementsAndClaimsMaster.SubProjectId = pettyCashRequestDto.SubProjectId;
-            disbursementsAndClaimsMaster.WorkTaskId = pettyCashRequestDto.WorkTaskId;
+            disbursementsAndClaimsMaster.ProjectId = null;
+            disbursementsAndClaimsMaster.SubProjectId = null;
+            disbursementsAndClaimsMaster.WorkTaskId = null;
             disbursementsAndClaimsMaster.RecordDate = DateTime.Now;
             disbursementsAndClaimsMaster.Amount = empReqAmount;
             disbursementsAndClaimsMaster.CostCentreId = _context.Departments.Find(_context.Employees.Find(reqEmpid).DepartmentId).CostCentreId;
-            disbursementsAndClaimsMaster.ApprovalStatusId = (int)ApprovalStatus.Pending;
+            disbursementsAndClaimsMaster.ApprovalStatusId = isSelfApprovedRequest ? (int)ApprovalStatus.Approved: (int)ApprovalStatus.Pending;
 
             _context.DisbursementsAndClaimsMasters.Add(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();

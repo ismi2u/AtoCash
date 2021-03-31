@@ -36,7 +36,7 @@ namespace AtoCash.Models
         public DateTime ReqRaisedDate { get; set; }
 
         [Required]
-        public string CurrentStatus { get; set; }
+        public int CurrentStatus { get; set; }
         /// <summary>
         /// foreignkeys
         /// </summary>

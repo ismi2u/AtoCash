@@ -9,6 +9,7 @@ using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
 using AtoCash.Authentication;
+using System.Net.Mail;
 
 namespace AtoCash.Controllers
 {
@@ -55,29 +56,30 @@ namespace AtoCash.Controllers
 
             foreach (Employee employee in employees)
             {
-                EmployeeDTO employeeDTO = new EmployeeDTO
-                {
-                    Id = employee.Id,
-                    FirstName = employee.FirstName,
-                    MiddleName = employee.MiddleName,
-                    LastName = employee.LastName,
-                    EmpCode = employee.EmpCode,
-                    BankAccount = employee.BankAccount,
-                    BankCardNo = employee.BankCardNo,
-                    NationalID = employee.NationalID,
-                    PassportNo = employee.PassportNo,
-                    TaxNumber = employee.TaxNumber,
-                    Nationality = employee.Nationality,
-                    DOB = employee.DOB,
-                    DOJ = employee.DOJ,
-                    Gender = employee.Gender,
-                    Email = employee.Email,
-                    MobileNumber = employee.MobileNumber,
-                    EmploymentTypeId = employee.EmploymentTypeId,
-                    DepartmentId = employee.DepartmentId,
-                    RoleId = employee.RoleId,
-                    ApprovalGroupId = employee.ApprovalGroupId
-                };
+                EmployeeDTO employeeDTO = new();
+
+                employeeDTO.Id = employee.Id;
+                employeeDTO.FirstName = employee.FirstName;
+                employeeDTO.MiddleName = employee.MiddleName;
+                employeeDTO.LastName = employee.LastName;
+                employeeDTO.EmpCode = employee.EmpCode;
+                employeeDTO.BankAccount = employee.BankAccount;
+                employeeDTO.BankCardNo = employee.BankCardNo;
+                employeeDTO.NationalID = employee.NationalID;
+                employeeDTO.PassportNo = employee.PassportNo;
+                employeeDTO.TaxNumber = employee.TaxNumber;
+                employeeDTO.Nationality = employee.Nationality;
+                employeeDTO.DOB = employee.DOB;
+                employeeDTO.DOJ = employee.DOJ;
+                employeeDTO.Gender = employee.Gender;
+                employeeDTO.Email = employee.Email;
+                employeeDTO.MobileNumber = employee.MobileNumber;
+                employeeDTO.EmploymentTypeId = employee.EmploymentTypeId;
+                employeeDTO.DepartmentId = employee.DepartmentId;
+                employeeDTO.RoleId = employee.RoleId;
+                employeeDTO.ApprovalGroupId = employee.ApprovalGroupId;
+
+
 
                 ListEmployeeDTO.Add(employeeDTO);
 
@@ -168,6 +170,17 @@ namespace AtoCash.Controllers
             employee.DOB = employeeDto.DOB;
             employee.DOJ = employeeDto.DOJ;
             employee.Gender = employeeDto.Gender;
+
+            MailAddress mailAdd = new MailAddress(employeeDto.Email);
+            if ((mailAdd.Host.ToUpper() != "MAILINATOR.COM") && mailAdd.Host.ToUpper() != "GMAIL.COM")
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Use company mail address!" });
+            }
+            else
+            {
+                employee.Email = employeeDto.Email;
+            }
+
             employee.Email = employeeDto.Email;
             employee.MobileNumber = employeeDto.MobileNumber;
             employee.EmploymentTypeId = employeeDto.EmploymentTypeId;
@@ -238,6 +251,15 @@ namespace AtoCash.Controllers
                 EmployeeStatusId = employeeDto.EmployeeStatusId
         };
 
+            MailAddress mailAdd = new MailAddress(employeeDto.Email);
+            if ((mailAdd.Host.ToUpper() != "MAILINATOR.COM") && mailAdd.Host.ToUpper() != "GMAIL.COM")
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Use company mail address!" });
+            }
+            else
+            {
+                employee.Email = employeeDto.Email;
+            }
             _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
 

@@ -142,6 +142,7 @@ namespace AtoCash.Controllers
                 SubProjectId = worktask.SubProjectId,
                 SubProject = _context.SubProjects.Find(worktask.SubProjectId).SubProjectName,
                 TaskName = worktask.TaskName,
+                  
                 TaskDesc = worktask.TaskDesc
             };
            

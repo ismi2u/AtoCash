@@ -265,8 +265,8 @@ namespace AtoCash.Controllers
                     result = result.Where(x => x.ReqRaisedDate >= searchModel.ReqRaisedDateFrom);
                 if (searchModel.ReqRaisedDateTo.HasValue)
                     result = result.Where(x => x.ReqRaisedDate <= searchModel.ReqRaisedDateTo);
-                if (!string.IsNullOrEmpty(searchModel.CurrentStatus))
-                    result = result.Where(x => x.CurrentStatus == searchModel.CurrentStatus);
+                //if (searchModel.CurrentStatus.HasValue)
+                //    result = result.Where(x => x.CurrentStatus == searchModel.CurrentStatus);
 
                 DataTable dt = new DataTable();
                 dt.Columns.AddRange(new DataColumn[9]
@@ -345,8 +345,8 @@ namespace AtoCash.Controllers
                     result = result.Where(x => x.ReqRaisedDate >= searchModel.ReqRaisedDateFrom);
                 if (searchModel.ReqRaisedDateTo.HasValue)
                     result = result.Where(x => x.ReqRaisedDate <= searchModel.ReqRaisedDateTo);
-                if (!string.IsNullOrEmpty(searchModel.CurrentStatus))
-                    result = result.Where(x => x.CurrentStatus == searchModel.CurrentStatus);
+                //if (!string.IsNullOrEmpty(searchModel.CurrentStatus))
+                //    result = result.Where(x => x.CurrentStatus == searchModel.CurrentStatus);
 
                 DataTable dt = new DataTable();
                 dt.Columns.AddRange(new DataColumn[9]

@@ -92,6 +92,7 @@ namespace AtoCash.Controllers
             projectDTO.Id = proj.Id;
             projectDTO.ProjectName = proj.ProjectName;
             projectDTO.CostCentreId = proj.CostCentreId;
+            projectDTO.ProjectManagerId = proj.ProjectManagerId;
             projectDTO.ProjectDesc = proj.ProjectDesc;
 
             return projectDTO;

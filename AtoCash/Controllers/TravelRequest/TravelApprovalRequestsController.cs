@@ -8,14 +8,16 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using EmailService;
-using Microsoft.AspNetCore.Authorization;
 using AtoCash.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
     [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+
+
     public class TravelApprovalRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -23,85 +25,281 @@ namespace AtoCash.Controllers
 
         public TravelApprovalRequestsController(AtoCashDbContext context, IEmailSender emailSender)
         {
-            _context = context;
-            _emailSender = emailSender;
+            this._context = context;
+            this._emailSender = emailSender;
         }
+
 
         // GET: api/TravelApprovalRequests
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TravelApprovalRequestDTO>>> GetTravelApprovalRequest()
+        [ActionName("GetTravelApprovalRequests")]
+        public async Task<ActionResult<IEnumerable<TravelApprovalRequestDTO>>> GetTravelApprovalRequests()
         {
-            List<TravelApprovalRequestDTO> ListTravelRequestDTO = new List<TravelApprovalRequestDTO>();
+            List<TravelApprovalRequestDTO> ListTravelApprovalRequestDTO = new();
 
-            var travelrequests = await _context.TravelApprovalRequests.ToListAsync();
+            //var claimApprovalStatusTracker = await _context.TravelApprovalRequests.FindAsync(1);
 
-            foreach (TravelApprovalRequest travelrequest in travelrequests)
+            var TravelApprovalRequests = await _context.TravelApprovalRequests.ToListAsync();
+
+            foreach (TravelApprovalRequest travelApprovalRequest in TravelApprovalRequests)
             {
-                TravelApprovalRequestDTO travelApprovalRequestDTO = new TravelApprovalRequestDTO
-                {
-                    Id = travelrequest.Id,
-                    EmployeeId = travelrequest.EmployeeId,
-                    TravelStartDate = travelrequest.TravelStartDate,
-                    TravelEndDate = travelrequest.TravelEndDate,
-                    TravelPurpose = travelrequest.TravelPurpose,
-                    CurrentStatus = travelrequest.CurrentStatus
-                };
+                TravelApprovalRequestDTO travelApprovalRequestDTO = new();
 
-                ListTravelRequestDTO.Add(travelApprovalRequestDTO);
+                travelApprovalRequestDTO.Id = travelApprovalRequest.Id;
+                travelApprovalRequestDTO.EmployeeId = travelApprovalRequest.EmployeeId;
+                travelApprovalRequestDTO.EmployeeName = _context.Employees.Find(travelApprovalRequest.EmployeeId).GetFullName();
+                travelApprovalRequestDTO.TravelStartDate = travelApprovalRequest.TravelStartDate;
+                travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
+                travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
+                travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
+                travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
+                travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
+                travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
+                travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
+                travelApprovalRequestDTO.Project = travelApprovalRequest.ProjectId != null ? _context.Projects.Find(travelApprovalRequest.ProjectId).ProjectName : null;
+                travelApprovalRequestDTO.SubProjectId = travelApprovalRequest.SubProjectId;
+                travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
+                travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
+                travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
 
+                ListTravelApprovalRequestDTO.Add(travelApprovalRequestDTO);
             }
 
-            return ListTravelRequestDTO;
+            return ListTravelApprovalRequestDTO;
         }
+
+
 
         // GET: api/TravelApprovalRequests/5
         [HttpGet("{id}")]
+        [ActionName("GetTravelApprovalRequest")]
         public async Task<ActionResult<TravelApprovalRequestDTO>> GetTravelApprovalRequest(int id)
         {
-            var travelrequest = await _context.TravelApprovalRequests.FindAsync(id);
 
-            TravelApprovalRequestDTO travelApprovalRequestDTO = new TravelApprovalRequestDTO
-            {
-                Id = travelrequest.Id,
-                EmployeeId = travelrequest.EmployeeId,
-                TravelStartDate = travelrequest.TravelStartDate,
-                TravelEndDate = travelrequest.TravelEndDate,
-                TravelPurpose = travelrequest.TravelPurpose,
-                ReqRaisedDate = travelrequest.ReqRaisedDate,
-                CurrentStatus = travelrequest.CurrentStatus
-            };
-
-
-            if (travelrequest == null)
-            {
-                return NoContent();
-            }
-            return travelApprovalRequestDTO;
-        }
-
-        // PUT: api/TravelApprovalRequests/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<IActionResult> PutTravelApprovalRequest(int id, TravelApprovalRequestDTO travelApprovalRequestDto)
-        {
-            if (id != travelApprovalRequestDto.Id)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Id state is invalid" });
-            }
 
             var travelApprovalRequest = await _context.TravelApprovalRequests.FindAsync(id);
 
-            travelApprovalRequest.Id = travelApprovalRequestDto.Id;
-            travelApprovalRequest.EmployeeId = travelApprovalRequestDto.EmployeeId;
-            travelApprovalRequest.TravelStartDate = travelApprovalRequestDto.TravelStartDate;
-            travelApprovalRequest.TravelEndDate = travelApprovalRequestDto.TravelEndDate;
-            travelApprovalRequest.TravelPurpose = travelApprovalRequestDto.TravelPurpose;
-            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate;
-            travelApprovalRequest.CurrentStatus = travelApprovalRequestDto.CurrentStatus;
+            if (travelApprovalRequest == null)
+            {
+                return NoContent();
+            }
+            TravelApprovalRequestDTO travelApprovalRequestDTO = new();
+
+
+            travelApprovalRequestDTO.Id = travelApprovalRequest.Id;
+            travelApprovalRequestDTO.EmployeeId = travelApprovalRequest.EmployeeId;
+            travelApprovalRequestDTO.EmployeeName = _context.Employees.Find(travelApprovalRequest.EmployeeId).GetFullName();
+            travelApprovalRequestDTO.TravelStartDate = travelApprovalRequest.TravelStartDate;
+            travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
+            travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
+            travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
+            travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
+            travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
+            travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
+            travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
+            travelApprovalRequestDTO.Project = travelApprovalRequest.ProjectId != null ? _context.Projects.Find(travelApprovalRequest.ProjectId).ProjectName : null;
+            travelApprovalRequestDTO.SubProjectId = travelApprovalRequest.SubProjectId;
+            travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
+            travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
+            travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
+
+
+            return travelApprovalRequestDTO;
+        }
+
+
+
+
+
+        [HttpGet("{id}")]
+        [ActionName("GetTravelApprovalRequestRaisedForEmployee")]
+        public async Task<ActionResult<IEnumerable<TravelApprovalRequestDTO>>> GetTravelApprovalRequestRaisedForEmployee(int id)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                return NoContent();
+            }
+
+            var TravelApprovalRequests = await _context.TravelApprovalRequests.Where(p => p.EmployeeId == id).ToListAsync();
+
+            if (TravelApprovalRequests == null)
+            {
+                return NoContent();
+            }
+
+            List<TravelApprovalRequestDTO> TravelApprovalRequestDTOs = new();
+
+            foreach (var travelApprovalRequest in TravelApprovalRequests)
+            {
+                TravelApprovalRequestDTO travelApprovalRequestDTO = new();
+
+                travelApprovalRequestDTO.Id = travelApprovalRequest.Id;
+                travelApprovalRequestDTO.EmployeeId = travelApprovalRequest.EmployeeId;
+                travelApprovalRequestDTO.EmployeeName = _context.Employees.Find(travelApprovalRequest.EmployeeId).GetFullName();
+                travelApprovalRequestDTO.TravelStartDate = travelApprovalRequest.TravelStartDate;
+                travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
+                travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
+                travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
+                travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
+                travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
+                travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
+                travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
+                travelApprovalRequestDTO.Project = travelApprovalRequest.ProjectId != null ? _context.Projects.Find(travelApprovalRequest.ProjectId).ProjectName : null;
+                travelApprovalRequestDTO.SubProjectId = travelApprovalRequest.SubProjectId;
+                travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
+                travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
+                travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
+
+                TravelApprovalRequestDTOs.Add(travelApprovalRequestDTO);
+            }
+
+
+            return Ok(TravelApprovalRequestDTOs);
+        }
+
+
+
+        [HttpGet("{id}")]
+        [ActionName("CountTravelApprovalRequestRaisedByEmployee")]
+        public async Task<ActionResult<int>> CountTravelApprovalRequestRaisedByEmployee(int id)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                return NoContent();
+            }
+
+            var TravelApprovalRequests = await _context.TravelApprovalRequests.Where(p => p.EmployeeId == id).ToListAsync();
+
+            if (TravelApprovalRequests == null)
+            {
+                return NoContent();
+            }
+
+            List<TravelApprovalRequestDTO> TravelApprovalRequestDTOs = new();
+
+            foreach (var travelApprovalRequest in TravelApprovalRequests)
+            {
+                TravelApprovalRequestDTO travelApprovalRequestDTO = new();
+
+                travelApprovalRequestDTO.Id = travelApprovalRequest.Id;
+                travelApprovalRequestDTO.EmployeeId = travelApprovalRequest.EmployeeId;
+                travelApprovalRequestDTO.EmployeeName = _context.Employees.Find(travelApprovalRequest.EmployeeId).GetFullName();
+                travelApprovalRequestDTO.TravelStartDate = travelApprovalRequest.TravelStartDate;
+                travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
+                travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
+                travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
+                travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
+                travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
+                travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
+                travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
+                travelApprovalRequestDTO.Project = travelApprovalRequest.ProjectId != null ? _context.Projects.Find(travelApprovalRequest.ProjectId).ProjectName : null;
+                travelApprovalRequestDTO.SubProjectId = travelApprovalRequest.SubProjectId;
+                travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
+                travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
+                travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
+
+                TravelApprovalRequestDTOs.Add(travelApprovalRequestDTO);
+            }
+
+
+            return Ok(TravelApprovalRequestDTOs.Count);
+        }
+
+
+        [HttpGet("{id}")]
+        [ActionName("CountTravelApprovalReqInPendingRaisedByEmployee")]
+        public async Task<ActionResult<int>> CountTravelApprovalReqInPendingRaisedByEmployee(int id)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                return NoContent();
+            }
+
+            //debug
+            //(int)ApprovalStatus.Pending
+            List<TravelApprovalStatusTracker> lists = _context.TravelApprovalStatusTrackers.Where(t => t.EmployeeId == id).ToList();
+
+            var travelApprovalsOfEmployee = await _context.TravelApprovalStatusTrackers.Where(t => t.EmployeeId == id).Select(p => p.TravelApprovalRequestId).Distinct().ToListAsync();
+
+            foreach (var item in travelApprovalsOfEmployee)
+            {
+                string test = item.ToString();
+
+            }
+
+            if (travelApprovalsOfEmployee == null)
+            {
+                return NoContent();
+            }
+
+
+
+            return Ok(travelApprovalsOfEmployee.Count);
+
+        }
+
+
+
+        [HttpGet]
+        [ActionName("GetTravelReqInPendingForAll")]
+        public async Task<ActionResult<int>> GetTravelReqInPendingForAll()
+        {
+            //debug
+            var TravelApprovalRequests = await _context.TravelApprovalRequests.Include("TravelApprovalStatusTrackers").ToListAsync();
+
+
+            //var TravelApprovalRequests = await _context.TravelApprovalRequests.Where(c => c.ApprovalStatusTypeId == ApprovalStatus.Pending).select( );
+
+            if (TravelApprovalRequests == null)
+            {
+                return NoContent();
+            }
+
+            return Ok(TravelApprovalRequests.Count);
+        }
+
+
+
+
+
+
+
+
+
+
+        // PUT: api/TravelApprovalRequests/5
+        [HttpPut("{id}")]
+        [ActionName("PutTravelApprovalRequest")]
+
+        public async Task<IActionResult> PutTravelApprovalRequest(int id, TravelApprovalRequestDTO travelApprovalRequestDTO)
+        {
+            if (id != travelApprovalRequestDTO.Id)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+            }
+
+            var travelApprovalRequest = await _context.TravelApprovalRequests.FindAsync(id);
+            travelApprovalRequest.Id = travelApprovalRequestDTO.Id;
+            travelApprovalRequest.EmployeeId = travelApprovalRequestDTO.EmployeeId;
+            travelApprovalRequest.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
+            travelApprovalRequest.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
+            travelApprovalRequest.TravelPurpose = travelApprovalRequestDTO.TravelPurpose;
+            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDTO.ReqRaisedDate;
+            travelApprovalRequest.CurrentStatus = travelApprovalRequestDTO.CurrentStatus;
+            travelApprovalRequest.DepartmentId = travelApprovalRequestDTO.DepartmentId;
+            travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
+            travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
+            travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
+
 
             _context.TravelApprovalRequests.Update(travelApprovalRequest);
-            //_context.Entry(projectDto).State = EntityState.Modified;
+            //_context.Entry(travelApprovalRequest).State = EntityState.Modified;
 
             try
             {
@@ -122,150 +320,57 @@ namespace AtoCash.Controllers
             return NoContent();
         }
 
-
-        /// <summary>
-        /// Step 1 : enter a record in TravelApprovalRequest table
-        /// Step 2: Enter a Record in Travel Approval Request Tracker (table)
-        /// Step 3: Send email to approvers after adding them in TravelApprovalStatusTracker
-        /// </summary>
-        /// <param name="travelApprovalRequestDto"></param>
-        /// <returns></returns>
-
-
         // POST: api/TravelApprovalRequests
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<ActionResult<TravelApprovalRequest>> PostTravelApprovalRequest(TravelApprovalRequestDTO travelApprovalRequestDto)
+        [ActionName("PostTravelApprovalRequest")]
+        public async Task<ActionResult<TravelApprovalRequest>> PostTravelApprovalRequest(TravelApprovalRequestDTO travelApprovalRequestDTO)
         {
-            /// Step 1 : enter a record in TravelApprovalRequest table
+            //Step ##1
 
-            TravelApprovalRequest travelApprovalRequest = new TravelApprovalRequest
+            var dupReq = _context.TravelApprovalRequests.Where(
+                t => t.TravelStartDate.Date == travelApprovalRequestDTO.TravelStartDate.Date &&
+                t.TravelEndDate.Date == travelApprovalRequestDTO.TravelEndDate.Date &&
+                t.TravelPurpose == travelApprovalRequestDTO.TravelPurpose).Count();
+
+            if (dupReq != 0)
             {
-                EmployeeId = travelApprovalRequestDto.EmployeeId,
-                TravelStartDate = travelApprovalRequestDto.TravelStartDate,
-                TravelEndDate = travelApprovalRequestDto.TravelEndDate,
-                TravelPurpose = travelApprovalRequestDto.TravelPurpose,
-                ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate,
-                CurrentStatus = travelApprovalRequestDto.CurrentStatus,
-                DepartmentId = _context.Employees.Find(travelApprovalRequestDto.EmployeeId).DepartmentId,
-                ProjectId = travelApprovalRequestDto.ProjectId,
-                SubProjectId = travelApprovalRequestDto.SubProjectId,
-                WorkTaskId = travelApprovalRequestDto.WorkTaskId
-            };
+                return Conflict(new RespStatus { Status = "Failure", Message = "Duplicate request cannot be created" });
+            }
 
-            _context.TravelApprovalRequests.Add(travelApprovalRequest);
-            await _context.SaveChangesAsync();
 
-            //Check if the Requestor is raising Travel reques on behalf of Project (Or) department
-            //Process the travel request appropriately
-            if (travelApprovalRequestDto.ProjectId == null)
+
+
+            //##Step 2
+
+            if (travelApprovalRequestDTO.ProjectId != null)
             {
-                await Task.Run(() => ProjectTravelRequest(travelApprovalRequestDto));
+                //Goes to Option 1 (Project)
+                await Task.Run(() => ProjectTravelRequest(travelApprovalRequestDTO));
             }
             else
             {
-                await Task.Run(() => DepartmentTravelRequest(travelApprovalRequestDto));
+                //Goes to Option 2 (Department)
+                await Task.Run(() => DepartmentTravelRequest(travelApprovalRequestDTO));
             }
 
-           
 
-            return CreatedAtAction("GetGetTravelApprovalRequest", new { id = travelApprovalRequest.Id }, travelApprovalRequest);
-        }
-
-        private async Task DepartmentTravelRequest(TravelApprovalRequestDTO travelApprovalRequestDto)
-        {
-
-
-            //Add oned entry to the TravelApprovalRequestTracker for Department based Request
-            //Here project ID will be null
-
-            int empid = travelApprovalRequestDto.EmployeeId;
-            int empApprGroupId = _context.Employees.Find(empid).ApprovalGroupId;
-            int costCentre = _context.Projects.Find(travelApprovalRequestDto.ProjectId).CostCentreId;
-            int projManagerid = _context.ProjectManagements.Find(travelApprovalRequestDto.ProjectId).EmployeeId;
-            var getEmpApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).ToList().OrderBy(a => a.ApprovalLevel);
-
-            foreach (ApprovalRoleMap ApprMap in getEmpApproversAllLevels)
+            try
             {
-
-                int role_id = ApprMap.RoleId;
-                var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
-
-                /// Step 2: Enter a Record in Travel Approval Request Tracker (table)
-
-                _context.TravelApprovalStatusTrackers.Add(new TravelApprovalStatusTracker
-                {
-                    EmployeeId = travelApprovalRequestDto.EmployeeId,
-                    TravelApprovalRequestId = travelApprovalRequestDto.Id,
-                    DepartmentId = approver.DepartmentId,
-                    ProjectId = null,
-                    RoleId = approver.RoleId,
-                    ReqDate = DateTime.Now,
-                    FinalApprovedDate = null,
-                    ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
-                });
-
-                //##### 3. Send email to the Approver
-                //Multiple instance for Department
-                //####################################
-
-                var approverMailAddress = approver.Email;
-                string subject = "Expense Claim Approval Request " + travelApprovalRequestDto.Id.ToString();
-                Employee emp = _context.Employees.Find(travelApprovalRequestDto.EmployeeId);
-                var expenseReimClaimReq = _context.ExpenseReimburseRequests.Find(travelApprovalRequestDto.Id);
-                string content = "Travel Request Approval sought by " + emp.FirstName + "/nfor the purpose of " + travelApprovalRequestDto.TravelPurpose;
-                var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
-
-               await _emailSender.SendEmailAsync(messagemail);
-
-                //repeat for each approver
-
-
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
             }
 
-        }
+            return Ok(new RespStatus { Status = "Success", Message = "Travel Request Created!" });
 
-
-        private async Task ProjectTravelRequest(TravelApprovalRequestDTO travelApprovalRequestDto)
-        {
-            //Add oned entry to the TravelApprovalRequestTracker for PROJECT based Request
-            //Here Department ID will be null
-            //###### 2. add entry in TravelApprovalStatus tracker
-            //int costCentre = _context.Projects.Find(travelApprovalRequestDto.ProjectId).CostCentreId;
-
-            int projManagerid = _context.ProjectManagements.Find(travelApprovalRequestDto.ProjectId).EmployeeId;
-
-            var approver = _context.Employees.Find(projManagerid);
-
-            _context.TravelApprovalStatusTrackers.Add(new TravelApprovalStatusTracker()
-            {
-                EmployeeId = travelApprovalRequestDto.EmployeeId,
-                TravelApprovalRequestId = travelApprovalRequestDto.Id,
-                DepartmentId = null,
-                ProjectId = travelApprovalRequestDto.ProjectId.Value,
-                RoleId = approver.RoleId,
-                ReqDate = DateTime.Now,
-                FinalApprovedDate = null,
-                ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
-            });
-
-            //##### 3. Send email to the Approver
-            //Single instance for Project
-            //####################################
-
-            var approverMailAddress = approver.Email;
-            string subject = "Expense Claim Approval Request " + travelApprovalRequestDto.Id.ToString();
-            Employee emp = _context.Employees.Find(travelApprovalRequestDto.EmployeeId);
-            //var expenseReimClaimReq = _context.ExpenseReimburseRequests.Find(travelApprovalRequestDto.Id);
-            string content = "Travel Request Approval sought by " + emp.FirstName + "/nfor the purpose of " + travelApprovalRequestDto.TravelPurpose;
-            var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
-
-           await _emailSender.SendEmailAsync(messagemail);
 
         }
 
         // DELETE: api/TravelApprovalRequests/5
         [HttpDelete("{id}")]
+        [ActionName("DeleteTravelApprovalRequest")]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteTravelApprovalRequest(int id)
         {
@@ -288,11 +393,312 @@ namespace AtoCash.Controllers
 
 
 
+
+
+        /// <summary>
+        /// This is the option 1 : : PROJECT BASED TRAVEL REQUEST
+        /// </summary>
+        /// <param name="travelApprovalRequestDto"></param>
+        /// <param name="travelApprovalRequestDto"></param>
+        private async Task<IActionResult> ProjectTravelRequest(TravelApprovalRequestDTO travelApprovalRequestDTO)
+        {
+
+
+            #region
+            int costCentre = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCentreId;
+            int projManagerid = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).ProjectManagerId;
+            var approver = _context.Employees.Find(projManagerid);
+            int reqEmpid = travelApprovalRequestDTO.EmployeeId;
+            #endregion
+
+            //### 1. If Employee Travel Request enter a record in TravelApprovalRequestTracker
+            #region
+            TravelApprovalRequest travelApprovalRequest = new();
+
+            travelApprovalRequest.Id = travelApprovalRequestDTO.Id;
+            travelApprovalRequest.EmployeeId = travelApprovalRequestDTO.EmployeeId;
+            travelApprovalRequest.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
+            travelApprovalRequest.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
+            travelApprovalRequest.TravelPurpose = travelApprovalRequestDTO.TravelPurpose;
+            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDTO.ReqRaisedDate;
+            travelApprovalRequest.CurrentStatus = travelApprovalRequestDTO.CurrentStatus;
+            travelApprovalRequest.DepartmentId = travelApprovalRequestDTO.DepartmentId;
+            travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
+            travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
+            travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
+
+
+            _context.TravelApprovalRequests.Add(travelApprovalRequest);
+
+            await _context.SaveChangesAsync();
+            //get the saved record Id
+            travelApprovalRequestDTO.Id = travelApprovalRequest.Id;
+            #endregion
+
+            //##### 3. Add an entry to ClaimApproval Status tracker
+            //get costcentreID based on project
+            #region
+
+            ///////////////////////////// Check if self Approved Request /////////////////////////////
+            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
+            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(reqEmpid).RoleId).FirstOrDefault().Id;
+            bool isSelfApprovedRequest = false;
+            //if highest approver is requesting Petty cash request himself
+            if (maxApprLevel == empApprLevel)
+            {
+                isSelfApprovedRequest = true;
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////
+            TravelApprovalStatusTracker travelApprovalStatusTracker = new();
+            if (isSelfApprovedRequest)
+            {
+                travelApprovalStatusTracker.EmployeeId = travelApprovalRequestDTO.EmployeeId;
+                travelApprovalStatusTracker.TravelApprovalRequestId = travelApprovalRequestDTO.Id;
+                travelApprovalStatusTracker.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
+                travelApprovalStatusTracker.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
+                travelApprovalStatusTracker.DepartmentId = null;
+                travelApprovalStatusTracker.ProjectId = travelApprovalRequestDTO.ProjectId;
+                travelApprovalStatusTracker.RoleId = approver.RoleId;
+                travelApprovalStatusTracker.ApprovalLevelId = empApprLevel; // default approval level is 2 for Project based request
+                travelApprovalStatusTracker.ReqDate = DateTime.Now;
+                travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
+                travelApprovalStatusTracker.ApprovalStatusTypeId = (int)ApprovalStatus.Approved; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
+
+            }
+            else
+            {
+                travelApprovalStatusTracker.EmployeeId = travelApprovalRequestDTO.EmployeeId;
+                travelApprovalStatusTracker.TravelApprovalRequestId = travelApprovalRequestDTO.Id;
+                travelApprovalStatusTracker.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
+                travelApprovalStatusTracker.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
+                travelApprovalStatusTracker.DepartmentId = null;
+                travelApprovalStatusTracker.ProjectId = travelApprovalRequestDTO.ProjectId;
+                travelApprovalStatusTracker.RoleId = approver.RoleId;
+                // get the next ProjectManager approval.
+                travelApprovalStatusTracker.ApprovalLevelId = 2; // default approval level is 2 for Project based request
+                travelApprovalStatusTracker.ReqDate = DateTime.Now;
+                travelApprovalStatusTracker.FinalApprovedDate = null;
+                travelApprovalStatusTracker.ApprovalStatusTypeId = (int)ApprovalStatus.Pending; //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+
+            }
+
+
+
+            _context.TravelApprovalStatusTrackers.Add(travelApprovalStatusTracker);
+            await _context.SaveChangesAsync();
+            #endregion
+
+
+            //##### 4. Send email to the user
+            //####################################
+            #region
+            if (isSelfApprovedRequest)
+            {
+                return null;
+            }
+            var approverMailAddress = approver.Email;
+            string subject = "Travel Approval Request No# " + travelApprovalRequestDTO.Id.ToString();
+            Employee emp = await _context.Employees.FindAsync(travelApprovalRequestDTO.EmployeeId);
+            var pettycashreq = _context.TravelApprovalRequests.Find(travelApprovalRequestDTO.Id);
+            string content = "Travel Approval Request sought by " + emp.FirstName + "<br/>Travel Request Details <br/>Start Date: " + travelApprovalRequestDTO.TravelStartDate + "<br/>End Date: " + travelApprovalRequestDTO.TravelEndDate + "<br/>Travel Purpose: " + travelApprovalRequestDTO.TravelPurpose;
+            var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+
+            await _emailSender.SendEmailAsync(messagemail);
+            #endregion
+
+
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new RespStatus { Status = "Success", Message = "Travel Request Created!" });
+        }
+
+        /// <summary>
+        /// This is option 2 : DEPARTMENT BASED CASH ADVANCE REQUEST
+        /// </summary>
+        /// <param name="travelApprovalRequestDto"></param>
+
+        private async Task DepartmentTravelRequest(TravelApprovalRequestDTO travelApprovalRequestDto)
+        {
+            //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
+            #region
+            int reqEmpid = travelApprovalRequestDto.EmployeeId;
+            int empApprGroupId = _context.Employees.Find(reqEmpid).ApprovalGroupId;
+
+            var travelApprovalRequest = new TravelApprovalRequest()
+            {
+                EmployeeId = reqEmpid,
+                TravelStartDate = travelApprovalRequestDto.TravelStartDate,
+                TravelEndDate = travelApprovalRequestDto.TravelEndDate,
+                TravelPurpose = travelApprovalRequestDto.TravelPurpose,
+                ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate,
+                CurrentStatus = (int)ApprovalStatus.Pending,
+                DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId,
+                ProjectId = travelApprovalRequestDto.ProjectId,
+                SubProjectId = travelApprovalRequestDto.SubProjectId,
+                WorkTaskId = travelApprovalRequestDto.WorkTaskId
+
+            };
+            _context.TravelApprovalRequests.Add(travelApprovalRequest);
+            await _context.SaveChangesAsync();
+
+            //get the saved record Id
+            travelApprovalRequestDto.Id = travelApprovalRequest.Id;
+
+            #endregion
+
+            //##### STEP 3. ClaimsApprovalTracker to be updated for all the allowed Approvers
+            #region
+            ///////////////////////////// Check if self Approved Request /////////////////////////////
+            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
+            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(reqEmpid).RoleId).FirstOrDefault().Id;
+            bool isSelfApprovedRequest = false;
+            //if highest approver is requesting Petty cash request himself
+            if (maxApprLevel == empApprLevel)
+            {
+                isSelfApprovedRequest = true;
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////
+
+            var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).ToList().OrderBy(o => o.ApprovalLevel.Level);
+
+            var ReqEmpRoleId = _context.Employees.Where(e => e.Id == reqEmpid).FirstOrDefault().RoleId;
+            var ReqEmpHisOwnApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == ReqEmpRoleId);
+            bool isFirstApprover = true;
+
+            if(isSelfApprovedRequest)
+            {
+                TravelApprovalStatusTracker travelApprovalStatusTracker = new()
+                {
+                    EmployeeId = travelApprovalRequestDto.EmployeeId,
+                    TravelApprovalRequestId = travelApprovalRequestDto.Id,
+                    TravelStartDate = travelApprovalRequestDto.TravelStartDate,
+                    TravelEndDate = travelApprovalRequestDto.TravelEndDate,
+                    DepartmentId = _context.Employees.Find(travelApprovalRequestDto.EmployeeId).DepartmentId,
+                    ProjectId = null,
+                    RoleId = _context.Employees.Find(travelApprovalRequestDto.EmployeeId).RoleId,
+                    ApprovalLevelId = empApprLevel,
+                    ReqDate = DateTime.Now,
+                    FinalApprovedDate = DateTime.Now,
+                    ApprovalStatusTypeId = (int)ApprovalStatus.Approved
+                    //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                };
+            }
+            else
+            {
+                foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
+                {
+
+                    int role_id = ApprMap.RoleId;
+                    var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
+
+                    if (ReqEmpRoleId >= approver.RoleId)
+                    {
+                        continue;
+                    }
+
+
+
+                    TravelApprovalStatusTracker travelApprovalStatusTracker = new()
+                    {
+                        EmployeeId = travelApprovalRequestDto.EmployeeId,
+                        TravelApprovalRequestId = travelApprovalRequestDto.Id,
+                        TravelStartDate = travelApprovalRequestDto.TravelStartDate,
+                        TravelEndDate = travelApprovalRequestDto.TravelEndDate,
+                        DepartmentId = approver.DepartmentId,
+                        ProjectId = null,
+                        RoleId = approver.RoleId,
+                        ApprovalLevelId = ApprMap.ApprovalLevelId,
+                        ReqDate = DateTime.Now,
+                        FinalApprovedDate = null,
+                        ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating
+                        //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    };
+
+
+                    _context.TravelApprovalStatusTrackers.Add(travelApprovalStatusTracker);
+                    await _context.SaveChangesAsync();
+
+
+                    if (isFirstApprover)
+                    {
+                        //##### 4. Send email to the Approver
+                        //####################################
+                        var approverMailAddress = approver.Email;
+                        string subject = "Travel Approval Request No# " + travelApprovalRequestDto.Id.ToString();
+                        Employee emp = await _context.Employees.FindAsync(travelApprovalRequestDto.EmployeeId);
+                        var pettycashreq = _context.TravelApprovalRequests.Find(travelApprovalRequestDto.Id);
+                        string content = "Travel Approval Request sought by " + emp.FirstName + "<br/>Travel Request Deetails <br/>Start Date: " + travelApprovalRequestDto.TravelStartDate + "<br/>End Date: " + travelApprovalRequestDto.TravelEndDate + "<br/>Travel Purpose: " + travelApprovalRequestDto.TravelPurpose;
+                        var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+
+                        await _emailSender.SendEmailAsync(messagemail);
+                    }
+
+                    //first approver will be added as Pending, other approvers will be with In Approval Queue
+                    isFirstApprover = false;
+
+                }
+            }
+
+          
+            #endregion
+
+
+            await _context.SaveChangesAsync();
+        }
+
+        [HttpGet("{id}")]
+        [ActionName("ApprovalFlowForTravelRequest")]
+        public ActionResult<IEnumerable<ApprovalStatusFlowVM>> GetApprovalFlowForTravelRequest(int id)
+        {
+
+            if (id == 0)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Flow Id is Invalid" });
+            }
+
+
+
+            var travelRequestTracks = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == id).ToList();
+
+            if (travelRequestTracks == null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Flow Id is Not Found" });
+            }
+
+            List<ApprovalStatusFlowVM> ListApprovalStatusFlow = new List<ApprovalStatusFlowVM>();
+
+            foreach (TravelApprovalStatusTracker travel in travelRequestTracks)
+            {
+                ApprovalStatusFlowVM approvalStatusFlow = new ApprovalStatusFlowVM()
+                {
+                    ApprovalLevel = travel.ApprovalLevelId,
+                    ApproverRole = _context.JobRoles.Find(travel.RoleId).RoleName,
+                    ApproverName = _context.Employees.Where(x => x.RoleId == travel.RoleId).Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault(),
+                    ApprovedDate = travel.FinalApprovedDate,
+                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status
+
+                };
+                ListApprovalStatusFlow.Add(approvalStatusFlow);
+            }
+
+            return Ok(ListApprovalStatusFlow);
+
+        }
         private enum ApprovalStatus
         {
-            Pending = 1,
+            Initiating = 1,
+            Pending,
+            InReview,
             Approved,
             Rejected
+
+        }
+
+        private enum ClaimType
+        {
+            CashAdvance = 1,
+            ExpenseReim
 
         }
 

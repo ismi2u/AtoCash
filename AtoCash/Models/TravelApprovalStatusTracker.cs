@@ -30,13 +30,12 @@ namespace AtoCash.Models
         public DateTime TravelEndDate { get; set; }
 
         //Approver Department
-        [Required]
         [ForeignKey("DepartmentId")]
         public virtual Department Department { get; set; }
         public int? DepartmentId { get; set; }
 
         //Approver Project (either Department or Project => Can't be both)
-        [Required]
+
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }
         public int? ProjectId { get; set; }
@@ -47,6 +46,12 @@ namespace AtoCash.Models
         [ForeignKey("RoleId")]
         public virtual JobRole Role { get; set; }
         public int RoleId { get; set; }
+
+        //Approver ApprovalLevel
+        [Required]
+        [ForeignKey("ApprovalLevelId")]
+        public virtual ApprovalLevel ApprovalLevel { get; set; }
+        public int ApprovalLevelId { get; set; }
 
         [Required]
         public DateTime ReqDate { get; set; }
