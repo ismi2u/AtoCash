@@ -28,12 +28,12 @@ namespace AtoCash.Controllers
         [ActionName("JobRolesForDropdown")]
         public async Task<ActionResult<IEnumerable<JobRoleVM>>> GetJobRolesForDropDown()
         {
-            List<JobRoleVM> ListJobRoleVM = new List<JobRoleVM>();
+            List<JobRoleVM> ListJobRoleVM = new();
 
             var jobRoles = await _context.JobRoles.ToListAsync();
             foreach (JobRole jobRole in jobRoles)
             {
-                JobRoleVM jobRoleVM = new JobRoleVM
+                JobRoleVM jobRoleVM = new()
                 {
                     Id = jobRole.Id,
                     RoleCode = jobRole.RoleCode

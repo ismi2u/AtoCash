@@ -15,7 +15,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    //[Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
 
 
     public class TravelApprovalRequestsController : ControllerBase
@@ -61,6 +61,10 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
                 travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
                 travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
+                travelApprovalRequestDTO.ApprovalStatusTypeId = travelApprovalRequest.ApprovalStatusTypeId;
+                travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
+                travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
+
 
                 ListTravelApprovalRequestDTO.Add(travelApprovalRequestDTO);
             }
@@ -102,7 +106,9 @@ namespace AtoCash.Controllers
             travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
             travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
             travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
-
+            travelApprovalRequestDTO.ApprovalStatusTypeId = travelApprovalRequest.ApprovalStatusTypeId;
+            travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
+            travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
 
             return travelApprovalRequestDTO;
         }
@@ -151,6 +157,10 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
                 travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
                 travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
+                travelApprovalRequestDTO.ApprovalStatusTypeId = travelApprovalRequest.ApprovalStatusTypeId;
+                travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
+                travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
+
 
                 TravelApprovalRequestDTOs.Add(travelApprovalRequestDTO);
             }
@@ -201,6 +211,10 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
                 travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
                 travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
+                travelApprovalRequestDTO.ApprovalStatusTypeId = travelApprovalRequest.ApprovalStatusTypeId;
+                travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
+                travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
+
 
                 TravelApprovalRequestDTOs.Add(travelApprovalRequestDTO);
             }
@@ -405,7 +419,7 @@ namespace AtoCash.Controllers
 
 
             #region
-            int costCentre = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCentreId;
+            int costCentreId = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCentreId;
             int projManagerid = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).ProjectManagerId;
             var approver = _context.Employees.Find(projManagerid);
             int reqEmpid = travelApprovalRequestDTO.EmployeeId;

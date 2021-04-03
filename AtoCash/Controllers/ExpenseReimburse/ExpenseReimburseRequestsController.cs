@@ -36,13 +36,13 @@ namespace AtoCash.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExpenseReimburseRequestDTO>>> GetExpenseReimburseRequests()
         {
-            List<ExpenseReimburseRequestDTO> ListExpenseReimburseRequestDTO = new List<ExpenseReimburseRequestDTO>();
+            List<ExpenseReimburseRequestDTO> ListExpenseReimburseRequestDTO = new();
 
             var expenseReimburseRequests = await _context.ExpenseReimburseRequests.ToListAsync();
 
             foreach (ExpenseReimburseRequest expenseReimburseRequest in expenseReimburseRequests)
             {
-                ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new ExpenseReimburseRequestDTO
+                ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new()
                 {
                     Id = expenseReimburseRequest.Id,
                     EmployeeId = expenseReimburseRequest.EmployeeId,
@@ -75,7 +75,7 @@ namespace AtoCash.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ExpenseReimburseRequestDTO>> GetExpenseReimburseRequest(int id)
         {
-            ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new ExpenseReimburseRequestDTO();
+            ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new();
 
             var expenseReimburseRequest = await _context.ExpenseReimburseRequests.FindAsync(id);
 
@@ -255,7 +255,7 @@ namespace AtoCash.Controllers
         {
 
             string uniqueFileName = string.Empty;
-            StringBuilder StrBuilderUploadedDocuments = new StringBuilder();
+            StringBuilder StrBuilderUploadedDocuments = new();
 
             if (expenseReimburseRequestDto.Documents != null && expenseReimburseRequestDto.Documents.Count > 0)
             {

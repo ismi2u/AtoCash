@@ -63,7 +63,7 @@ namespace AtoCash.Models
         public virtual ApprovalStatusType ApprovalStatusType { get; set; }
         public int ApprovalStatusTypeId { get; set; }
 
-
+        public string Comments { get; set; }
 
     }
 
@@ -73,7 +73,7 @@ namespace AtoCash.Models
         public int Id { get; set; }
         public int EmployeeId { get; set; }
         public string EmployeeName { get; set; }
-        public int TravelApprovalRequestId { get; set; }
+        public int? TravelApprovalRequestId { get; set; }
 
 
         public DateTime TravelStartDate { get; set; }
@@ -94,7 +94,7 @@ namespace AtoCash.Models
 
         public string ApprovalStatusType { get; set; }
 
-
+        public string Comments { get; set; }
 
     }
 }

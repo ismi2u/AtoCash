@@ -15,4 +15,10 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(8)")]
         public string Status { get; set; }
     }
+
+    public class StatusTypeVM
+    {
+        public int Id { get; set; }
+        public string Status { get; set; }
+    }
 }

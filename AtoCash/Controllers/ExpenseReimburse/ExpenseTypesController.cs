@@ -29,12 +29,12 @@ namespace AtoCash.Controllers
         [ActionName("ExpenseTypesForDropdown")]
         public async Task<ActionResult<IEnumerable<ExpenseTypeVM>>> GetExpenseTypesForDropdown()
         {
-            List<ExpenseTypeVM> ListExpenseTypeVM = new List<ExpenseTypeVM>();
+            List<ExpenseTypeVM> ListExpenseTypeVM = new();
 
             var expenseTypes = await _context.ExpenseTypes.Where(c => c.StatusTypeId == (int)StatusType.Active).ToListAsync();
             foreach (ExpenseType expenseType in expenseTypes)
             {
-                ExpenseTypeVM expenseTypeVM = new ExpenseTypeVM
+                ExpenseTypeVM expenseTypeVM = new()
                 {
                     Id = expenseType.Id,
                     ExpenseTypeName = expenseType.ExpenseTypeName,
@@ -50,13 +50,13 @@ namespace AtoCash.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExpenseTypeDTO>>> GetExpenseTypes()
         {
-            List<ExpenseTypeDTO> ListExpenseTypeDTO = new List<ExpenseTypeDTO>();
+            List<ExpenseTypeDTO> ListExpenseTypeDTO = new();
 
             var expenseTypes = await _context.ExpenseTypes.ToListAsync();
 
             foreach (ExpenseType expenseType in expenseTypes)
             {
-                ExpenseTypeDTO expenseTypeDTO = new ExpenseTypeDTO
+                ExpenseTypeDTO expenseTypeDTO = new()
                 {
                     Id = expenseType.Id,
                     ExpenseTypeName = expenseType.ExpenseTypeName,
@@ -82,7 +82,7 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
-            ExpenseTypeDTO expenseTypeDTO = new ExpenseTypeDTO
+            ExpenseTypeDTO expenseTypeDTO = new()
             {
                 Id = expenseType.Id,
                 ExpenseTypeName = expenseType.ExpenseTypeName,

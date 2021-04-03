@@ -31,30 +31,32 @@ namespace AtoCash.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ClaimApprovalStatusTrackerDTO>>> GetClaimApprovalStatusTrackers()
         {
-            List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new List<ClaimApprovalStatusTrackerDTO>();
+            List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new();
 
             var claimApprovalStatusTrackers = await _context.ClaimApprovalStatusTrackers.ToListAsync();
 
             foreach (ClaimApprovalStatusTracker claimApprovalStatusTracker in claimApprovalStatusTrackers)
             {
-                ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new ClaimApprovalStatusTrackerDTO();
-                claimApprovalStatusTrackerDTO.Id = claimApprovalStatusTracker.Id;
-                claimApprovalStatusTrackerDTO.EmployeeId = claimApprovalStatusTracker.EmployeeId;
-                claimApprovalStatusTrackerDTO.EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName();
-                claimApprovalStatusTrackerDTO.PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId;
-                claimApprovalStatusTrackerDTO.ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId;
-                claimApprovalStatusTrackerDTO.DepartmentId = claimApprovalStatusTracker.DepartmentId;
-                claimApprovalStatusTrackerDTO.DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null;
-                claimApprovalStatusTrackerDTO.ProjectId = claimApprovalStatusTracker.ProjectId;
-                claimApprovalStatusTrackerDTO.ProjectName = claimApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName : null;
-                claimApprovalStatusTrackerDTO.RoleId = claimApprovalStatusTracker.RoleId;
-                claimApprovalStatusTrackerDTO.JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName;
-                claimApprovalStatusTrackerDTO.ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId;
-                claimApprovalStatusTrackerDTO.ReqDate = claimApprovalStatusTracker.ReqDate;
-                claimApprovalStatusTrackerDTO.FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate;
-                claimApprovalStatusTrackerDTO.ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId;
-                claimApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status;
-                claimApprovalStatusTrackerDTO.Comments = claimApprovalStatusTracker.Comments;
+                ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new()
+                {
+                    Id = claimApprovalStatusTracker.Id,
+                    EmployeeId = claimApprovalStatusTracker.EmployeeId,
+                    EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
+                    PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
+                    ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
+                    DepartmentId = claimApprovalStatusTracker.DepartmentId,
+                    DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null,
+                    ProjectId = claimApprovalStatusTracker.ProjectId,
+                    ProjectName = claimApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName : null,
+                    RoleId = claimApprovalStatusTracker.RoleId,
+                    JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName,
+                    ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId,
+                    ReqDate = claimApprovalStatusTracker.ReqDate,
+                    FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate,
+                    ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId,
+                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status,
+                    Comments = claimApprovalStatusTracker.Comments
+                };
 
                 ListClaimApprovalStatusTrackerDTO.Add(claimApprovalStatusTrackerDTO);
 
@@ -76,24 +78,26 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
-            ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new ClaimApprovalStatusTrackerDTO();
-            claimApprovalStatusTrackerDTO.Id = claimApprovalStatusTracker.Id;
-            claimApprovalStatusTrackerDTO.EmployeeId = claimApprovalStatusTracker.EmployeeId;
-            claimApprovalStatusTrackerDTO.EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName();
-            claimApprovalStatusTrackerDTO.PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId;
-            claimApprovalStatusTrackerDTO.ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId;
-            claimApprovalStatusTrackerDTO.DepartmentId = claimApprovalStatusTracker.DepartmentId;
-            claimApprovalStatusTrackerDTO.DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null;
-            claimApprovalStatusTrackerDTO.ProjectId = claimApprovalStatusTracker.ProjectId;
-            claimApprovalStatusTrackerDTO.ProjectName = claimApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName : null;
-            claimApprovalStatusTrackerDTO.RoleId = claimApprovalStatusTracker.RoleId;
-            claimApprovalStatusTrackerDTO.JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName;
-            claimApprovalStatusTrackerDTO.ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId;
-            claimApprovalStatusTrackerDTO.ReqDate = claimApprovalStatusTracker.ReqDate;
-            claimApprovalStatusTrackerDTO.FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate;
-            claimApprovalStatusTrackerDTO.ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId;
-            claimApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status;
-            claimApprovalStatusTrackerDTO.Comments = claimApprovalStatusTracker.Comments;
+            ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new()
+            {
+                Id = claimApprovalStatusTracker.Id,
+                EmployeeId = claimApprovalStatusTracker.EmployeeId,
+                EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
+                PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
+                ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
+                DepartmentId = claimApprovalStatusTracker.DepartmentId,
+                DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null,
+                ProjectId = claimApprovalStatusTracker.ProjectId,
+                ProjectName = claimApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName : null,
+                RoleId = claimApprovalStatusTracker.RoleId,
+                JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName,
+                ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId,
+                ReqDate = claimApprovalStatusTracker.ReqDate,
+                FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate,
+                ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId,
+                ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status,
+                Comments = claimApprovalStatusTracker.Comments
+            };
 
 
             return claimApprovalStatusTrackerDTO;
@@ -118,10 +122,7 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "No Request to Approve!" });
             }
 
-            //if (id != claimApprovalStatusTrackerDto.Id)
-            //{
-            //    return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
-            //}
+
             bool isNextApproverAvailable = true;
             foreach (ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto in ListClaimApprovalStatusTrackerDto)
             {
@@ -235,11 +236,9 @@ namespace AtoCash.Controllers
                     //if nothing else then just update the approval status
                     claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
 
-
                 }
                 else
                 {
-
                     //final approver hence update PettyCashRequest
                     claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == claimApprovalStatusTracker.PettyCashRequestId &&
                                 c.ApprovalStatusTypeId == (int)ApprovalStatus.Pending).FirstOrDefault();
@@ -250,6 +249,14 @@ namespace AtoCash.Controllers
 
                     disbAndClaimItem.ApprovalStatusId = (int)ApprovalStatus.Approved;
                     _context.Update(disbAndClaimItem);
+
+                    //Update Pettycashrequest table to update the record to Approved as the final approver has approved it.
+                    int pettyCashReqId = _context.PettyCashRequests.Where(d => d.Id == claimitem.PettyCashRequestId).FirstOrDefault().Id;
+                    var pettyCashReq = await _context.PettyCashRequests.FindAsync(pettyCashReqId);
+
+                    pettyCashReq.ApprovalStatusTypeId = (int)ApprovalStatus.Approved;
+                    pettyCashReq.ApprovedDate = DateTime.Now;
+                    _context.Update(pettyCashReq);
 
                 }
 
@@ -265,7 +272,7 @@ namespace AtoCash.Controllers
                 throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Cash Advances is/are Approved!" });
         }
 
 
@@ -274,9 +281,9 @@ namespace AtoCash.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<ActionResult<ClaimApprovalStatusTracker>> PostClaimApprovalStatusTracker(ClaimApprovalStatusTracker claimApprovalStatusTrackerDto)
+        public async Task<ActionResult<ClaimApprovalStatusTracker>> PostClaimApprovalStatusTracker(ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto)
         {
-            ClaimApprovalStatusTracker claimApprovalStatusTracker = new ClaimApprovalStatusTracker
+            ClaimApprovalStatusTracker claimApprovalStatusTracker = new()
             {
                 Id = claimApprovalStatusTrackerDto.Id,
                 EmployeeId = claimApprovalStatusTrackerDto.EmployeeId,
@@ -288,7 +295,7 @@ namespace AtoCash.Controllers
                 ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId,
                 ReqDate = claimApprovalStatusTrackerDto.ReqDate,
                 FinalApprovedDate = claimApprovalStatusTrackerDto.FinalApprovedDate,
-                ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId,
+                ApprovalStatusTypeId = (int)ApprovalStatus.Pending,
                 Comments = claimApprovalStatusTrackerDto.Comments
         };
 
@@ -347,28 +354,30 @@ namespace AtoCash.Controllers
             }
 
             var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)ApprovalStatus.Pending);
-            List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new List<ClaimApprovalStatusTrackerDTO>();
+            List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new();
 
             foreach (ClaimApprovalStatusTracker claimApprovalStatusTracker in claimApprovalStatusTrackers)
             {
-                ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new ClaimApprovalStatusTrackerDTO();
-                claimApprovalStatusTrackerDTO.Id = claimApprovalStatusTracker.Id;
-                claimApprovalStatusTrackerDTO.EmployeeId = claimApprovalStatusTracker.EmployeeId;
-                claimApprovalStatusTrackerDTO.EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName();
-                claimApprovalStatusTrackerDTO.PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId;
-                claimApprovalStatusTrackerDTO.ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId;
-                claimApprovalStatusTrackerDTO.DepartmentId = claimApprovalStatusTracker.DepartmentId;
-                claimApprovalStatusTrackerDTO.DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null;
-                claimApprovalStatusTrackerDTO.ProjectId = claimApprovalStatusTracker.ProjectId;
-                claimApprovalStatusTrackerDTO.ProjectName = claimApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName : null;
-                claimApprovalStatusTrackerDTO.RoleId = claimApprovalStatusTracker.RoleId;
-                claimApprovalStatusTrackerDTO.JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName;
-                claimApprovalStatusTrackerDTO.ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId;
-                claimApprovalStatusTrackerDTO.ReqDate = claimApprovalStatusTracker.ReqDate;
-                claimApprovalStatusTrackerDTO.FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate;
-                claimApprovalStatusTrackerDTO.ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId;
-                claimApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status;
-                claimApprovalStatusTrackerDTO.Comments = claimApprovalStatusTracker.Comments;
+                ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new()
+                {
+                    Id = claimApprovalStatusTracker.Id,
+                    EmployeeId = claimApprovalStatusTracker.EmployeeId,
+                    EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
+                    PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
+                    ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
+                    DepartmentId = claimApprovalStatusTracker.DepartmentId,
+                    DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null,
+                    ProjectId = claimApprovalStatusTracker.ProjectId,
+                    ProjectName = claimApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(claimApprovalStatusTracker.ProjectId).ProjectName : null,
+                    RoleId = claimApprovalStatusTracker.RoleId,
+                    JobRole = _context.JobRoles.Find(claimApprovalStatusTracker.RoleId).RoleName,
+                    ApprovalLevelId = claimApprovalStatusTracker.ApprovalLevelId,
+                    ReqDate = claimApprovalStatusTracker.ReqDate,
+                    FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate,
+                    ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId,
+                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status,
+                    Comments = claimApprovalStatusTracker.Comments
+                };
 
 
                 ListClaimApprovalStatusTrackerDTO.Add(claimApprovalStatusTrackerDTO);
@@ -430,11 +439,11 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "PettycashRequest Id is Not Found" });
             }
 
-            List<ApprovalStatusFlowVM> ListApprovalStatusFlow = new List<ApprovalStatusFlowVM>();
+            List<ApprovalStatusFlowVM> ListApprovalStatusFlow = new();
 
             foreach (ClaimApprovalStatusTracker claim in claimRequestTracks)
             {
-                ApprovalStatusFlowVM approvalStatusFlow = new ApprovalStatusFlowVM()
+                ApprovalStatusFlowVM approvalStatusFlow = new()
                 {
                     ApprovalLevel = claim.ApprovalLevelId,
                     ApproverRole = _context.JobRoles.Find(claim.RoleId).RoleName,

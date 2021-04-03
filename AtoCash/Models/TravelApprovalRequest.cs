@@ -57,6 +57,14 @@ namespace AtoCash.Models
         public virtual WorkTask WorkTask { get; set; }
         public int? WorkTaskId { get; set; }
 
+
+        [Required]
+        [ForeignKey("ApprovalStatusTypeId")]
+        public virtual ApprovalStatusType ApprovalStatusType { get; set; }
+        public int ApprovalStatusTypeId { get; set; }
+
+        public DateTime? ApprovedDate { get; set; }
+
     }
 
     public class TravelApprovalRequestDTO
@@ -80,6 +88,9 @@ namespace AtoCash.Models
         public int? WorkTaskId { get; set; }
         public string WorkTask { get; set; }
 
+        public int ApprovalStatusTypeId { get; set; }
+        public string ApprovalStatusType { get; set; }
+        public DateTime? ApprovedDate { get; set; }
 
     }
 }

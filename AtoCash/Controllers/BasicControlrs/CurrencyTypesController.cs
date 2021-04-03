@@ -28,12 +28,12 @@ namespace AtoCash.Controllers.BasicControlrs
         [ActionName("CurrencyTypesForDropdown")]
         public async Task<ActionResult<IEnumerable<CurrencyTypeVM>>> GetCurrencyTypesForDropdown()
         {
-            List<CurrencyTypeVM> ListCurrencyTypeVM = new List<CurrencyTypeVM>();
+            List<CurrencyTypeVM> ListCurrencyTypeVM = new();
 
             var currencyTypes = await _context.CurrencyTypes.Where(c => c.StatusTypeId == (int)StatusType.Active).ToListAsync();
             foreach (CurrencyType currencyType in currencyTypes)
             {
-                CurrencyTypeVM currencyTypeVM = new CurrencyTypeVM
+                CurrencyTypeVM currencyTypeVM = new()
                 {
                     Id = currencyType.Id,
                     CurrencyCode = currencyType.CurrencyCode,
@@ -52,13 +52,13 @@ namespace AtoCash.Controllers.BasicControlrs
         public async Task<ActionResult<IEnumerable<CurrencyTypeDTO>>> GetCurrencyTypes()
         {
 
-            List<CurrencyTypeDTO> ListCurrencyTypeDTO = new List<CurrencyTypeDTO>();
+            List<CurrencyTypeDTO> ListCurrencyTypeDTO = new();
 
             var currencyTypes = await _context.CurrencyTypes.ToListAsync();
 
             foreach (CurrencyType currencyType in currencyTypes)
             {
-                CurrencyTypeDTO currencyTypeDTO = new CurrencyTypeDTO
+                CurrencyTypeDTO currencyTypeDTO = new()
                 {
                     Id = currencyType.Id,
                     CurrencyCode = currencyType.CurrencyCode,
@@ -84,7 +84,7 @@ namespace AtoCash.Controllers.BasicControlrs
                 return NotFound();
             }
 
-            CurrencyTypeDTO currencyTypeDTO = new CurrencyTypeDTO
+            CurrencyTypeDTO currencyTypeDTO = new()
             {
                 Id = currencyType.Id,
                 CurrencyCode = currencyType.CurrencyCode,

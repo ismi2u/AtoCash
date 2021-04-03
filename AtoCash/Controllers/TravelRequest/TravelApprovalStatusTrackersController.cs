@@ -35,29 +35,30 @@ namespace AtoCash.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TravelApprovalStatusTrackerDTO>>> GetTravelApprovalStatusTrackers()
         {
-            List<TravelApprovalStatusTrackerDTO> ListTravelApprovalStatusTrackerDTO = new List<TravelApprovalStatusTrackerDTO>();
+            List<TravelApprovalStatusTrackerDTO> ListTravelApprovalStatusTrackerDTO = new();
 
             var TravelApprovalStatusTrackers = await _context.TravelApprovalStatusTrackers.ToListAsync();
 
             foreach (TravelApprovalStatusTracker travelApprovalStatusTracker in TravelApprovalStatusTrackers)
             {
-                TravelApprovalStatusTrackerDTO TravelApprovalStatusTrackerDTO = new TravelApprovalStatusTrackerDTO();
-
-                TravelApprovalStatusTrackerDTO.Id = travelApprovalStatusTracker.Id;
-                TravelApprovalStatusTrackerDTO.EmployeeId = travelApprovalStatusTracker.EmployeeId;
-                TravelApprovalStatusTrackerDTO.EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName();
-                TravelApprovalStatusTrackerDTO.TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId;
-                TravelApprovalStatusTrackerDTO.DepartmentId = travelApprovalStatusTracker.DepartmentId;
-                TravelApprovalStatusTrackerDTO.DepartmentName = travelApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(travelApprovalStatusTracker.DepartmentId).DeptName : null;
-                TravelApprovalStatusTrackerDTO.ProjectId = travelApprovalStatusTracker.ProjectId;
-                TravelApprovalStatusTrackerDTO.ProjectName = travelApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(travelApprovalStatusTracker.ProjectId).ProjectName : null;
-                TravelApprovalStatusTrackerDTO.RoleId = travelApprovalStatusTracker.RoleId;
-                TravelApprovalStatusTrackerDTO.JobRole = _context.JobRoles.Find(travelApprovalStatusTracker.RoleId).RoleName;
-                TravelApprovalStatusTrackerDTO.ApprovalLevelId = travelApprovalStatusTracker.ApprovalLevelId;
-                TravelApprovalStatusTrackerDTO.ReqDate = travelApprovalStatusTracker.ReqDate;
-                TravelApprovalStatusTrackerDTO.FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate;
-                TravelApprovalStatusTrackerDTO.ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId;
-                TravelApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status;
+                TravelApprovalStatusTrackerDTO TravelApprovalStatusTrackerDTO = new()
+                {
+                    Id = travelApprovalStatusTracker.Id,
+                    EmployeeId = travelApprovalStatusTracker.EmployeeId,
+                    EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName(),
+                    TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId,
+                    DepartmentId = travelApprovalStatusTracker.DepartmentId,
+                    DepartmentName = travelApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(travelApprovalStatusTracker.DepartmentId).DeptName : null,
+                    ProjectId = travelApprovalStatusTracker.ProjectId,
+                    ProjectName = travelApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(travelApprovalStatusTracker.ProjectId).ProjectName : null,
+                    RoleId = travelApprovalStatusTracker.RoleId,
+                    JobRole = _context.JobRoles.Find(travelApprovalStatusTracker.RoleId).RoleName,
+                    ApprovalLevelId = travelApprovalStatusTracker.ApprovalLevelId,
+                    ReqDate = travelApprovalStatusTracker.ReqDate,
+                    FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate,
+                    ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId,
+                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status
+                };
 
 
                 ListTravelApprovalStatusTrackerDTO.Add(TravelApprovalStatusTrackerDTO);
@@ -78,23 +79,24 @@ namespace AtoCash.Controllers
                 return NotFound();
             }
 
-            TravelApprovalStatusTrackerDTO TravelApprovalStatusTrackerDTO = new TravelApprovalStatusTrackerDTO();
-
-            TravelApprovalStatusTrackerDTO.Id = travelApprovalStatusTracker.Id;
-            TravelApprovalStatusTrackerDTO.EmployeeId = travelApprovalStatusTracker.EmployeeId;
-            TravelApprovalStatusTrackerDTO.EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName();
-            TravelApprovalStatusTrackerDTO.TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId;
-            TravelApprovalStatusTrackerDTO.DepartmentId = travelApprovalStatusTracker.DepartmentId;
-            TravelApprovalStatusTrackerDTO.DepartmentName = travelApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(travelApprovalStatusTracker.DepartmentId).DeptName : null;
-            TravelApprovalStatusTrackerDTO.ProjectId = travelApprovalStatusTracker.ProjectId;
-            TravelApprovalStatusTrackerDTO.ProjectName = travelApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(travelApprovalStatusTracker.ProjectId).ProjectName : null;
-            TravelApprovalStatusTrackerDTO.RoleId = travelApprovalStatusTracker.RoleId;
-            TravelApprovalStatusTrackerDTO.JobRole = _context.JobRoles.Find(travelApprovalStatusTracker.RoleId).RoleName;
-            TravelApprovalStatusTrackerDTO.ApprovalLevelId = travelApprovalStatusTracker.ApprovalLevelId;
-            TravelApprovalStatusTrackerDTO.ReqDate = travelApprovalStatusTracker.ReqDate;
-            TravelApprovalStatusTrackerDTO.FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate;
-            TravelApprovalStatusTrackerDTO.ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId;
-            TravelApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status;
+            TravelApprovalStatusTrackerDTO TravelApprovalStatusTrackerDTO = new()
+            {
+                Id = travelApprovalStatusTracker.Id,
+                EmployeeId = travelApprovalStatusTracker.EmployeeId,
+                EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName(),
+                TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId,
+                DepartmentId = travelApprovalStatusTracker.DepartmentId,
+                DepartmentName = travelApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(travelApprovalStatusTracker.DepartmentId).DeptName : null,
+                ProjectId = travelApprovalStatusTracker.ProjectId,
+                ProjectName = travelApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(travelApprovalStatusTracker.ProjectId).ProjectName : null,
+                RoleId = travelApprovalStatusTracker.RoleId,
+                JobRole = _context.JobRoles.Find(travelApprovalStatusTracker.RoleId).RoleName,
+                ApprovalLevelId = travelApprovalStatusTracker.ApprovalLevelId,
+                ReqDate = travelApprovalStatusTracker.ReqDate,
+                FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate,
+                ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId,
+                ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status
+            };
 
 
             return travelApprovalStatusTracker;
@@ -102,15 +104,148 @@ namespace AtoCash.Controllers
 
         // PUT: api/TravelApprovalStatusTrackers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTravelApprovalStatusTracker(int id, TravelApprovalStatusTracker travelApprovalStatusTracker)
+        [HttpPut]
+        public async Task<IActionResult> PutTravelApprovalStatusTracker(List<TravelApprovalStatusTrackerDTO> ListTravelApprovalStatusTrackerDTO)
         {
-            if (id != travelApprovalStatusTracker.Id)
+            if (ListTravelApprovalStatusTrackerDTO.Count == 0)
             {
-                return BadRequest();
+                return Conflict(new RespStatus { Status = "Failure", Message = "No Request to Approve!" });
             }
 
-            _context.Entry(travelApprovalStatusTracker).State = EntityState.Modified;
+            bool isNextApproverAvailable = true;
+            foreach (TravelApprovalStatusTrackerDTO travelApprovalStatusTrackerDTO in ListTravelApprovalStatusTrackerDTO)
+            {
+                var travelApprovalStatusTracker = await _context.TravelApprovalStatusTrackers.FindAsync(travelApprovalStatusTrackerDTO.Id);
+
+                //if same status continue to next loop, otherwise process
+                if (travelApprovalStatusTracker.ApprovalStatusTypeId == travelApprovalStatusTrackerDTO.ApprovalStatusTypeId)
+                {
+                    continue;
+                }
+
+                travelApprovalStatusTracker.Id = travelApprovalStatusTrackerDTO.Id;
+                travelApprovalStatusTracker.EmployeeId = travelApprovalStatusTrackerDTO.EmployeeId;
+
+                travelApprovalStatusTracker.TravelApprovalRequestId = travelApprovalStatusTrackerDTO.TravelApprovalRequestId ?? 0;
+
+                travelApprovalStatusTracker.DepartmentId = travelApprovalStatusTrackerDTO.DepartmentId;
+                travelApprovalStatusTracker.ProjectId = travelApprovalStatusTrackerDTO.ProjectId;
+                travelApprovalStatusTracker.RoleId = travelApprovalStatusTrackerDTO.RoleId;
+                travelApprovalStatusTracker.ApprovalLevelId = travelApprovalStatusTrackerDTO.ApprovalLevelId;
+                travelApprovalStatusTracker.ReqDate = travelApprovalStatusTrackerDTO.ReqDate;
+                travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
+                travelApprovalStatusTracker.Comments = travelApprovalStatusTrackerDTO.Comments;
+
+                TravelApprovalStatusTracker travelItem;
+
+                //department based request
+                if (travelApprovalStatusTrackerDTO.DepartmentId != null)
+                {
+                    int empApprGroupId = _context.Employees.Find(travelApprovalStatusTrackerDTO.EmployeeId).ApprovalGroupId;
+
+                    //Check if the record is already approved
+                    //if it is not approved then trigger next approver level email & Change the status to approved
+                    if (travelApprovalStatusTrackerDTO.ApprovalStatusTypeId == (int)ApprovalStatus.Approved)
+                    {
+                        //Get the next approval level (get its ID)
+                        int qTravelApprovalRequestId = travelApprovalStatusTrackerDTO.TravelApprovalRequestId ?? 0;
+
+                        isNextApproverAvailable = true;
+
+                        int CurTravelApprovalLevel = _context.ApprovalLevels.Find(travelApprovalStatusTrackerDTO.ApprovalLevelId).Level;
+                        int nextClaimApprovalLevel = CurTravelApprovalLevel + 1;
+                        int qApprovalLevelId;
+                        if (_context.ApprovalLevels.Where(x => x.Level == nextClaimApprovalLevel).FirstOrDefault() != null)
+                        {
+                            qApprovalLevelId = _context.ApprovalLevels.Where(x => x.Level == nextClaimApprovalLevel).FirstOrDefault().Id;
+                        }
+                        else
+                        {
+                            qApprovalLevelId = _context.ApprovalLevels.Where(x => x.Level == CurTravelApprovalLevel).FirstOrDefault().Id;
+                            isNextApproverAvailable = false;
+                        }
+
+                        int qApprovalStatusTypeId = isNextApproverAvailable ? (int)ApprovalStatus.Initiating : (int)ApprovalStatus.Pending;
+
+                        //update the next level approver Track request to PENDING (from Initiating) 
+                        //if claimitem is not null change the status
+                        if (isNextApproverAvailable)
+                        {
+                            travelItem = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == qTravelApprovalRequestId &&
+                                c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
+                                c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
+                            travelItem.ApprovalStatusTypeId = (int)ApprovalStatus.Pending;
+
+                        }
+                        else
+                        {
+                            //final approver hence update TravelApprovalRequest
+                            travelItem = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == qTravelApprovalRequestId &&
+                               c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
+                               c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
+                            //travelItem.ApprovalStatusTypeId = (int)ApprovalStatus.Approved;
+                            travelItem.FinalApprovedDate = DateTime.Now;
+
+                        }
+
+                        //Save to database
+                        _context.Update(travelItem);
+                        await _context.SaveChangesAsync();
+                        var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).OrderBy(a => a.ApprovalLevel).ToList();
+
+                        foreach (var ApprMap in getEmpClaimApproversAllLevels)
+                        {
+
+                            //only next level (level + 1) approver is considered here
+                            if (ApprMap.ApprovalLevelId == travelApprovalStatusTracker.ApprovalLevelId + 1)
+                            {
+                                int role_id = ApprMap.RoleId;
+                                var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
+
+                                //##### 4. Send email to the Approver
+                                //####################################
+                                var approverMailAddress = approver.Email;
+                                string subject = "Travel Approval Request " + travelApprovalStatusTracker.TravelApprovalRequestId.ToString();
+                                Employee emp = await _context.Employees.FindAsync(travelApprovalStatusTracker.EmployeeId);
+                                var travelApprReq = _context.TravelApprovalRequests.Find(travelApprovalStatusTracker.TravelApprovalRequestId);
+                                string content = "Travel Request Approval sought by " + emp.FirstName + "<br/>for the purpose of " + travelApprReq.TravelPurpose;
+                                var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+
+
+                                await _emailSender.SendEmailAsync(messagemail);
+
+                                break;
+
+                            }
+                        }
+                    }
+
+                    //if nothing else then just update the approval status
+                    travelApprovalStatusTracker.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
+
+
+                }
+                else //if the approver is the final approver
+                {
+
+                    //final approver hence update TravelApprovalRequest
+                    travelItem = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == travelApprovalStatusTracker.TravelApprovalRequestId &&
+                                c.ApprovalStatusTypeId == (int)ApprovalStatus.Pending).FirstOrDefault();
+                    travelApprovalStatusTracker.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
+                    //Update the TravelApprovalRequst table -> update the record to Approved (ApprovalStatusId
+
+                    int travelApprovalrequestId = _context.TravelApprovalRequests.Where(d => d.Id == travelItem.TravelApprovalRequestId).FirstOrDefault().Id;
+                    var travelApprovalrequest = await _context.TravelApprovalRequests.FindAsync(travelApprovalrequestId);
+
+                    travelApprovalrequest.ApprovalStatusTypeId = (int)ApprovalStatus.Approved;
+                    travelApprovalrequest.ApprovedDate = DateTime.Now;
+                    _context.Update(travelApprovalrequest);
+
+                }
+
+                _context.TravelApprovalStatusTrackers.Update(travelApprovalStatusTracker);
+            }
+
 
             try
             {
@@ -118,17 +253,10 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TravelApprovalStatusTrackerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Travel Approval Request is/are Approved!" });
         }
 
         // POST: api/TravelApprovalStatusTrackers
@@ -183,27 +311,28 @@ namespace AtoCash.Controllers
             }
 
             var TravelApprovalStatusTrackers = _context.TravelApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)ApprovalStatus.Pending);
-            List<TravelApprovalStatusTrackerDTO> ListTravelApprovalStatusTrackerDTO = new List<TravelApprovalStatusTrackerDTO>();
+            List<TravelApprovalStatusTrackerDTO> ListTravelApprovalStatusTrackerDTO = new();
 
             foreach (TravelApprovalStatusTracker travelApprovalStatusTracker in TravelApprovalStatusTrackers)
             {
-                TravelApprovalStatusTrackerDTO TravelApprovalStatusTrackerDTO = new TravelApprovalStatusTrackerDTO();
-
-                TravelApprovalStatusTrackerDTO.Id = travelApprovalStatusTracker.Id;
-                TravelApprovalStatusTrackerDTO.EmployeeId = travelApprovalStatusTracker.EmployeeId;
-                TravelApprovalStatusTrackerDTO.EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName();
-                TravelApprovalStatusTrackerDTO.TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId;
-                TravelApprovalStatusTrackerDTO.DepartmentId = travelApprovalStatusTracker.DepartmentId;
-                TravelApprovalStatusTrackerDTO.DepartmentName = travelApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(travelApprovalStatusTracker.DepartmentId).DeptName : null;
-                TravelApprovalStatusTrackerDTO.ProjectId = travelApprovalStatusTracker.ProjectId;
-                TravelApprovalStatusTrackerDTO.ProjectName = travelApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(travelApprovalStatusTracker.ProjectId).ProjectName : null;
-                TravelApprovalStatusTrackerDTO.RoleId = travelApprovalStatusTracker.RoleId;
-                TravelApprovalStatusTrackerDTO.JobRole = _context.JobRoles.Find(travelApprovalStatusTracker.RoleId).RoleName;
-                TravelApprovalStatusTrackerDTO.ApprovalLevelId = travelApprovalStatusTracker.ApprovalLevelId;
-                TravelApprovalStatusTrackerDTO.ReqDate = travelApprovalStatusTracker.ReqDate;
-                TravelApprovalStatusTrackerDTO.FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate;
-                TravelApprovalStatusTrackerDTO.ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId;
-                TravelApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status;
+                TravelApprovalStatusTrackerDTO TravelApprovalStatusTrackerDTO = new()
+                {
+                    Id = travelApprovalStatusTracker.Id,
+                    EmployeeId = travelApprovalStatusTracker.EmployeeId,
+                    EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName(),
+                    TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId,
+                    DepartmentId = travelApprovalStatusTracker.DepartmentId,
+                    DepartmentName = travelApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(travelApprovalStatusTracker.DepartmentId).DeptName : null,
+                    ProjectId = travelApprovalStatusTracker.ProjectId,
+                    ProjectName = travelApprovalStatusTracker.ProjectId != null ? _context.Projects.Find(travelApprovalStatusTracker.ProjectId).ProjectName : null,
+                    RoleId = travelApprovalStatusTracker.RoleId,
+                    JobRole = _context.JobRoles.Find(travelApprovalStatusTracker.RoleId).RoleName,
+                    ApprovalLevelId = travelApprovalStatusTracker.ApprovalLevelId,
+                    ReqDate = travelApprovalStatusTracker.ReqDate,
+                    FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate,
+                    ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId,
+                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status
+                };
 
 
                 ListTravelApprovalStatusTrackerDTO.Add(TravelApprovalStatusTrackerDTO);
@@ -257,11 +386,11 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Approval Flow Id is Not Found" });
             }
 
-            List<ApprovalStatusFlowVM> ListApprovalStatusFlow = new List<ApprovalStatusFlowVM>();
+            List<ApprovalStatusFlowVM> ListApprovalStatusFlow = new();
 
             foreach (TravelApprovalStatusTracker travel in travelRequestTracks)
             {
-                ApprovalStatusFlowVM approvalStatusFlow = new ApprovalStatusFlowVM()
+                ApprovalStatusFlowVM approvalStatusFlow = new()
                 {
                     ApprovalLevel = travel.ApprovalLevelId,
                     ApproverRole = _context.JobRoles.Find(travel.RoleId).RoleName,

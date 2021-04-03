@@ -7,11 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AtoCash.Controllers.BasicControlrs
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
+    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class StatusTypesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -20,6 +22,29 @@ namespace AtoCash.Controllers.BasicControlrs
         {
             _context = context;
         }
+
+        [HttpGet]
+        [ActionName("StatusTypesForDropdown")]
+        public async Task<ActionResult<IEnumerable<StatusTypeVM>>> GetStatusTypesForDropdown()
+        {
+            List<StatusTypeVM> ListStatusTypeVM = new();
+
+            var statusTypes = await _context.StatusTypes.ToListAsync();
+            foreach (StatusType statusType in statusTypes)
+            {
+                StatusTypeVM statusTypeVM = new()
+                {
+                    Id = statusType.Id,
+                    Status = statusType.Status,
+                };
+
+                ListStatusTypeVM.Add(statusTypeVM);
+            }
+
+            return ListStatusTypeVM;
+
+        }
+
 
         // GET: api/StatusTypes
         [HttpGet]
@@ -45,6 +70,7 @@ namespace AtoCash.Controllers.BasicControlrs
         // PUT: api/StatusTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> PutStatusType(int id, StatusType statusType)
         {
             if (id != statusType.Id)
@@ -76,6 +102,7 @@ namespace AtoCash.Controllers.BasicControlrs
         // POST: api/StatusTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<ActionResult<StatusType>> PostStatusType(StatusType statusType)
         {
             _context.StatusTypes.Add(statusType);
@@ -86,6 +113,7 @@ namespace AtoCash.Controllers.BasicControlrs
 
         // DELETE: api/StatusTypes/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteStatusType(int id)
         {
             var statusType = await _context.StatusTypes.FindAsync(id);
