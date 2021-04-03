@@ -54,8 +54,15 @@ namespace AtoCash.Models
         [Required]
         public DateTime RecordDate { get; set; }
 
+
         [Required]
-        
+        [ForeignKey("CurrencyTypeId")]
+        public virtual CurrencyType CurrencyType { get; set; }
+        public int CurrencyTypeId { get; set; }
+
+
+
+        [Required]
         public Double Amount { get; set; }
 
 
@@ -67,6 +74,26 @@ namespace AtoCash.Models
         [Required]
         [ForeignKey("ApprovalStatusId")]
         public ApprovalStatusType ApprovalStatusType { get; set; }
+        public int ApprovalStatusId { get; set; }
+
+
+
+    }
+
+    public class DisbursementsAndClaimsMasterDTO
+    {
+
+        public int Id { get; set; }
+        public int EmployeeId { get; set; }
+        public int? PettyCashRequestId { get; set; }
+        public int? ExpenseReimburseReqId { get; set; }
+        public int RequestTypeId { get; set; }
+        public int? ProjectId { get; set; }
+        public int? SubProjectId { get; set; }
+        public int? WorkTaskId { get; set; }
+        public DateTime RecordDate { get; set; }
+        public Double Amount { get; set; }
+        public int CostCentreId { get; set; }
         public int ApprovalStatusId { get; set; }
 
 

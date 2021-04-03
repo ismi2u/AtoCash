@@ -647,44 +647,7 @@ namespace AtoCash.Controllers
             await _context.SaveChangesAsync();
         }
 
-        [HttpGet("{id}")]
-        [ActionName("ApprovalFlowForTravelRequest")]
-        public ActionResult<IEnumerable<ApprovalStatusFlowVM>> GetApprovalFlowForTravelRequest(int id)
-        {
-
-            if (id == 0)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Flow Id is Invalid" });
-            }
-
-
-
-            var travelRequestTracks = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == id).ToList();
-
-            if (travelRequestTracks == null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Flow Id is Not Found" });
-            }
-
-            List<ApprovalStatusFlowVM> ListApprovalStatusFlow = new List<ApprovalStatusFlowVM>();
-
-            foreach (TravelApprovalStatusTracker travel in travelRequestTracks)
-            {
-                ApprovalStatusFlowVM approvalStatusFlow = new ApprovalStatusFlowVM()
-                {
-                    ApprovalLevel = travel.ApprovalLevelId,
-                    ApproverRole = _context.JobRoles.Find(travel.RoleId).RoleName,
-                    ApproverName = _context.Employees.Where(x => x.RoleId == travel.RoleId).Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault(),
-                    ApprovedDate = travel.FinalApprovedDate,
-                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status
-
-                };
-                ListApprovalStatusFlow.Add(approvalStatusFlow);
-            }
-
-            return Ok(ListApprovalStatusFlow);
-
-        }
+       
         private enum ApprovalStatus
         {
             Initiating = 1,

@@ -20,4 +20,13 @@ namespace AtoCash.Models
         public string EmpJobTypeDesc { get; set; }
 
     }
+
+    public class EmploymentTypeDTO
+    {
+
+        public int Id { get; set; }
+        public string EmpJobTypeCode { get; set; }
+        public string EmpJobTypeDesc { get; set; }
+
+    }
 }

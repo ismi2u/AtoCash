@@ -152,103 +152,103 @@ namespace AtoCash.Controllers
 
         // POST: api/ExpenseReimburseRequests
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<ActionResult<ExpenseReimburseRequest>> PostExpenseReimburseRequest(List<ExpenseReimburseRequestDTO> listExpenseReimburseRequestDto)
+
+        public async Task<ActionResult<ExpenseReimburseRequest>> PostExpenseReimburseRequest([FromForm] List<ExpenseReimburseRequestDTO> listExpenseReimburseRequestDto)
         {
             
 
-            if (listExpenseReimburseRequestDto.Count == 1)
-            {
-                ExpenseReimburseRequest expenseReimburseRequest = null;
+            //if (listExpenseReimburseRequestDto.Count == 1)
+            //{
+            //    ExpenseReimburseRequest expenseReimburseRequest = null;
 
-                ExpenseReimburseRequestDTO expenseReimburseRequestDto = listExpenseReimburseRequestDto[0];
+            //    ExpenseReimburseRequestDTO expenseReimburseRequestDto = listExpenseReimburseRequestDto[0];
 
-                StringBuilder StrBuilderUploadedDocuments = new StringBuilder();
+            //    StringBuilder StrBuilderUploadedDocuments = new StringBuilder();
 
-                if (ModelState.IsValid)
-                {
-                    string uniqueFileName = null;
+            //    if (ModelState.IsValid)
+            //    {
+            //        string uniqueFileName = null;
 
-                    uniqueFileName = await SaveFileToFolderAndGetName(expenseReimburseRequestDto);
+            //        uniqueFileName = await SaveFileToFolderAndGetName(expenseReimburseRequestDto);
 
-                    expenseReimburseRequest = new ExpenseReimburseRequest()
-                    {
-                        EmployeeId = expenseReimburseRequestDto.EmployeeId,
-                        ExpenseReimbClaimAmount = expenseReimburseRequestDto.ExpenseReimbClaimAmount,
-                        Documents = StrBuilderUploadedDocuments.ToString(),
-                        ExpReimReqDate = expenseReimburseRequestDto.ExpReimReqDate
-                        //ExpenseTypeId = expenseReimburseRequestDto.ExpenseTypeId
-                    };
+            //        expenseReimburseRequest = new ExpenseReimburseRequest()
+            //        {
+            //            EmployeeId = expenseReimburseRequestDto.EmployeeId,
+            //            ExpenseReimbClaimAmount = expenseReimburseRequestDto.ExpenseReimbClaimAmount,
+            //            Documents = StrBuilderUploadedDocuments.ToString(),
+            //            ExpReimReqDate = expenseReimburseRequestDto.ExpReimReqDate
+            //            //ExpenseTypeId = expenseReimburseRequestDto.ExpenseTypeId
+            //        };
 
-                    _context.ExpenseReimburseRequests.Add(expenseReimburseRequest);
-                    await _context.SaveChangesAsync();
+            //        _context.ExpenseReimburseRequests.Add(expenseReimburseRequest);
+            //        await _context.SaveChangesAsync();
 
-                }
+            //    }
 
-                //##### 3. Adding a entry in DisbursementsAndClaimsMaster table for records
-                //If it is department based Expense reimbursement claim
-                if (expenseReimburseRequestDto.ProjectId == null)
-                {
+            //    //////////////##### 3. Adding a entry in DisbursementsAndClaimsMaster table for records
+            //    //////////////If it is department based Expense reimbursement claim
+            //    ////////////if (expenseReimburseRequestDto.ProjectId == null)
+            //    ////////////{
 
-                    _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
-                    {
-                        EmployeeId = expenseReimburseRequestDto.EmployeeId,
-                        PettyCashRequestId = null,
-                        ExpenseReimburseReqId = expenseReimburseRequest.Id,
+            //    ////////////    _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
+            //    ////////////    {
+            //    ////////////        EmployeeId = expenseReimburseRequestDto.EmployeeId,
+            //    ////////////        PettyCashRequestId = null,
+            //    ////////////        ExpenseReimburseReqId = expenseReimburseRequest.Id,
 
-                        RequestTypeId = (int)RequestType.ExpenseReim,
-                        ProjectId = null,
-                        SubProjectId = null,
-                        WorkTaskId = null,
+            //    ////////////        RequestTypeId = (int)RequestType.ExpenseReim,
+            //    ////////////        ProjectId = null,
+            //    ////////////        SubProjectId = null,
+            //    ////////////        WorkTaskId = null,
 
-                        RecordDate = DateTime.Now,
-                        Amount = expenseReimburseRequest.ExpenseReimbClaimAmount,
-                        CostCentreId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCentreId,
-                        ApprovalStatusId = (int)ApprovalStatus.Pending
-                    });
-                    await _context.SaveChangesAsync();
-                }
-                else //If it is Project based Expense reimbursement claim
-                {
-                    _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
-                    {
-                        EmployeeId = expenseReimburseRequestDto.EmployeeId,
-                        PettyCashRequestId = null,
-                        ExpenseReimburseReqId = expenseReimburseRequest.Id,
-                        RequestTypeId = (int)RequestType.ExpenseReim,
-                        ProjectId = expenseReimburseRequest.ProjectId,
-                        SubProjectId = expenseReimburseRequest.SubProjectId,
-                        WorkTaskId = expenseReimburseRequest.WorkTaskId,
-                        RecordDate = DateTime.Now,
-                        Amount = expenseReimburseRequest.ExpenseReimbClaimAmount,
-                        CostCentreId = _context.Projects.Find(expenseReimburseRequestDto.ProjectId).CostCentreId,
-                        ApprovalStatusId = (int)ApprovalStatus.Pending
-                    });
-                    await _context.SaveChangesAsync();
-                }
-                //##### 4. ClaimsApprovalTracker to be updated for all the allowed Approvers
+            //    ////////////        RecordDate = DateTime.Now,
+            //    ////////////        Amount = expenseReimburseRequest.ExpenseReimbClaimAmount,
+            //    ////////////        CostCentreId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCentreId,
+            //    ////////////        ApprovalStatusId = (int)ApprovalStatus.Pending
+            //    ////////////    });
+            //    ////////////    await _context.SaveChangesAsync();
+            //    ////////////}
+            //    ////////////else //If it is Project based Expense reimbursement claim
+            //    ////////////{
+            //    ////////////    _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
+            //    ////////////    {
+            //    ////////////        EmployeeId = expenseReimburseRequestDto.EmployeeId,
+            //    ////////////        PettyCashRequestId = null,
+            //    ////////////        ExpenseReimburseReqId = expenseReimburseRequest.Id,
+            //    ////////////        RequestTypeId = (int)RequestType.ExpenseReim,
+            //    ////////////        ProjectId = expenseReimburseRequest.ProjectId,
+            //    ////////////        SubProjectId = expenseReimburseRequest.SubProjectId,
+            //    ////////////        WorkTaskId = expenseReimburseRequest.WorkTaskId,
+            //    ////////////        RecordDate = DateTime.Now,
+            //    ////////////        Amount = expenseReimburseRequest.ExpenseReimbClaimAmount,
+            //    ////////////        CostCentreId = _context.Projects.Find(expenseReimburseRequestDto.ProjectId).CostCentreId,
+            //    ////////////        ApprovalStatusId = (int)ApprovalStatus.Pending
+            //    ////////////    });
+            //    ////////////    await _context.SaveChangesAsync();
+            //    ////////////}
+            //    //////////////##### 4. ClaimsApprovalTracker to be updated for all the allowed Approvers
 
-                if (expenseReimburseRequestDto.ProjectId == null)
-                {
-                    await Task.Run(() => ProjectBasedExpReimRequest(expenseReimburseRequestDto, expenseReimburseRequest.Id));
-                }
-                else
-                {
-                    await Task.Run(() => DepartmentBasedExpReimRequest(expenseReimburseRequestDto, expenseReimburseRequest.Id));
-                }
-
-
-            }
-            else
-            {
-                /// for multiple Expenseclaims at the same time
-                /// 
-                ///TODO lis 
-            }
+            //    ////////////if (expenseReimburseRequestDto.ProjectId == null)
+            //    ////////////{
+            //    ////////////    await Task.Run(() => ProjectBasedExpReimRequest(expenseReimburseRequestDto, expenseReimburseRequest.Id));
+            //    ////////////}
+            //    ////////////else
+            //    ////////////{
+            //    ////////////    await Task.Run(() => DepartmentBasedExpReimRequest(expenseReimburseRequestDto, expenseReimburseRequest.Id));
+            //    ////////////}
 
 
+            //}
+            //else
+            //{
+            //    /// for multiple Expenseclaims at the same time
+            //    /// 
+            //    ///TODO lis 
+            //}
 
-            return Ok();
+
+
+            return Ok(listExpenseReimburseRequestDto);
         }
 
         private async Task<string> SaveFileToFolderAndGetName(ExpenseReimburseRequestDTO expenseReimburseRequestDto)

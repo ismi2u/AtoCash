@@ -12,7 +12,7 @@ using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class ExpenseTypesController : ControllerBase
@@ -24,16 +24,56 @@ namespace AtoCash.Controllers
             _context = context;
         }
 
+
+        [HttpGet]
+        [ActionName("ExpenseTypesForDropdown")]
+        public async Task<ActionResult<IEnumerable<ExpenseTypeVM>>> GetExpenseTypesForDropdown()
+        {
+            List<ExpenseTypeVM> ListExpenseTypeVM = new List<ExpenseTypeVM>();
+
+            var expenseTypes = await _context.ExpenseTypes.Where(c => c.StatusTypeId == (int)StatusType.Active).ToListAsync();
+            foreach (ExpenseType expenseType in expenseTypes)
+            {
+                ExpenseTypeVM expenseTypeVM = new ExpenseTypeVM
+                {
+                    Id = expenseType.Id,
+                    ExpenseTypeName = expenseType.ExpenseTypeName,
+                };
+
+                ListExpenseTypeVM.Add(expenseTypeVM);
+            }
+
+            return ListExpenseTypeVM;
+
+        }
         // GET: api/ExpenseTypes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ExpenseType>>> GetExpenseTypes()
+        public async Task<ActionResult<IEnumerable<ExpenseTypeDTO>>> GetExpenseTypes()
         {
-            return await _context.ExpenseTypes.ToListAsync();
+            List<ExpenseTypeDTO> ListExpenseTypeDTO = new List<ExpenseTypeDTO>();
+
+            var expenseTypes = await _context.ExpenseTypes.ToListAsync();
+
+            foreach (ExpenseType expenseType in expenseTypes)
+            {
+                ExpenseTypeDTO expenseTypeDTO = new ExpenseTypeDTO
+                {
+                    Id = expenseType.Id,
+                    ExpenseTypeName = expenseType.ExpenseTypeName,
+                    ExpenseTypeDesc = expenseType.ExpenseTypeDesc,
+                    StatusTypeId = expenseType.StatusTypeId,
+                    StatusType = _context.StatusTypes.Find(expenseType.StatusTypeId).Status
+                };
+
+                ListExpenseTypeDTO.Add(expenseTypeDTO);
+
+            }
+            return Ok(ListExpenseTypeDTO);
         }
 
         // GET: api/ExpenseTypes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ExpenseType>> GetExpenseType(int id)
+        public async Task<ActionResult<ExpenseTypeDTO>> GetExpenseType(int id)
         {
             var expenseType = await _context.ExpenseTypes.FindAsync(id);
 
@@ -42,21 +82,36 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
-            return expenseType;
+            ExpenseTypeDTO expenseTypeDTO = new ExpenseTypeDTO
+            {
+                Id = expenseType.Id,
+                ExpenseTypeName = expenseType.ExpenseTypeName,
+                ExpenseTypeDesc = expenseType.ExpenseTypeDesc,
+                StatusTypeId = expenseType.StatusTypeId,
+                StatusType = _context.StatusTypes.Find(expenseType.StatusTypeId).Status
+            };
+
+            return expenseTypeDTO;
         }
 
         // PUT: api/ExpenseTypes/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<IActionResult> PutExpenseType(int id, ExpenseType expenseType)
+        public async Task<IActionResult> PutExpenseType(int id, ExpenseTypeDTO expenseTypeDTO)
         {
-            if (id != expenseType.Id)
+            if (id != expenseTypeDTO.Id)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            _context.Entry(expenseType).State = EntityState.Modified;
+            var expType = await _context.ExpenseTypes.FindAsync(id);
+
+            expType.ExpenseTypeName = expenseTypeDTO.ExpenseTypeName;
+            expType.ExpenseTypeDesc = expenseTypeDTO.ExpenseTypeDesc;
+            expType.StatusTypeId = expenseTypeDTO.StatusTypeId;
+            _context.ExpenseTypes.Update(expType);
+
+            //_context.Entry(expenseType).State = EntityState.Modified;
 
             try
             {
@@ -74,20 +129,24 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Expsense Type Details Updated!" });
         }
 
         // POST: api/ExpenseTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<ActionResult<ExpenseType>> PostExpenseType(ExpenseType expenseType)
+        public async Task<ActionResult<ExpenseType>> PostExpenseType(ExpenseTypeDTO expenseTypeDTO)
         {
-            var eType = _context.ExpenseTypes.Where(e => e.ExpenseTypeName == expenseType.ExpenseTypeName).FirstOrDefault();
+            var eType = _context.ExpenseTypes.Where(e => e.ExpenseTypeName == expenseTypeDTO.ExpenseTypeName).FirstOrDefault();
             if (eType != null)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Expense Type Already Exists" });
             }
+
+            ExpenseType expenseType = new();
+            expenseType.ExpenseTypeName = expenseTypeDTO.ExpenseTypeName;
+            expenseType.ExpenseTypeDesc = expenseTypeDTO.ExpenseTypeDesc;
 
             _context.ExpenseTypes.Add(expenseType);
             await _context.SaveChangesAsync();
@@ -100,6 +159,14 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
         public async Task<IActionResult> DeleteExpenseType(int id)
         {
+
+            var expReimburse = _context.ExpenseReimburseRequests.Where(d => d.ExpenseTypeId == id).FirstOrDefault();
+
+            if (expReimburse != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense-Type in use for Expense Reimburse!" });
+            }
+
             var expenseType = await _context.ExpenseTypes.FindAsync(id);
             if (expenseType == null)
             {
@@ -109,12 +176,23 @@ namespace AtoCash.Controllers
             _context.ExpenseTypes.Remove(expenseType);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Expense-Type" });
         }
 
         private bool ExpenseTypeExists(int id)
         {
             return _context.ExpenseTypes.Any(e => e.Id == id);
         }
+
+
+        private enum StatusType
+        {
+            Active = 1,
+            Inactive
+
+        }
+        ///
+
+
     }
 }

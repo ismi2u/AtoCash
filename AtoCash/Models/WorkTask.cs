@@ -28,4 +28,21 @@ namespace AtoCash.Models
         public string TaskDesc { get; set; }
 
     }
+
+    public class WorkTaskDTO
+    {
+        public int Id { get; set; }
+        public int SubProjectId { get; set; }
+        public string SubProject { get; set; }
+        public string TaskName { get; set; }
+        public string TaskDesc { get; set; }
+
+    }
+
+    public class WorkTaskVM
+    {
+        public int Id { get; set; }
+        public string TaskName { get; set; }
+        public string TaskDesc { get; set; }
+    }
 }

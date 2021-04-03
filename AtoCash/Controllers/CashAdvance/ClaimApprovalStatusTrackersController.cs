@@ -54,7 +54,7 @@ namespace AtoCash.Controllers
                 claimApprovalStatusTrackerDTO.FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate;
                 claimApprovalStatusTrackerDTO.ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId;
                 claimApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status;
-
+                claimApprovalStatusTrackerDTO.Comments = claimApprovalStatusTracker.Comments;
 
                 ListClaimApprovalStatusTrackerDTO.Add(claimApprovalStatusTrackerDTO);
 
@@ -93,6 +93,7 @@ namespace AtoCash.Controllers
             claimApprovalStatusTrackerDTO.FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate;
             claimApprovalStatusTrackerDTO.ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId;
             claimApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status;
+            claimApprovalStatusTrackerDTO.Comments = claimApprovalStatusTracker.Comments;
 
 
             return claimApprovalStatusTrackerDTO;
@@ -142,6 +143,7 @@ namespace AtoCash.Controllers
                 claimApprovalStatusTracker.ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId;
                 claimApprovalStatusTracker.ReqDate = claimApprovalStatusTrackerDto.ReqDate;
                 claimApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
+                claimApprovalStatusTracker.Comments = claimApprovalStatusTrackerDto.Comments;
 
                 ClaimApprovalStatusTracker claimitem;
                 if (claimApprovalStatusTrackerDto.DepartmentId != null)
@@ -286,8 +288,9 @@ namespace AtoCash.Controllers
                 ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId,
                 ReqDate = claimApprovalStatusTrackerDto.ReqDate,
                 FinalApprovedDate = claimApprovalStatusTrackerDto.FinalApprovedDate,
-                ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId
-            };
+                ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId,
+                Comments = claimApprovalStatusTrackerDto.Comments
+        };
 
             _context.ClaimApprovalStatusTrackers.Add(claimApprovalStatusTracker);
             await _context.SaveChangesAsync();
@@ -365,6 +368,7 @@ namespace AtoCash.Controllers
                 claimApprovalStatusTrackerDTO.FinalApprovedDate = claimApprovalStatusTracker.FinalApprovedDate;
                 claimApprovalStatusTrackerDTO.ApprovalStatusTypeId = claimApprovalStatusTracker.ApprovalStatusTypeId;
                 claimApprovalStatusTrackerDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claimApprovalStatusTracker.ApprovalStatusTypeId).Status;
+                claimApprovalStatusTrackerDTO.Comments = claimApprovalStatusTracker.Comments;
 
 
                 ListClaimApprovalStatusTrackerDTO.Add(claimApprovalStatusTrackerDTO);

@@ -29,4 +29,17 @@ namespace AtoCash.Models
         public virtual ApprovalLevel ApprovalLevel { get; set; }
         public int ApprovalLevelId { get; set; }
     }
+
+    public class ApprovalRoleMapDTO
+    {
+        public int Id { get; set; }
+
+        public string ApprovalGroup { get; set; }
+        public int ApprovalGroupId { get; set; }
+        public string Role { get; set; }
+        public int RoleId { get; set; }
+
+        public int ApprovalLevel { get; set; }
+        public int ApprovalLevelId { get; set; }
+    }
 }

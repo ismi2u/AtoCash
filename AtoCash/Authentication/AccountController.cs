@@ -108,8 +108,8 @@ namespace AtoCash.Authentication
 
             if (user.EmployeeId!=0)
             {
-                var empleeee = context.Employees.Find(user.EmployeeId);
-                bool isEmpActive = empleeee.EmployeeStatusId == 1 ? true : false;
+                var emplye = context.Employees.Find(user.EmployeeId);
+                bool isEmpActive = emplye.StatusTypeId == (int)StatusType.Active ? true : false;
                 if (!isEmpActive)
                 {
                     return Unauthorized(new RespStatus { Status = "Failure", Message = "Employee is Inactive" });
@@ -244,6 +244,14 @@ namespace AtoCash.Authentication
             }
 
             return Conflict(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
+
+        }
+
+
+        private enum StatusType
+        {
+            Active = 1,
+            Inactive
 
         }
 

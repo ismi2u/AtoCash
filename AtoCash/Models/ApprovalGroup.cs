@@ -24,4 +24,10 @@ namespace AtoCash.Models
 
 
     }
+
+    public class ApprovalGroupVM
+    {
+        public int Id { get; set; }
+        public string ApprovalGroupCode { get; set; }
+    }
 }

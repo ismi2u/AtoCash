@@ -21,4 +21,11 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(150)")]
         public string RequestTypeDesc { get; set; }
     }
+
+    public class RequestTypeVM
+    {
+        public int Id { get; set; }
+        public string RequestName { get; set; }
+
+    }
 }

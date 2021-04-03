@@ -19,4 +19,11 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(150)")]
         public string LevelDesc { get; set; }
     }
+
+    public class ApprovalLevelDTO
+    {
+        public int Id { get; set; }
+        public int Level { get; set; }
+        public string LevelDesc { get; set; }
+    }
 }

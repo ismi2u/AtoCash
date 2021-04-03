@@ -27,4 +27,21 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(200)")]
         public string SubProjectDesc { get; set; }
     }
+
+    public class SubProjectDTO
+    {
+        public int Id { get; set; }
+        public int ProjectId { get; set; }
+        public string ProjectName { get; set; }
+        public string SubProjectName { get; set; }
+        public string SubProjectDesc { get; set; }
+    }
+
+
+    public class SubProjectVM
+    {
+        public int Id { get; set; }
+        public string SubProjectName { get; set; }
+        public string SubProjectDesc { get; set; }
+    }
 }

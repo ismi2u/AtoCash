@@ -26,4 +26,12 @@ namespace AtoCash.Models
         public int EmployeeId { get; set; }
 
     }
+
+    public class ProjectManagementDTO
+    {
+        public int Id { get; set; }
+        public int ProjectId { get; set; }
+        public int EmployeeId { get; set; }
+
+    }
 }

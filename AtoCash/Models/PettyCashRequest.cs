@@ -30,10 +30,11 @@ namespace AtoCash.Models
         public DateTime CashReqDate { get; set; }
 
 
-        /// <summary>
-        /// //////////////////
-        /// </summary>
-        //Foreign Key Relationsions
+        [Required]
+        [ForeignKey("CurrencyTypeId")]
+        public virtual CurrencyType CurrencyType { get; set; }
+        public int CurrencyTypeId { get; set; }
+
 
         [ForeignKey("DepartmentId")]
         public virtual Department Department { get; set; }
@@ -50,6 +51,49 @@ namespace AtoCash.Models
         [ForeignKey("WorkTaskId")]
         public virtual WorkTask WorkTask { get; set; }
         public int? WorkTaskId { get; set; }
+
+        [Required]
+        [ForeignKey("ApprovalStatusTypeId")]
+        public virtual ApprovalStatusType ApprovalStatusType { get; set; }
+        public int ApprovalStatusTypeId { get; set; }
+
+        public DateTime? ApprovedDate { get; set; }
+
+
+    }
+
+    public class PettyCashRequestDTO
+    {
+
+        public int Id { get; set; }
+        public string EmployeeName { get; set; }
+
+        public int EmployeeId { get; set; }
+
+        public string CurrencyType { get; set; }
+        public int CurrencyTypeId { get; set; }
+        public Double PettyClaimAmount { get; set; }
+
+        public string PettyClaimRequestDesc { get; set; }
+
+        public DateTime CashReqDate { get; set; }
+
+        public string Department { get; set; }
+        public int? DepartmentId { get; set; }
+        public string Project { get; set; }
+        public int? ProjectId { get; set; }
+
+        public string SubProject { get; set; }
+        public int? SubProjectId { get; set; }
+
+        public string WorkTask { get; set; }
+        public int? WorkTaskId { get; set; }
+
+        public string ApprovalStatusType { get; set; }
+        public int ApprovalStatusTypeId { get; set; }
+
+
+        public DateTime? ApprovedDate { get; set; }
 
     }
 }

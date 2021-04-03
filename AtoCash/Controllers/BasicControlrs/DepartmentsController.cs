@@ -31,7 +31,7 @@ namespace AtoCash.Controllers
         {
             List<DepartmentVM> ListDepartmentVM = new List<DepartmentVM>();
 
-            var departments = await _context.Departments.ToListAsync();
+            var departments = await _context.Departments.Where(d => d.StatusTypeId == (int)StatusType.Active).ToListAsync();
             foreach (Department department in departments)
             {
                 DepartmentVM departmentVM = new DepartmentVM
@@ -62,7 +62,10 @@ namespace AtoCash.Controllers
                     DeptCode = department.DeptCode,
                     DeptName = department.DeptName,
                     CostCentreId = department.CostCentreId,
-                    CostCentre = _context.CostCentres.Find(department.CostCentreId).CostCentreCode
+                    CostCentre = _context.CostCentres.Find(department.CostCentreId).CostCentreCode,
+                    StatusTypeId = department.StatusTypeId,
+                    StatusType = _context.StatusTypes.Find(department.StatusTypeId).Status
+
                 };
 
                 ListDepartmentDTO.Add(departmentDTO);
@@ -90,6 +93,8 @@ namespace AtoCash.Controllers
             departmentDTO.DeptName = department.DeptName;
             departmentDTO.CostCentreId = department.CostCentreId;
             departmentDTO.CostCentre = _context.CostCentres.Find(department.CostCentreId).CostCentreCode;
+            departmentDTO.StatusTypeId = department.StatusTypeId;
+            departmentDTO.StatusType = _context.StatusTypes.Find(department.StatusTypeId).Status;
 
             return departmentDTO;
         }
@@ -109,6 +114,7 @@ namespace AtoCash.Controllers
 
             department.DeptName = departmentDto.DeptName;
             department.CostCentreId = departmentDto.CostCentreId;
+            department.StatusTypeId = departmentDto.StatusTypeId;
 
             _context.Departments.Update(department);
             //_context.Entry(projectDto).State = EntityState.Modified;
@@ -147,7 +153,8 @@ namespace AtoCash.Controllers
             {
                 DeptCode = departmentDto.DeptCode,
                 DeptName = departmentDto.DeptName,
-                CostCentreId = departmentDto.CostCentreId
+                CostCentreId = departmentDto.CostCentreId,
+                StatusTypeId = departmentDto.StatusTypeId
             };
 
             _context.Departments.Add(department);
@@ -162,9 +169,9 @@ namespace AtoCash.Controllers
         public async Task<IActionResult> DeleteDepartment(int id)
         {
 
-           var emp =  _context.Employees.Where(e => e.DepartmentId == id).FirstOrDefault();
+            var emp = _context.Employees.Where(e => e.DepartmentId == id).FirstOrDefault();
 
-            if (emp !=null)
+            if (emp != null)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Department in Use - Can't delete" });
             }
@@ -186,5 +193,13 @@ namespace AtoCash.Controllers
         {
             return _context.Departments.Any(e => e.Id == id);
         }
+
+        private enum StatusType
+        {
+            Active = 1,
+            Inactive
+
+        }
+        //
     }
 }

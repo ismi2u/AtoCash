@@ -30,13 +30,13 @@ namespace AtoCash.Controllers
         {
             List<CostCentreVM> ListCostCentreVM = new List<CostCentreVM>();
 
-            var costCentres = await _context.CostCentres.ToListAsync();
+            var costCentres = await _context.CostCentres.Where(c => c.StatusTypeId == (int)StatusType.Active).ToListAsync();
             foreach (CostCentre costCentre in costCentres)
             {
                 CostCentreVM costCentreVM = new CostCentreVM
                 {
                     Id = costCentre.Id,
-                    CostCentreCode = costCentre.CostCentreCode
+                    CostCentreCode = costCentre.CostCentreCode,
                 };
 
                 ListCostCentreVM.Add(costCentreVM);
@@ -48,14 +48,33 @@ namespace AtoCash.Controllers
 
         // GET: api/CostCentres
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CostCentre>>> GetCostCentres()
+        public async Task<ActionResult<IEnumerable<CostCentreDTO>>> GetCostCentres()
         {
-            return await _context.CostCentres.ToListAsync();
+
+            List<CostCentreDTO> ListCostCentreDTO = new List<CostCentreDTO>();
+
+            var costCentres = await _context.CostCentres.ToListAsync();
+
+            foreach (CostCentre costCentre in costCentres)
+            {
+                CostCentreDTO costCentreDTO = new CostCentreDTO
+                {
+                    Id = costCentre.Id,
+                    CostCentreCode = costCentre.CostCentreCode,
+                    CostCentreDesc = costCentre.CostCentreDesc,
+                    StatusTypeId = costCentre.StatusTypeId,
+                    StatusType = _context.StatusTypes.Find(costCentre.StatusTypeId).Status
+                };
+
+                ListCostCentreDTO.Add(costCentreDTO);
+
+            }
+            return Ok(ListCostCentreDTO);
         }
 
         // GET: api/CostCentres/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CostCentre>> GetCostCentre(int id)
+        public async Task<ActionResult<CostCentreDTO>> GetCostCentre(int id)
         {
             var costCentre = await _context.CostCentres.FindAsync(id);
 
@@ -64,22 +83,33 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
-            return costCentre;
+            CostCentreDTO costCentreDTO = new CostCentreDTO
+            {
+                Id = costCentre.Id,
+                CostCentreCode = costCentre.CostCentreCode,
+                CostCentreDesc = costCentre.CostCentreDesc,
+                StatusTypeId = costCentre.StatusTypeId,
+                StatusType = _context.StatusTypes.Find(costCentre.StatusTypeId).Status
+
+            };
+
+            return costCentreDTO;
         }
 
         // PUT: api/CostCentres/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<IActionResult> PutCostCentre(int id, CostCentreDTO costCentre)
+        public async Task<IActionResult> PutCostCentre(int id, CostCentreDTO costCentreDTO)
         {
-            if (id != costCentre.Id)
+            if (id != costCentreDTO.Id)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
             var ccentre = await _context.CostCentres.FindAsync(id);
-            ccentre.CostCentreDesc = costCentre.CostCentreDesc;
+            ccentre.CostCentreDesc = costCentreDTO.CostCentreDesc;
+            ccentre.StatusTypeId = costCentreDTO.StatusTypeId;
             _context.CostCentres.Update(ccentre);
 
             //_context.Entry(costCentre).State = EntityState.Modified;
@@ -107,13 +137,18 @@ namespace AtoCash.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<ActionResult<CostCentre>> PostCostCentre(CostCentre costCentre)
+        public async Task<ActionResult<CostCentre>> PostCostCentre(CostCentreDTO costCentreDTO)
         {
-            var ccentre = _context.CostCentres.Where(c => c.CostCentreCode == costCentre.CostCentreCode).FirstOrDefault();
+            var ccentre = _context.CostCentres.Where(c => c.CostCentreCode == costCentreDTO.CostCentreCode).FirstOrDefault();
             if (ccentre != null)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
             }
+            CostCentre costCentre = new();
+            costCentre.CostCentreCode = costCentreDTO.CostCentreCode;
+            costCentre.CostCentreDesc = costCentreDTO.CostCentreDesc;
+            costCentre.StatusTypeId = costCentreDTO.StatusTypeId;
+
             _context.CostCentres.Add(costCentre);
             await _context.SaveChangesAsync();
 
@@ -132,7 +167,7 @@ namespace AtoCash.Controllers
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Cost-Centre in use for Department" });
             }
-            if (dept != null || proj != null)
+            if (proj != null)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Cost-Centre in use for Project" });
             }
@@ -153,5 +188,14 @@ namespace AtoCash.Controllers
         {
             return _context.CostCentres.Any(e => e.Id == id);
         }
+
+
+        private enum StatusType
+        {
+            Active = 1,
+            Inactive
+
+        }
+        //
     }
 }

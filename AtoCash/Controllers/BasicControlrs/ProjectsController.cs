@@ -31,7 +31,7 @@ namespace AtoCash.Controllers
         {
             List<ProjectVM> ListProjectVM = new List<ProjectVM>();
 
-            var projects = await _context.Projects.ToListAsync();
+            var projects = await _context.Projects.Where(p => p.StatusTypeId == (int)StatusType.Active).ToListAsync();
             foreach (Project project in projects)
             {
                 ProjectVM projectVM = new ProjectVM
@@ -63,7 +63,9 @@ namespace AtoCash.Controllers
                     Id = proj.Id,
                     ProjectName = proj.ProjectName,
                     CostCentreId = proj.CostCentreId,
-                    ProjectDesc = proj.ProjectDesc
+                    ProjectDesc = proj.ProjectDesc,
+                     StatusTypeId = proj.StatusTypeId,
+                    StatusType = _context.StatusTypes.Find(proj.StatusTypeId).Status
                 };
 
                 ListProjectDTO.Add(projectDTO);
@@ -80,7 +82,7 @@ namespace AtoCash.Controllers
         public async Task<ActionResult<ProjectDTO>> GetProject(int id)
         {
 
-            ProjectDTO projectDTO = new ProjectDTO();
+            
 
             var proj = await _context.Projects.FindAsync(id);
 
@@ -88,12 +90,16 @@ namespace AtoCash.Controllers
             {
                 return NoContent();
             }
-
-            projectDTO.Id = proj.Id;
-            projectDTO.ProjectName = proj.ProjectName;
-            projectDTO.CostCentreId = proj.CostCentreId;
-            projectDTO.ProjectManagerId = proj.ProjectManagerId;
-            projectDTO.ProjectDesc = proj.ProjectDesc;
+            ProjectDTO projectDTO = new ProjectDTO
+            {
+                Id = proj.Id,
+                ProjectName = proj.ProjectName,
+                CostCentreId = proj.CostCentreId,
+                ProjectManagerId = proj.ProjectManagerId,
+                ProjectDesc = proj.ProjectDesc,
+                StatusTypeId = proj.StatusTypeId,
+                StatusType = _context.StatusTypes.Find(proj.StatusTypeId).Status
+            };
 
             return projectDTO;
 
@@ -104,7 +110,7 @@ namespace AtoCash.Controllers
         [ActionName("GetEmployeeAssignedProjects")]
         public ActionResult<ProjectVM> GetEmployeeAssignedProjects(int id)
         {
-            var listOfProjmgts = _context.ProjectManagements.Where(p => p.EmployeeId == id).ToList();
+            var listOfProjmgts = _context.ProjectManagements.Where(p => p.EmployeeId == id ).ToList();
 
             List<ProjectVM> ListprojectVM = new List<ProjectVM>();
 
@@ -142,6 +148,7 @@ namespace AtoCash.Controllers
             proj.CostCentreId = projectDto.CostCentreId  ;
             proj.ProjectManagerId = projectDto.ProjectManagerId;
             proj.ProjectDesc = projectDto.ProjectDesc;
+            proj.StatusTypeId = projectDto.StatusTypeId;
 
             _context.Projects.Update(proj);
             //_context.Entry(projectDto).State = EntityState.Modified;
@@ -154,7 +161,7 @@ namespace AtoCash.Controllers
             {
                 if (!ProjectExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Project is invalid" });
                 }
                 else
                 {
@@ -162,7 +169,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Project Details Updated!" });
         }
 
         // POST: api/Projects
@@ -181,7 +188,8 @@ namespace AtoCash.Controllers
                 ProjectName = projectDto.ProjectName,
                 CostCentreId = projectDto.CostCentreId,
                 ProjectManagerId = projectDto.ProjectManagerId,
-                ProjectDesc = projectDto.ProjectDesc
+                ProjectDesc = projectDto.ProjectDesc,
+                StatusTypeId = projectDto.StatusTypeId
             };
 
             _context.Projects.Add(proj);
@@ -217,5 +225,14 @@ namespace AtoCash.Controllers
         {
             return _context.Projects.Any(e => e.Id == id);
         }
+
+
+        private enum StatusType
+        {
+            Active = 1,
+            Inactive
+
+        }
+        //
     }
 }

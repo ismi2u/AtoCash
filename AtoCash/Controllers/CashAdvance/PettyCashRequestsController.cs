@@ -47,6 +47,8 @@ namespace AtoCash.Controllers
 
                 pettyCashRequestDTO.Id = pettyCashRequest.Id;
                 pettyCashRequestDTO.EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName();
+                pettyCashRequestDTO.CurrencyTypeId = pettyCashRequest.CurrencyTypeId;
+                pettyCashRequestDTO.CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null;
                 pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
                 pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
                 pettyCashRequestDTO.Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode : null;
@@ -56,7 +58,9 @@ namespace AtoCash.Controllers
                 pettyCashRequestDTO.SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null;
                 pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
                 pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null;
-
+                pettyCashRequestDTO.ApprovalStatusType = pettyCashRequest.ApprovalStatusTypeId != 0 ? _context.ApprovalStatusTypes.Find(pettyCashRequest.ApprovalStatusTypeId).Status : null;
+                pettyCashRequestDTO.ApprovalStatusTypeId = pettyCashRequest.ApprovalStatusTypeId;
+                pettyCashRequestDTO.ApprovedDate = pettyCashRequest.ApprovedDate;
                 ListPettyCashRequestDTO.Add(pettyCashRequestDTO);
             }
 
@@ -82,6 +86,8 @@ namespace AtoCash.Controllers
 
             pettyCashRequestDTO.Id = pettyCashRequest.Id;
             pettyCashRequestDTO.EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName();
+            pettyCashRequestDTO.CurrencyTypeId = pettyCashRequest.CurrencyTypeId;
+            pettyCashRequestDTO.CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null;
             pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
             pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
             pettyCashRequestDTO.Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode : null;
@@ -127,7 +133,9 @@ namespace AtoCash.Controllers
                     Id = pettyCashRequest.Id,
                     EmployeeId = pettyCashRequest.EmployeeId,
                     EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
-                    PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
+                     CurrencyTypeId = pettyCashRequest.CurrencyTypeId,
+                      CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null,
+                PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
                     PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
                     CashReqDate = pettyCashRequest.CashReqDate,
                     DepartmentId = pettyCashRequest.DepartmentId,
@@ -174,6 +182,8 @@ namespace AtoCash.Controllers
                 {
                     Id = pettyCashRequest.Id,
                     EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
+                    CurrencyTypeId = pettyCashRequest.CurrencyTypeId,
+                    CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null,
                     PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
                     PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
                     CashReqDate = pettyCashRequest.CashReqDate,
@@ -271,6 +281,7 @@ namespace AtoCash.Controllers
             pettyCashRequest.Id = pettyCashRequestDto.Id;
 
             pettyCashRequest.Id = pettyCashRequestDto.Id;
+            pettyCashRequest.CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId;
             pettyCashRequest.EmployeeId = pettyCashRequestDto.EmployeeId;
             pettyCashRequest.PettyClaimAmount = pettyCashRequestDto.PettyClaimAmount;
             pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;

@@ -121,7 +121,7 @@ namespace AtoCash.Controllers
             employeeDTO.DepartmentId = employee.DepartmentId;
             employeeDTO.RoleId = employee.RoleId;
             employeeDTO.ApprovalGroupId = employee.ApprovalGroupId;
-            employeeDTO.EmployeeStatusId = employee.EmployeeStatusId;
+            employeeDTO.EmployeeStatusId = employee.StatusTypeId;
 
 
             return employeeDTO;
@@ -187,7 +187,7 @@ namespace AtoCash.Controllers
             employee.DepartmentId = employeeDto.DepartmentId;
             employee.RoleId = employeeDto.RoleId;
             employee.ApprovalGroupId = employeeDto.ApprovalGroupId;
-            employee.EmployeeStatusId = employeeDto.EmployeeStatusId;
+            employee.StatusTypeId = employeeDto.EmployeeStatusId;
 
             _context.Employees.Update(employee);
             //_context.Entry(employeeDto).State = EntityState.Modified;
@@ -248,7 +248,7 @@ namespace AtoCash.Controllers
                 DepartmentId = employeeDto.DepartmentId,
                 RoleId = employeeDto.RoleId,
                 ApprovalGroupId = employeeDto.ApprovalGroupId,
-                EmployeeStatusId = employeeDto.EmployeeStatusId
+                StatusTypeId = employeeDto.EmployeeStatusId
         };
 
             MailAddress mailAdd = new MailAddress(employeeDto.Email);

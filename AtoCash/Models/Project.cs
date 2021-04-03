@@ -32,5 +32,33 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(200)")]
         public string ProjectDesc{ get; set; }
 
+
+        [Required]
+        [ForeignKey("StatusTypeId")]
+        public virtual StatusType StatusType { get; set; }
+        public int StatusTypeId { get; set; }
+    }
+
+    public class ProjectDTO
+    {
+        public int Id { get; set; }
+        public string ProjectName { get; set; }
+        public int CostCentreId { get; set; }
+        public string CostCentre { get; set; }
+        public int ProjectManagerId { get; set; }
+        public string ProjectManager { get; set; }
+        public string ProjectDesc { get; set; }
+        public int StatusTypeId { get; set; }
+        public string StatusType { get; set; }
+
+    }
+
+    public class ProjectVM
+    {
+        public int Id { get; set; }
+        public string ProjectName { get; set; }
+
+        public string ProjectDesc { get; set; }
+
     }
 }

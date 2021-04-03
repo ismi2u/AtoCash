@@ -21,5 +21,31 @@ namespace AtoCash.Models
         [Required]
         [Column(TypeName = "nvarchar(150)")]
         public string ExpenseTypeDesc { get; set; }
+
+        [Required]
+        [ForeignKey("StatusTypeId")]
+        public virtual StatusType StatusType { get; set; }
+        public int StatusTypeId { get; set; }
+
+    }
+
+
+    public class ExpenseTypeDTO
+    {
+
+        public int Id { get; set; }
+        public string ExpenseTypeName { get; set; }
+        public string ExpenseTypeDesc { get; set; }
+        public string StatusType { get; set; }
+        public int StatusTypeId { get; set; }
+
+    }
+
+
+    public class ExpenseTypeVM
+    {
+        public int Id { get; set; }
+        public string ExpenseTypeName { get; set; }
+
     }
 }

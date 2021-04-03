@@ -16,11 +16,37 @@ namespace AtoCash.Models
         [Column(TypeName = "nvarchar(20)")]
         public string RoleCode { get; set; }
         [Required]
-        [Column(TypeName = "nvarchar(20)")]
+        [Column(TypeName = "nvarchar(50)")]
         public string RoleName { get; set; }
 
         [Required]
         public Double MaxPettyCashAllowed { get; set; }
 
     }
+
+    public class JobRoleDTO
+    {
+
+        public int Id { get; set; }
+
+        public string RoleCode { get; set; }
+
+        public string RoleName { get; set; }
+        public Double MaxPettyCashAllowed { get; set; }
+
+    }
+
+
+
+
+
+    public class JobRoleVM
+    {
+
+        public int Id { get; set; }
+        public string RoleCode { get; set; }
+
+    }
+
+
 }

@@ -26,4 +26,15 @@ namespace AtoCash.Models
         public DateTime UpdatedOn   { get; set; }
 
     }
+
+
+    public class EmpCurrentPettyCashBalanceDTO
+    {
+        public int Id { get; set; }
+        public int EmployeeId { get; set; }
+        public Double CurBalance { get; set; }
+
+        public DateTime UpdatedOn { get; set; }
+
+    }
 }

@@ -25,5 +25,39 @@ namespace AtoCash.Models
         public virtual CostCentre CostCentre { get; set; }
         public int CostCentreId { get; set; }
 
+
+        [Required]
+        [ForeignKey("StatusTypeId")]
+        public virtual StatusType StatusType { get; set; }
+        public int StatusTypeId { get; set; }
+    }
+
+    public class DepartmentDTO
+    {
+
+        public int Id { get; set; }
+
+        public string DeptCode { get; set; }
+
+        public string DeptName { get; set; }
+
+        public int CostCentreId { get; set; }
+
+        public string CostCentre { get; set; }
+
+        public string StatusType { get; set; }
+
+        public int StatusTypeId { get; set; }
+
+    }
+
+    public class DepartmentVM
+    {
+
+        public int Id { get; set; }
+
+        public string DeptName { get; set; }
+        public string DeptDesc { get; set; }
+
     }
 }
