@@ -104,20 +104,6 @@ namespace AtoCash.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ExpenseTypes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ExpenseTypeName = table.Column<string>(type: "nvarchar(50)", nullable: false),
-                    ExpenseTypeDesc = table.Column<string>(type: "nvarchar(150)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExpenseTypes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "JobRoles",
                 columns: table => new
                 {
@@ -283,19 +269,19 @@ namespace AtoCash.Migrations
                         column: x => x.ApprovalGroupId,
                         principalTable: "ApprovalGroups",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_ApprovalRoleMaps_ApprovalLevels_ApprovalLevelId",
                         column: x => x.ApprovalLevelId,
                         principalTable: "ApprovalLevels",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_ApprovalRoleMaps_JobRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "JobRoles",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -316,7 +302,7 @@ namespace AtoCash.Migrations
                         column: x => x.StatusTypeId,
                         principalTable: "StatusTypes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -338,7 +324,28 @@ namespace AtoCash.Migrations
                         column: x => x.StatusTypeId,
                         principalTable: "StatusTypes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExpenseTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExpenseTypeName = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    ExpenseTypeDesc = table.Column<string>(type: "nvarchar(150)", nullable: false),
+                    StatusTypeId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpenseTypes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExpenseTypes_StatusTypes_StatusTypeId",
+                        column: x => x.StatusTypeId,
+                        principalTable: "StatusTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -456,7 +463,7 @@ namespace AtoCash.Migrations
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                 });
 
             migrationBuilder.CreateTable(
@@ -576,15 +583,30 @@ namespace AtoCash.Migrations
                     InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Vendor = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(20)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(150)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(250)", nullable: false),
                     ExpenseTypeId = table.Column<int>(type: "int", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     SubProjectId = table.Column<int>(type: "int", nullable: true),
-                    WorkTaskId = table.Column<int>(type: "int", nullable: true)
+                    WorkTaskId = table.Column<int>(type: "int", nullable: true),
+                    ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false),
+                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExpenseReimburseRequests", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseRequests_ApprovalStatusTypes_ApprovalStatusTypeId",
+                        column: x => x.ApprovalStatusTypeId,
+                        principalTable: "ApprovalStatusTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseRequests_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExpenseReimburseRequests_Employees_EmployeeId",
                         column: x => x.EmployeeId,
@@ -602,19 +624,19 @@ namespace AtoCash.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExpenseReimburseRequests_SubProjects_SubProjectId",
                         column: x => x.SubProjectId,
                         principalTable: "SubProjects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ExpenseReimburseRequests_WorkTasks_WorkTaskId",
                         column: x => x.WorkTaskId,
                         principalTable: "WorkTasks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -667,19 +689,19 @@ namespace AtoCash.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PettyCashRequests_SubProjects_SubProjectId",
                         column: x => x.SubProjectId,
                         principalTable: "SubProjects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_PettyCashRequests_WorkTasks_WorkTaskId",
                         column: x => x.WorkTaskId,
                         principalTable: "WorkTasks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -697,41 +719,49 @@ namespace AtoCash.Migrations
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     SubProjectId = table.Column<int>(type: "int", nullable: true),
-                    WorkTaskId = table.Column<int>(type: "int", nullable: true)
+                    WorkTaskId = table.Column<int>(type: "int", nullable: true),
+                    ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false),
+                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_TravelApprovalRequests", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_TravelApprovalRequests_ApprovalStatusTypes_ApprovalStatusTypeId",
+                        column: x => x.ApprovalStatusTypeId,
+                        principalTable: "ApprovalStatusTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
                         name: "FK_TravelApprovalRequests_Departments_DepartmentId",
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TravelApprovalRequests_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_TravelApprovalRequests_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TravelApprovalRequests_SubProjects_SubProjectId",
                         column: x => x.SubProjectId,
                         principalTable: "SubProjects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TravelApprovalRequests_WorkTasks_WorkTaskId",
                         column: x => x.WorkTaskId,
                         principalTable: "WorkTasks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -751,7 +781,6 @@ namespace AtoCash.Migrations
                     FinalApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false),
                     Comments = table.Column<string>(type: "nvarchar(250)", nullable: false)
-                    
                 },
                 constraints: table =>
                 {
@@ -773,19 +802,19 @@ namespace AtoCash.Migrations
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ClaimApprovalStatusTrackers_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_ClaimApprovalStatusTrackers_ExpenseReimburseRequests_ExpenseReimburseRequestId",
                         column: x => x.ExpenseReimburseRequestId,
                         principalTable: "ExpenseReimburseRequests",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ClaimApprovalStatusTrackers_JobRoles_RoleId",
                         column: x => x.RoleId,
@@ -797,13 +826,13 @@ namespace AtoCash.Migrations
                         column: x => x.PettyCashRequestId,
                         principalTable: "PettyCashRequests",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ClaimApprovalStatusTrackers_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -852,7 +881,7 @@ namespace AtoCash.Migrations
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DisbursementsAndClaimsMasters_Employees_EmployeeId",
                         column: x => x.EmployeeId,
@@ -864,19 +893,19 @@ namespace AtoCash.Migrations
                         column: x => x.ExpenseReimburseReqId,
                         principalTable: "ExpenseReimburseRequests",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DisbursementsAndClaimsMasters_PettyCashRequests_PettyCashRequestId",
                         column: x => x.PettyCashRequestId,
                         principalTable: "PettyCashRequests",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DisbursementsAndClaimsMasters_Projects_ProjectId",
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DisbursementsAndClaimsMasters_RequestTypes_RequestTypeId",
                         column: x => x.RequestTypeId,
@@ -888,13 +917,13 @@ namespace AtoCash.Migrations
                         column: x => x.SubProjectId,
                         principalTable: "SubProjects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DisbursementsAndClaimsMasters_WorkTasks_WorkTaskId",
                         column: x => x.WorkTaskId,
                         principalTable: "WorkTasks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -913,7 +942,8 @@ namespace AtoCash.Migrations
                     ApprovalLevelId = table.Column<int>(type: "int", nullable: false),
                     ReqDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FinalApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false)
+                    ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false),
+                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -935,7 +965,7 @@ namespace AtoCash.Migrations
                         column: x => x.DepartmentId,
                         principalTable: "Departments",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TravelApprovalStatusTrackers_Employees_EmployeeId",
                         column: x => x.EmployeeId,
@@ -953,7 +983,7 @@ namespace AtoCash.Migrations
                         column: x => x.ProjectId,
                         principalTable: "Projects",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TravelApprovalStatusTrackers_TravelApprovalRequests_TravelApprovalRequestId",
                         column: x => x.TravelApprovalRequestId,
@@ -1167,6 +1197,16 @@ namespace AtoCash.Migrations
                 column: "StatusTypeId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseRequests_ApprovalStatusTypeId",
+                table: "ExpenseReimburseRequests",
+                column: "ApprovalStatusTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseRequests_DepartmentId",
+                table: "ExpenseReimburseRequests",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ExpenseReimburseRequests_EmployeeId",
                 table: "ExpenseReimburseRequests",
                 column: "EmployeeId");
@@ -1190,6 +1230,11 @@ namespace AtoCash.Migrations
                 name: "IX_ExpenseReimburseRequests_WorkTaskId",
                 table: "ExpenseReimburseRequests",
                 column: "WorkTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseTypes_StatusTypeId",
+                table: "ExpenseTypes",
+                column: "StatusTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PettyCashRequests_ApprovalStatusTypeId",
@@ -1255,6 +1300,11 @@ namespace AtoCash.Migrations
                 name: "IX_SubProjects_ProjectId",
                 table: "SubProjects",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TravelApprovalRequests_ApprovalStatusTypeId",
+                table: "TravelApprovalRequests",
+                column: "ApprovalStatusTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_TravelApprovalRequests_DepartmentId",

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtoCash.Migrations
 {
     [DbContext(typeof(AtoCashDbContext))]
-    [Migration("20210403102956_Initial")]
+    [Migration("20210404072233_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -185,6 +185,10 @@ namespace AtoCash.Migrations
 
                     b.Property<int>("ApprovalStatusTypeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
@@ -531,9 +535,18 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ApprovalStatusTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<string>("Documents")
                         .HasColumnType("nvarchar(max)");
@@ -576,6 +589,10 @@ namespace AtoCash.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApprovalStatusTypeId");
+
+                    b.HasIndex("DepartmentId");
+
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("ExpenseTypeId");
@@ -604,7 +621,12 @@ namespace AtoCash.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<int>("StatusTypeId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("StatusTypeId");
 
                     b.ToTable("ExpenseTypes");
                 });
@@ -817,6 +839,12 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ApprovalStatusTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("CurrentStatus")
                         .HasColumnType("int");
 
@@ -850,6 +878,8 @@ namespace AtoCash.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApprovalStatusTypeId");
+
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("EmployeeId");
@@ -875,6 +905,9 @@ namespace AtoCash.Migrations
 
                     b.Property<int>("ApprovalStatusTypeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
@@ -1348,6 +1381,16 @@ namespace AtoCash.Migrations
 
             modelBuilder.Entity("AtoCash.Models.ExpenseReimburseRequest", b =>
                 {
+                    b.HasOne("AtoCash.Models.ApprovalStatusType", "ApprovalStatusType")
+                        .WithMany()
+                        .HasForeignKey("ApprovalStatusTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId");
+
                     b.HasOne("AtoCash.Models.Employee", "Employee")
                         .WithMany()
                         .HasForeignKey("EmployeeId")
@@ -1372,6 +1415,10 @@ namespace AtoCash.Migrations
                         .WithMany()
                         .HasForeignKey("WorkTaskId");
 
+                    b.Navigation("ApprovalStatusType");
+
+                    b.Navigation("Department");
+
                     b.Navigation("Employee");
 
                     b.Navigation("ExpenseType");
@@ -1381,6 +1428,17 @@ namespace AtoCash.Migrations
                     b.Navigation("SubProject");
 
                     b.Navigation("WorkTask");
+                });
+
+            modelBuilder.Entity("AtoCash.Models.ExpenseType", b =>
+                {
+                    b.HasOne("AtoCash.Models.StatusType", "StatusType")
+                        .WithMany()
+                        .HasForeignKey("StatusTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StatusType");
                 });
 
             modelBuilder.Entity("AtoCash.Models.PettyCashRequest", b =>
@@ -1493,6 +1551,12 @@ namespace AtoCash.Migrations
 
             modelBuilder.Entity("AtoCash.Models.TravelApprovalRequest", b =>
                 {
+                    b.HasOne("AtoCash.Models.ApprovalStatusType", "ApprovalStatusType")
+                        .WithMany()
+                        .HasForeignKey("ApprovalStatusTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AtoCash.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId");
@@ -1514,6 +1578,8 @@ namespace AtoCash.Migrations
                     b.HasOne("AtoCash.Models.WorkTask", "WorkTask")
                         .WithMany()
                         .HasForeignKey("WorkTaskId");
+
+                    b.Navigation("ApprovalStatusType");
 
                     b.Navigation("Department");
 

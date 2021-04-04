@@ -102,7 +102,7 @@ namespace AtoCash.Controllers
         // DELETE: api/ApprovalStatusTypes/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<IActionResult> DeleteApprovalStatusType(int id)
+        public async Task<IActionResult> DeletEApprovalStatusType(int id)
         {
             var approvalStatusType = await _context.ApprovalStatusTypes.FindAsync(id);
             if (approvalStatusType == null)

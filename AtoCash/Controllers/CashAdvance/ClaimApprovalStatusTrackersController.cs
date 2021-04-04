@@ -153,7 +153,7 @@ namespace AtoCash.Controllers
 
                     //Check if the record is already approved
                     //if it is not approved then trigger next approver level email & Change the status to approved
-                    if (claimApprovalStatusTrackerDto.ApprovalStatusTypeId == (int)ApprovalStatus.Approved)
+                    if (claimApprovalStatusTrackerDto.ApprovalStatusTypeId == (int)EApprovalStatus.Approved)
                     {
                         //Get the next approval level (get its ID)
                         int qPettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId ?? 0;
@@ -173,7 +173,7 @@ namespace AtoCash.Controllers
                             isNextApproverAvailable = false;
                         }
 
-                        int qApprovalStatusTypeId = isNextApproverAvailable ? (int)ApprovalStatus.Initiating : (int)ApprovalStatus.Pending;
+                        int qApprovalStatusTypeId = isNextApproverAvailable ? (int)EApprovalStatus.Initiating : (int)EApprovalStatus.Pending;
 
                         //update the next level approver Track request to PENDING (from Initiating) 
                         //if claimitem is not null change the status
@@ -182,7 +182,7 @@ namespace AtoCash.Controllers
                             claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == qPettyCashRequestId &&
                                 c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
                                 c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
-                            claimitem.ApprovalStatusTypeId = (int)ApprovalStatus.Pending;
+                            claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
 
                         }
                         else
@@ -191,14 +191,14 @@ namespace AtoCash.Controllers
                             claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == qPettyCashRequestId &&
                                c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
                                c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
-                            //claimitem.ApprovalStatusTypeId = (int)ApprovalStatus.Approved;
+                            //claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                             claimitem.FinalApprovedDate = DateTime.Now;
 
                             //DisbursementAndClaimsMaster update the record to Approved (ApprovalStatusId
                             int disbAndClaimItemId = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == claimitem.PettyCashRequestId).FirstOrDefault().Id;
                             var disbAndClaimItem = await _context.DisbursementsAndClaimsMasters.FindAsync(disbAndClaimItemId);
 
-                            disbAndClaimItem.ApprovalStatusId = (int)ApprovalStatus.Approved;
+                            disbAndClaimItem.ApprovalStatusId = (int)EApprovalStatus.Approved;
                             _context.Update(disbAndClaimItem);
                         }
 
@@ -241,20 +241,20 @@ namespace AtoCash.Controllers
                 {
                     //final approver hence update PettyCashRequest
                     claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == claimApprovalStatusTracker.PettyCashRequestId &&
-                                c.ApprovalStatusTypeId == (int)ApprovalStatus.Pending).FirstOrDefault();
+                                c.ApprovalStatusTypeId == (int)EApprovalStatus.Pending).FirstOrDefault();
                     claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
                     //DisbursementAndClaimsMaster update the record to Approved (ApprovalStatusId
                     int disbAndClaimItemId = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == claimitem.PettyCashRequestId).FirstOrDefault().Id;
                     var disbAndClaimItem = await _context.DisbursementsAndClaimsMasters.FindAsync(disbAndClaimItemId);
 
-                    disbAndClaimItem.ApprovalStatusId = (int)ApprovalStatus.Approved;
+                    disbAndClaimItem.ApprovalStatusId = (int)EApprovalStatus.Approved;
                     _context.Update(disbAndClaimItem);
 
                     //Update Pettycashrequest table to update the record to Approved as the final approver has approved it.
                     int pettyCashReqId = _context.PettyCashRequests.Where(d => d.Id == claimitem.PettyCashRequestId).FirstOrDefault().Id;
                     var pettyCashReq = await _context.PettyCashRequests.FindAsync(pettyCashReqId);
 
-                    pettyCashReq.ApprovalStatusTypeId = (int)ApprovalStatus.Approved;
+                    pettyCashReq.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                     pettyCashReq.ApprovedDate = DateTime.Now;
                     _context.Update(pettyCashReq);
 
@@ -295,7 +295,7 @@ namespace AtoCash.Controllers
                 ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId,
                 ReqDate = claimApprovalStatusTrackerDto.ReqDate,
                 FinalApprovedDate = claimApprovalStatusTrackerDto.FinalApprovedDate,
-                ApprovalStatusTypeId = (int)ApprovalStatus.Pending,
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending,
                 Comments = claimApprovalStatusTrackerDto.Comments
         };
 
@@ -322,10 +322,10 @@ namespace AtoCash.Controllers
             return NoContent();
         }
 
-        private bool ClaimApprovalStatusTrackerExists(int id)
-        {
-            return _context.ClaimApprovalStatusTrackers.Any(e => e.Id == id);
-        }
+        //private bool ClaimApprovalStatusTrackerExists(int id)
+        //{
+        //    return _context.ClaimApprovalStatusTrackers.Any(e => e.Id == id);
+        //}
 
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Role Id is Invalid" });
             }
 
-            var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)ApprovalStatus.Pending);
+            var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending);
             List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new();
 
             foreach (ClaimApprovalStatusTracker claimApprovalStatusTracker in claimApprovalStatusTrackers)
@@ -410,7 +410,7 @@ namespace AtoCash.Controllers
                 return NotFound(new RespStatus { Status = "Failure", Message = "Role Id is Invalid" });
             }
 
-            return Ok(_context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)ApprovalStatus.Pending).Count());
+            return Ok(_context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending).Count());
 
         }
 

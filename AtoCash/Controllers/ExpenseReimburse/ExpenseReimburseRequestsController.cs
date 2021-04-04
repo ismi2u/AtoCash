@@ -16,8 +16,9 @@ using AtoCash.Authentication;
 
 namespace AtoCash.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
     [ApiController]
+    //[Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
     public class ExpenseReimburseRequestsController : ControllerBase
     {
@@ -104,6 +105,133 @@ namespace AtoCash.Controllers
             return expenseReimburseRequestDTO;
         }
 
+
+
+        [HttpGet("{id}")]
+        [ActionName("GetExpenseReimburseRequestRaisedForEmployee")]
+        public async Task<ActionResult<IEnumerable<ExpenseReimburseRequestDTO>>> GetExpenseReimburseRequestRaisedForEmployee(int id)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                return NoContent();
+            }
+
+            var expenseReimbRequests = await _context.ExpenseReimburseRequests.Where(p => p.EmployeeId == id).ToListAsync();
+
+            if (expenseReimbRequests == null)
+            {
+                return NoContent();
+            }
+
+            List<ExpenseReimburseRequestDTO> expenseReimburseRequestDTOs = new();
+
+            foreach (var expenseReimbRequest in expenseReimbRequests)
+            {
+                ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new()
+                {
+                    Id = expenseReimbRequest.Id,
+                    EmployeeId = expenseReimbRequest.EmployeeId,
+                    EmployeeName = _context.Employees.Find(expenseReimbRequest.EmployeeId).GetFullName(),
+                    ExpenseReimbClaimAmount = expenseReimbRequest.ExpenseReimbClaimAmount,
+                    Documents = expenseReimbRequest.Documents,
+                    InvoiceNo = expenseReimbRequest.InvoiceNo,
+                    InvoiceDate = expenseReimbRequest.InvoiceDate,
+                    Vendor = expenseReimbRequest.Vendor,
+                    Location = expenseReimbRequest.Location,
+                    Description = expenseReimbRequest.Description,
+                    ExpReimReqDate = DateTime.Now,
+                    CurrencyTypeId = expenseReimbRequest.CurrencyTypeId,
+                    CurrencyType = expenseReimbRequest.CurrencyType != null ? _context.CurrencyTypes.Find(expenseReimbRequest.CurrencyType).CurrencyName : null,
+                    ExpenseTypeId = expenseReimbRequest.ExpenseTypeId,
+                    ExpenseType =  _context.ExpenseTypes.Find(expenseReimbRequest.ExpenseTypeId).ExpenseTypeName ,
+
+                    DepartmentId = expenseReimbRequest.DepartmentId,
+                    Department = expenseReimbRequest.DepartmentId != null ? _context.Departments.Find(expenseReimbRequest.DepartmentId).DeptCode + _context.Departments.Find(expenseReimbRequest.DepartmentId).DeptName : null,
+                    ProjectId = expenseReimbRequest.ProjectId,
+                    Project = expenseReimbRequest.ProjectId != null ? _context.Projects.Find(expenseReimbRequest.ProjectId).ProjectName : null,
+                    SubProjectId = expenseReimbRequest.SubProjectId,
+                    SubProject = expenseReimbRequest.SubProjectId != null ? _context.SubProjects.Find(expenseReimbRequest.SubProjectId).SubProjectName : null,
+                    WorkTaskId = expenseReimbRequest.WorkTaskId,
+                    WorkTask = expenseReimbRequest.WorkTaskId != null ? _context.WorkTasks.Find(expenseReimbRequest.WorkTaskId).TaskName : null,
+
+                    ApprovalStatusTypeId = expenseReimbRequest.ApprovalStatusTypeId,
+                    ApprovalStatusType = expenseReimbRequest.ApprovalStatusType != null ? _context.ApprovalStatusTypes.Find(expenseReimbRequest.ApprovalStatusTypeId).Status : null,
+                    ApprovedDate = expenseReimbRequest.ApprovedDate
+                };
+                expenseReimburseRequestDTOs.Add(expenseReimburseRequestDTO);
+            }
+
+
+            return Ok(expenseReimburseRequestDTOs);
+        }
+
+
+
+        [HttpGet("{id}")]
+        [ActionName("CountExpsenseReiburseRequestRaisedByEmployee")]
+        public async Task<ActionResult<int>> CountExpsenseReiburseRequestRaisedByEmployee(int id)
+        {
+            var employee = await _context.Employees.FindAsync(id);
+
+            if (employee == null)
+            {
+                return NoContent();
+            }
+
+            var expenseReimbRequests = await _context.ExpenseReimburseRequests.Where(p => p.EmployeeId == id).ToListAsync();
+
+            if (expenseReimbRequests == null)
+            {
+                return NoContent();
+            }
+
+
+            List<ExpenseReimburseRequestDTO> expenseReimburseRequestDTOs = new();
+
+            foreach (var expenseReimbRequest in expenseReimbRequests)
+            {
+                ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new()
+                {
+                    Id = expenseReimbRequest.Id,
+                    EmployeeId = expenseReimbRequest.EmployeeId,
+                    EmployeeName = _context.Employees.Find(expenseReimbRequest.EmployeeId).GetFullName(),
+                    ExpenseReimbClaimAmount = expenseReimbRequest.ExpenseReimbClaimAmount,
+                    Documents = expenseReimbRequest.Documents,
+                    InvoiceNo = expenseReimbRequest.InvoiceNo,
+                    InvoiceDate = expenseReimbRequest.InvoiceDate,
+                    Vendor = expenseReimbRequest.Vendor,
+                    Location = expenseReimbRequest.Location,
+                    Description = expenseReimbRequest.Description,
+                    ExpReimReqDate = DateTime.Now,
+                    CurrencyTypeId = expenseReimbRequest.CurrencyTypeId,
+                    CurrencyType = expenseReimbRequest.CurrencyType != null ? _context.CurrencyTypes.Find(expenseReimbRequest.CurrencyType).CurrencyName : null,
+                    ExpenseTypeId = expenseReimbRequest.ExpenseTypeId,
+                    ExpenseType = _context.ExpenseTypes.Find(expenseReimbRequest.ExpenseTypeId).ExpenseTypeName,
+
+                    DepartmentId = expenseReimbRequest.DepartmentId,
+                    Department = expenseReimbRequest.DepartmentId != null ? _context.Departments.Find(expenseReimbRequest.DepartmentId).DeptCode + _context.Departments.Find(expenseReimbRequest.DepartmentId).DeptName : null,
+                    ProjectId = expenseReimbRequest.ProjectId,
+                    Project = expenseReimbRequest.ProjectId != null ? _context.Projects.Find(expenseReimbRequest.ProjectId).ProjectName : null,
+                    SubProjectId = expenseReimbRequest.SubProjectId,
+                    SubProject = expenseReimbRequest.SubProjectId != null ? _context.SubProjects.Find(expenseReimbRequest.SubProjectId).SubProjectName : null,
+                    WorkTaskId = expenseReimbRequest.WorkTaskId,
+                    WorkTask = expenseReimbRequest.WorkTaskId != null ? _context.WorkTasks.Find(expenseReimbRequest.WorkTaskId).TaskName : null,
+
+                    ApprovalStatusTypeId = expenseReimbRequest.ApprovalStatusTypeId,
+                    ApprovalStatusType = expenseReimbRequest.ApprovalStatusType != null ? _context.ApprovalStatusTypes.Find(expenseReimbRequest.ApprovalStatusTypeId).Status : null,
+                    ApprovedDate = expenseReimbRequest.ApprovedDate
+                }; 
+                expenseReimburseRequestDTOs.Add(expenseReimburseRequestDTO);
+            }
+
+            return Ok(expenseReimburseRequestDTOs.Count);
+
+        }
+
+
+
         // PUT: api/ExpenseReimburseRequests/5
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
@@ -127,8 +255,8 @@ namespace AtoCash.Controllers
             expenseReimburseRequest.ProjectId = expenseReimburseRequestDto.ProjectId;
             expenseReimburseRequest.SubProjectId = expenseReimburseRequestDto.SubProjectId;
             expenseReimburseRequest.WorkTaskId = expenseReimburseRequestDto.WorkTaskId;
+            await Task.Run(() => _context.ExpenseReimburseRequests.Update(expenseReimburseRequest));
 
-            _context.ExpenseReimburseRequests.Update(expenseReimburseRequest);
             //_context.Entry(expenseReimburseRequestDTO).State = EntityState.Modified;
 
             try
@@ -137,14 +265,7 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ExpenseReimburseRequestExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return NoContent();
@@ -155,7 +276,7 @@ namespace AtoCash.Controllers
 
         public async Task<ActionResult<ExpenseReimburseRequest>> PostExpenseReimburseRequest([FromForm] List<ExpenseReimburseRequestDTO> listExpenseReimburseRequestDto)
         {
-            
+
 
             //if (listExpenseReimburseRequestDto.Count == 1)
             //{
@@ -204,7 +325,7 @@ namespace AtoCash.Controllers
             //    ////////////        RecordDate = DateTime.Now,
             //    ////////////        Amount = expenseReimburseRequest.ExpenseReimbClaimAmount,
             //    ////////////        CostCentreId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCentreId,
-            //    ////////////        ApprovalStatusId = (int)ApprovalStatus.Pending
+            //    ////////////        ApprovalStatusId = (int)EApprovalStatus.Pending
             //    ////////////    });
             //    ////////////    await _context.SaveChangesAsync();
             //    ////////////}
@@ -222,7 +343,7 @@ namespace AtoCash.Controllers
             //    ////////////        RecordDate = DateTime.Now,
             //    ////////////        Amount = expenseReimburseRequest.ExpenseReimbClaimAmount,
             //    ////////////        CostCentreId = _context.Projects.Find(expenseReimburseRequestDto.ProjectId).CostCentreId,
-            //    ////////////        ApprovalStatusId = (int)ApprovalStatus.Pending
+            //    ////////////        ApprovalStatusId = (int)EApprovalStatus.Pending
             //    ////////////    });
             //    ////////////    await _context.SaveChangesAsync();
             //    ////////////}
@@ -246,7 +367,7 @@ namespace AtoCash.Controllers
             //    ///TODO lis 
             //}
 
-
+            
 
             return Ok(listExpenseReimburseRequestDto);
         }
@@ -255,27 +376,27 @@ namespace AtoCash.Controllers
         {
 
             string uniqueFileName = string.Empty;
-            StringBuilder StrBuilderUploadedDocuments = new();
+            //StringBuilder StrBuilderUploadedDocuments = new();
 
-            if (expenseReimburseRequestDto.Documents != null && expenseReimburseRequestDto.Documents.Count > 0)
-            {
-                foreach (IFormFile document in expenseReimburseRequestDto.Documents)
-                {
-                    string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Images");
+            //if (expenseReimburseRequestDto.Documents != null && expenseReimburseRequestDto.Documents.Count > 0)
+            //{
+            //    foreach (IFormFile document in expenseReimburseRequestDto.Documents)
+            //    {
+            //        string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Images");
 
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + document.FileName;
+            //        uniqueFileName = Guid.NewGuid().ToString() + "_" + document.FileName;
 
-                    StrBuilderUploadedDocuments.Append(uniqueFileName + "^");
+            //        StrBuilderUploadedDocuments.Append(uniqueFileName + "^");
 
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            //        string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
 
-                    using var stream = new FileStream(filePath, FileMode.Create);
-                    await document.CopyToAsync(stream);
-                    stream.Flush();
-                }
+            //        using var stream = new FileStream(filePath, FileMode.Create);
+            //        await document.CopyToAsync(stream);
+            //        stream.Flush();
+            //    }
 
-            }
+            //}
 
             return uniqueFileName;
         }
@@ -297,20 +418,7 @@ namespace AtoCash.Controllers
             return NoContent();
         }
 
-        private bool ExpenseReimburseRequestExists(int id)
-        {
-            return _context.ExpenseReimburseRequests.Any(e => e.Id == id);
-        }
-
-
-
-
-
-
-
-     
-
-
+       
 
 
 
@@ -335,7 +443,7 @@ namespace AtoCash.Controllers
                     RoleId = approver.RoleId,
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = null,
-                    ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
+                    ApprovalStatusTypeId = (int)EApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
                 });
 
                 await _context.SaveChangesAsync();
@@ -375,7 +483,7 @@ namespace AtoCash.Controllers
                 RoleId = approver.RoleId, // Approver Role Id
                 ReqDate = DateTime.Now,
                 FinalApprovedDate = null,
-                ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending //1-Pending, 2-Approved, 3-Rejected
             });
 
             //##### 5. Send email to the Approver

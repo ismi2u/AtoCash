@@ -66,6 +66,8 @@ namespace AtoCash.Models
 
         //Navigation Properties
         //------------------------------------------------
+
+
         [Required]
         [ForeignKey("EmploymentTypeId")]
         public virtual EmploymentType EmploymentType { get; set; }
@@ -168,7 +170,8 @@ namespace AtoCash.Models
 
         public int ApprovalGroupId { get; set; }
 
-        public int EmployeeStatusId { get; set; }
+        public int CurrencyTypeId { get; set; }
+        public int StatusTypeId { get; set; }
 
     }
 

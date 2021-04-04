@@ -77,8 +77,9 @@ namespace AtoCash.Controllers
                 employeeDTO.EmploymentTypeId = employee.EmploymentTypeId;
                 employeeDTO.DepartmentId = employee.DepartmentId;
                 employeeDTO.RoleId = employee.RoleId;
+                employeeDTO.CurrencyTypeId = employee.CurrencyTypeId;
                 employeeDTO.ApprovalGroupId = employee.ApprovalGroupId;
-
+                employeeDTO.StatusTypeId = employee.StatusTypeId;
 
 
                 ListEmployeeDTO.Add(employeeDTO);
@@ -120,8 +121,9 @@ namespace AtoCash.Controllers
             employeeDTO.EmploymentTypeId = employee.EmploymentTypeId;
             employeeDTO.DepartmentId = employee.DepartmentId;
             employeeDTO.RoleId = employee.RoleId;
+            employeeDTO.CurrencyTypeId = employee.CurrencyTypeId;
             employeeDTO.ApprovalGroupId = employee.ApprovalGroupId;
-            employeeDTO.EmployeeStatusId = employee.StatusTypeId;
+            employeeDTO.StatusTypeId = employee.StatusTypeId;
 
 
             return employeeDTO;
@@ -186,8 +188,9 @@ namespace AtoCash.Controllers
             employee.EmploymentTypeId = employeeDto.EmploymentTypeId;
             employee.DepartmentId = employeeDto.DepartmentId;
             employee.RoleId = employeeDto.RoleId;
+            employee.CurrencyTypeId = employeeDto.CurrencyTypeId;
             employee.ApprovalGroupId = employeeDto.ApprovalGroupId;
-            employee.StatusTypeId = employeeDto.EmployeeStatusId;
+            employee.StatusTypeId = employeeDto.StatusTypeId;
 
             _context.Employees.Update(employee);
             //_context.Entry(employeeDto).State = EntityState.Modified;
@@ -219,7 +222,7 @@ namespace AtoCash.Controllers
 
             //var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
 
-            var emplye = _context.Employees.Where(e => e.Email == employeeDto.Email || e.EmpCode == employeeDto.EmpCode || e.Email == employeeDto.Email).FirstOrDefault();
+            var emplye = _context.Employees.Where(e => e.Email == employeeDto.Email || e.EmpCode == employeeDto.EmpCode || e.MobileNumber == employeeDto.MobileNumber).FirstOrDefault();
 
             if (emplye != null)
             {
@@ -248,8 +251,9 @@ namespace AtoCash.Controllers
                 DepartmentId = employeeDto.DepartmentId,
                 RoleId = employeeDto.RoleId,
                 ApprovalGroupId = employeeDto.ApprovalGroupId,
-                StatusTypeId = employeeDto.EmployeeStatusId
-        };
+                CurrencyTypeId = employeeDto.CurrencyTypeId,
+                StatusTypeId = employeeDto.StatusTypeId
+            };
 
             MailAddress mailAdd = new MailAddress(employeeDto.Email);
             if ((mailAdd.Host.ToUpper() != "MAILINATOR.COM") && mailAdd.Host.ToUpper() != "GMAIL.COM")
