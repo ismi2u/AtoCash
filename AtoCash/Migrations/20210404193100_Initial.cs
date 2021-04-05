@@ -584,6 +584,7 @@ namespace AtoCash.Migrations
                     Vendor = table.Column<string>(type: "nvarchar(50)", nullable: false),
                     Location = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(250)", nullable: false),
+                    CurrencyTypeId = table.Column<int>(type: "int", nullable: false),
                     ExpenseTypeId = table.Column<int>(type: "int", nullable: false),
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
@@ -599,6 +600,12 @@ namespace AtoCash.Migrations
                         name: "FK_ExpenseReimburseRequests_ApprovalStatusTypes_ApprovalStatusTypeId",
                         column: x => x.ApprovalStatusTypeId,
                         principalTable: "ApprovalStatusTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseRequests_CurrencyTypes_CurrencyTypeId",
+                        column: x => x.CurrencyTypeId,
+                        principalTable: "CurrencyTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
@@ -943,7 +950,7 @@ namespace AtoCash.Migrations
                     ReqDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FinalApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Comments = table.Column<string>(type: "nvarchar(250)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1200,6 +1207,11 @@ namespace AtoCash.Migrations
                 name: "IX_ExpenseReimburseRequests_ApprovalStatusTypeId",
                 table: "ExpenseReimburseRequests",
                 column: "ApprovalStatusTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseRequests_CurrencyTypeId",
+                table: "ExpenseReimburseRequests",
+                column: "CurrencyTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExpenseReimburseRequests_DepartmentId",

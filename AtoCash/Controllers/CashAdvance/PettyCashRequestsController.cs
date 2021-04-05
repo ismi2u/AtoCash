@@ -460,7 +460,10 @@ namespace AtoCash.Controllers
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
-                PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc
+                PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc,
+                CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
+                ApprovalStatusTypeId = (int)EApprovalStatus.Initiating
+                
             };
             _context.PettyCashRequests.Add(pcrq);
             await _context.SaveChangesAsync(); 
@@ -496,7 +499,8 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = empApprLevel, // default approval level is 2 for Project based request
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
-                    ApprovalStatusTypeId = (int)ApprovalStatus.Approved //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    ApprovalStatusTypeId = (int)ApprovalStatus.Approved, //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    Comments = "Awaiting Approver Action"
                 };
 
 
@@ -517,7 +521,8 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = 2, // default approval level is 2 for Project based request
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = null,
-                    ApprovalStatusTypeId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    ApprovalStatusTypeId = (int)ApprovalStatus.Pending, //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    Comments = "Awaiting Approver Action"
                 };
 
 
@@ -555,6 +560,7 @@ namespace AtoCash.Controllers
                 SubProjectId = pettyCashRequestDto.SubProjectId,
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
                 RecordDate = DateTime.Now,
+                CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
                 Amount = pettyCashRequestDto.PettyClaimAmount,
                 CostCentreId = _context.Departments.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId).CostCentreId,
                 ApprovalStatusId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
@@ -605,9 +611,9 @@ namespace AtoCash.Controllers
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
-                DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId
-
-
+                DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId,
+                CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
+                ApprovalStatusTypeId = (int)EApprovalStatus.Initiating
 
             };
             _context.PettyCashRequests.Add(pcrq);
@@ -646,7 +652,8 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = empApprLevel,
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
-                    ApprovalStatusTypeId =  (int)ApprovalStatus.Approved
+                    ApprovalStatusTypeId =  (int)ApprovalStatus.Approved,
+                    Comments = "Awaiting Approver Action"
                     //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
                 _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
@@ -683,7 +690,8 @@ namespace AtoCash.Controllers
                         ApprovalLevelId = ApprMap.ApprovalLevelId,
                         ReqDate = DateTime.Now,
                         FinalApprovedDate = null,
-                        ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating
+                        ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating,
+                        Comments = "Awaiting Approver Action"
                         //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                     };
 
@@ -726,6 +734,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.SubProjectId = null;
             disbursementsAndClaimsMaster.WorkTaskId = null;
             disbursementsAndClaimsMaster.RecordDate = DateTime.Now;
+            disbursementsAndClaimsMaster.CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId;
             disbursementsAndClaimsMaster.Amount = empReqAmount;
             disbursementsAndClaimsMaster.CostCentreId = _context.Departments.Find(_context.Employees.Find(reqEmpid).DepartmentId).CostCentreId;
             disbursementsAndClaimsMaster.ApprovalStatusId = isSelfApprovedRequest ? (int)ApprovalStatus.Approved: (int)ApprovalStatus.Pending;

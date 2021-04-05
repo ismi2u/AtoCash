@@ -92,6 +92,8 @@ namespace AtoCash.Models
         public int? SubProjectId { get; set; }
         public int? WorkTaskId { get; set; }
         public DateTime RecordDate { get; set; }
+
+        public int CurrencyTypeId { get; set; }
         public Double Amount { get; set; }
         public int CostCentreId { get; set; }
         public int ApprovalStatusId { get; set; }

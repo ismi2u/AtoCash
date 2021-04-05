@@ -539,6 +539,9 @@ namespace AtoCash.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CurrencyTypeId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
@@ -588,6 +591,8 @@ namespace AtoCash.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovalStatusTypeId");
+
+                    b.HasIndex("CurrencyTypeId");
 
                     b.HasIndex("DepartmentId");
 
@@ -905,7 +910,8 @@ namespace AtoCash.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Comments")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
@@ -1385,6 +1391,12 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AtoCash.Models.CurrencyType", "CurrencyType")
+                        .WithMany()
+                        .HasForeignKey("CurrencyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AtoCash.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId");
@@ -1414,6 +1426,8 @@ namespace AtoCash.Migrations
                         .HasForeignKey("WorkTaskId");
 
                     b.Navigation("ApprovalStatusType");
+
+                    b.Navigation("CurrencyType");
 
                     b.Navigation("Department");
 

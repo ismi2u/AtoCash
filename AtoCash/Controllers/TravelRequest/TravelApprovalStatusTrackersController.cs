@@ -45,6 +45,8 @@ namespace AtoCash.Controllers
                 {
                     Id = travelApprovalStatusTracker.Id,
                     EmployeeId = travelApprovalStatusTracker.EmployeeId,
+                    TravelStartDate = travelApprovalStatusTracker.TravelStartDate,
+                    TravelEndDate = travelApprovalStatusTracker.TravelEndDate,
                     EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName(),
                     TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId,
                     DepartmentId = travelApprovalStatusTracker.DepartmentId,
@@ -57,7 +59,8 @@ namespace AtoCash.Controllers
                     ReqDate = travelApprovalStatusTracker.ReqDate,
                     FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate,
                     ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId,
-                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status
+                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status,
+                    Comments = travelApprovalStatusTracker.Comments
                 };
 
 
@@ -122,6 +125,8 @@ namespace AtoCash.Controllers
             {
                 Id = travelApprovalStatusTracker.Id,
                 EmployeeId = travelApprovalStatusTracker.EmployeeId,
+                 TravelStartDate = travelApprovalStatusTracker.TravelStartDate,
+                TravelEndDate  = travelApprovalStatusTracker.TravelEndDate,
                 EmployeeName = _context.Employees.Find(travelApprovalStatusTracker.EmployeeId).GetFullName(),
                 TravelApprovalRequestId = travelApprovalStatusTracker.TravelApprovalRequestId,
                 DepartmentId = travelApprovalStatusTracker.DepartmentId,
@@ -134,7 +139,8 @@ namespace AtoCash.Controllers
                 ReqDate = travelApprovalStatusTracker.ReqDate,
                 FinalApprovedDate = travelApprovalStatusTracker.FinalApprovedDate,
                 ApprovalStatusTypeId = travelApprovalStatusTracker.ApprovalStatusTypeId,
-                ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status
+                ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalStatusTracker.ApprovalStatusTypeId).Status,
+                Comments = travelApprovalStatusTracker.Comments
             };
 
 
@@ -173,7 +179,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.ApprovalLevelId = travelApprovalStatusTrackerDTO.ApprovalLevelId;
                 travelApprovalStatusTracker.ReqDate = travelApprovalStatusTrackerDTO.ReqDate;
                 travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
-                travelApprovalStatusTracker.Comments = travelApprovalStatusTrackerDTO.Comments;
+                travelApprovalStatusTracker.Comments = travelApprovalStatusTrackerDTO.Comments ?? "In Process";
 
                 TravelApprovalStatusTracker travelItem;
 
@@ -227,9 +233,21 @@ namespace AtoCash.Controllers
 
                         }
 
+
+                        try
+                        {
+
+                            _context.TravelApprovalStatusTrackers.Update(travelItem);
+                            //_context.Entry(travelItem).State = EntityState.Modified;
+                            await _context.SaveChangesAsync();
+                        }
+
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.ToString());
+                        }
                         //Save to database
-                        _context.Update(travelItem);
-                        await _context.SaveChangesAsync();
+                       
                         var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).OrderBy(a => a.ApprovalLevel).ToList();
 
                         foreach (var ApprMap in getEmpClaimApproversAllLevels)

@@ -63,6 +63,8 @@ namespace AtoCash.Models
         public virtual ApprovalStatusType ApprovalStatusType { get; set; }
         public int ApprovalStatusTypeId { get; set; }
 
+
+        [Column(TypeName = "nvarchar(250)")]
         public string Comments { get; set; }
 
     }

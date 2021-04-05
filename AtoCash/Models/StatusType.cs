@@ -14,6 +14,7 @@ namespace AtoCash.Models
         [Required]
         [Column(TypeName = "nvarchar(8)")]
         public string Status { get; set; }
+
     }
 
     public class StatusTypeVM

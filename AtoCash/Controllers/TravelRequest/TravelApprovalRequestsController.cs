@@ -440,6 +440,7 @@ namespace AtoCash.Controllers
             travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
             travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
             travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
+            travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Initiating;
 
 
             _context.TravelApprovalRequests.Add(travelApprovalRequest);
@@ -477,7 +478,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.ReqDate = DateTime.Now;
                 travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
                 travelApprovalStatusTracker.ApprovalStatusTypeId = (int)EApprovalStatus.Approved; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
-
+                travelApprovalStatusTracker.Comments = "Travel Request in Proceess";
             }
             else
             {
@@ -493,7 +494,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.ReqDate = DateTime.Now;
                 travelApprovalStatusTracker.FinalApprovedDate = null;
                 travelApprovalStatusTracker.ApprovalStatusTypeId = (int)EApprovalStatus.Pending; //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
-
+                travelApprovalStatusTracker.Comments = "Travel Request in Proceess";
             }
 
 
@@ -550,7 +551,9 @@ namespace AtoCash.Controllers
                 DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId,
                 ProjectId = travelApprovalRequestDto.ProjectId,
                 SubProjectId = travelApprovalRequestDto.SubProjectId,
-                WorkTaskId = travelApprovalRequestDto.WorkTaskId
+                WorkTaskId = travelApprovalRequestDto.WorkTaskId,
+                ApprovalStatusTypeId = (int)EApprovalStatus.Initiating
+
 
             };
             _context.TravelApprovalRequests.Add(travelApprovalRequest);
@@ -594,7 +597,8 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = empApprLevel,
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
-                    ApprovalStatusTypeId = (int)EApprovalStatus.Approved
+                    ApprovalStatusTypeId = (int)EApprovalStatus.Approved,
+                    Comments = "Travel Request in Proceess"
                     //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
             }
@@ -625,7 +629,8 @@ namespace AtoCash.Controllers
                         ApprovalLevelId = ApprMap.ApprovalLevelId,
                         ReqDate = DateTime.Now,
                         FinalApprovedDate = null,
-                        ApprovalStatusTypeId = isFirstApprover ? (int)EApprovalStatus.Pending : (int)EApprovalStatus.Initiating
+                        ApprovalStatusTypeId = isFirstApprover ? (int)EApprovalStatus.Pending : (int)EApprovalStatus.Initiating,
+                        Comments = "Travel Request in Proceess"
                         //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                     };
 

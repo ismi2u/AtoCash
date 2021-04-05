@@ -133,25 +133,31 @@ namespace AtoCash.Authentication
                 var modeluser = await userManager.FindByEmailAsync(model.Email);
                 var userroles = await userManager.GetRolesAsync(modeluser);
                 var empid = user.EmployeeId;
+                int currencyId;
+                string currencyCode;
+                string empFirstName;
+                string empLastName;
+                string empEmail;
 
                 var employee = await context.Employees.FindAsync(empid);
-
-                string empFirstName ;
-                string empLastName ;
-                string empEmail ;
-
                 if (empid == 0)
-                { 
-                     empFirstName = "Atominos";
-                     empLastName = "Atominos";
-                     empEmail = "atominos@gmail.com";
+                {
+                    empFirstName = "Atominos";
+                    empLastName = "Atominos";
+                    empEmail = "atominos@gmail.com";
+                    currencyCode = "INR";
+                    currencyId = 1;
                 }
                 else
                 {
-                     empFirstName = employee.FirstName;
-                     empLastName = employee.LastName;
-                     empEmail = employee.Email;
+                    empFirstName = employee.FirstName;
+                    empLastName = employee.LastName;
+                    empEmail = employee.Email;
+                    currencyId = employee.CurrencyTypeId;
+                     currencyCode = context.CurrencyTypes.Find(currencyId).CurrencyCode;
                 }
+                    
+   
 
                 //add claims
                 var claims = new List<Claim> {
@@ -179,7 +185,7 @@ namespace AtoCash.Authentication
                 var tokenString = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
                 
-                return Ok( new { Token = tokenString, Role = userroles, FirstName = empFirstName, LastName = empLastName, EmpId = empid.ToString(), Email= empEmail });
+                return Ok( new { Token = tokenString, Role = userroles, FirstName = empFirstName, LastName = empLastName, EmpId = empid.ToString(), Email= empEmail, currencyCode, currencyId });
             }
 
             return Unauthorized(new RespStatus { Status = "Failure", Message = "Username or Password Incorrect" });

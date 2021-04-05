@@ -280,7 +280,7 @@ namespace AtoCash.Controllers
         // POST: api/ClaimApprovalStatusTrackers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager, User")]
         public async Task<ActionResult<ClaimApprovalStatusTracker>> PostClaimApprovalStatusTracker(ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto)
         {
             ClaimApprovalStatusTracker claimApprovalStatusTracker = new()
