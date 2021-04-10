@@ -35,8 +35,6 @@ namespace AtoCash.Models
         [Required]
         public DateTime ReqRaisedDate { get; set; }
 
-        [Required]
-        public int CurrentStatus { get; set; }
         /// <summary>
         /// foreignkeys
         /// </summary>
@@ -78,7 +76,6 @@ namespace AtoCash.Models
         public DateTime TravelEndDate { get; set; }
         public string TravelPurpose { get; set; }
         public DateTime ReqRaisedDate { get; set; }
-        public int CurrentStatus { get; set; }
         public string Department { get; set; }
         public int? DepartmentId { get; set; }
         public int? ProjectId { get; set; }
@@ -87,10 +84,11 @@ namespace AtoCash.Models
         public string SubProject { get; set; }
         public int? WorkTaskId { get; set; }
         public string WorkTask { get; set; }
-
         public int ApprovalStatusTypeId { get; set; }
         public string ApprovalStatusType { get; set; }
         public DateTime? ApprovedDate { get; set; }
+
+        public bool ShowEditDelete { get; set; }
 
     }
 }

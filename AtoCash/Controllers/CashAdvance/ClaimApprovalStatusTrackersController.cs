@@ -43,7 +43,6 @@ namespace AtoCash.Controllers
                     EmployeeId = claimApprovalStatusTracker.EmployeeId,
                     EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
                     PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
-                    ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
                     DepartmentId = claimApprovalStatusTracker.DepartmentId,
                     DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null,
                     ProjectId = claimApprovalStatusTracker.ProjectId,
@@ -84,7 +83,6 @@ namespace AtoCash.Controllers
                 EmployeeId = claimApprovalStatusTracker.EmployeeId,
                 EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
                 PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
-                ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
                 DepartmentId = claimApprovalStatusTracker.DepartmentId,
                 DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null,
                 ProjectId = claimApprovalStatusTracker.ProjectId,
@@ -137,7 +135,6 @@ namespace AtoCash.Controllers
                 claimApprovalStatusTracker.Id = claimApprovalStatusTrackerDto.Id;
                 claimApprovalStatusTracker.EmployeeId = claimApprovalStatusTrackerDto.EmployeeId;
                 claimApprovalStatusTracker.PettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId;
-                claimApprovalStatusTracker.ExpenseReimburseRequestId = claimApprovalStatusTrackerDto.ExpenseReimburseRequestId;
                 claimApprovalStatusTracker.DepartmentId = claimApprovalStatusTrackerDto.DepartmentId;
                 claimApprovalStatusTracker.ProjectId = claimApprovalStatusTrackerDto.ProjectId;
                 claimApprovalStatusTracker.RoleId = claimApprovalStatusTrackerDto.RoleId;
@@ -288,7 +285,6 @@ namespace AtoCash.Controllers
                 Id = claimApprovalStatusTrackerDto.Id,
                 EmployeeId = claimApprovalStatusTrackerDto.EmployeeId,
                 PettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId,
-                ExpenseReimburseRequestId = claimApprovalStatusTrackerDto.ExpenseReimburseRequestId,
                 DepartmentId = claimApprovalStatusTrackerDto.DepartmentId,
                 ProjectId = claimApprovalStatusTrackerDto.ProjectId,
                 RoleId = claimApprovalStatusTrackerDto.RoleId,
@@ -364,7 +360,6 @@ namespace AtoCash.Controllers
                     EmployeeId = claimApprovalStatusTracker.EmployeeId,
                     EmployeeName = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).GetFullName(),
                     PettyCashRequestId = claimApprovalStatusTracker.PettyCashRequestId,
-                    ExpenseReimburseRequestId = claimApprovalStatusTracker.ExpenseReimburseRequestId,
                     DepartmentId = claimApprovalStatusTracker.DepartmentId,
                     DepartmentName = claimApprovalStatusTracker.DepartmentId != null ? _context.Departments.Find(claimApprovalStatusTracker.DepartmentId).DeptName : null,
                     ProjectId = claimApprovalStatusTracker.ProjectId,
@@ -459,22 +454,7 @@ namespace AtoCash.Controllers
 
         }
 
-        private enum RequestType
-        {
-            CashAdvance = 1,
-            ExpenseReim
-
-        }
-
-        private enum ApprovalStatus
-        {
-            Initiating = 1,
-            Pending,
-            InReview,
-            Approved,
-            Rejected
-
-        }
+       
 
 
         ////

@@ -41,6 +41,9 @@ namespace AtoCash.Data
 
         public DbSet<ExpenseReimburseRequest> ExpenseReimburseRequests { get; set; }
 
+        public DbSet<ExpenseReimburseStatusTracker> ExpenseReimburseStatusTrackers { get; set; }
+
+        public DbSet<ExpenseSubClaim> ExpenseSubClaims { get; set; }
         public DbSet<Project> Projects { get; set; }
 
         public DbSet<SubProject> SubProjects { get; set; }
@@ -58,7 +61,8 @@ namespace AtoCash.Data
         public DbSet<TravelApprovalStatusTracker> TravelApprovalStatusTrackers { get; set; }
 
         public DbSet<StatusType> StatusTypes { get; set; }
-
+        public DbSet<FileDocument> FileDocuments { get; set; }
         public DbSet<CurrencyType> CurrencyTypes { get; set; }
+
     }
 }

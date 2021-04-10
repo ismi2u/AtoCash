@@ -22,4 +22,11 @@ namespace AtoCash.Models
         public int Id { get; set; }
         public string Status { get; set; }
     }
+
+
+    public enum EStatusType
+    {
+        Active = 1,
+        Inactive
+    }
 }

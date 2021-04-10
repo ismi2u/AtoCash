@@ -194,9 +194,6 @@ namespace AtoCash.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ExpenseReimburseRequestId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("FinalApprovedDate")
                         .HasColumnType("datetime2");
 
@@ -221,8 +218,6 @@ namespace AtoCash.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("EmployeeId");
-
-                    b.HasIndex("ExpenseReimburseRequestId");
 
                     b.HasIndex("PettyCashRequestId");
 
@@ -545,12 +540,72 @@ namespace AtoCash.Migrations
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Description")
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpReimReqDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExpenseReportTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("Documents")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TotalClaimAmount")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("WorkTaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovalStatusTypeId");
+
+                    b.HasIndex("CurrencyTypeId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("SubProjectId");
+
+                    b.HasIndex("WorkTaskId");
+
+                    b.ToTable("ExpenseReimburseRequests");
+                });
+
+            modelBuilder.Entity("AtoCash.Models.ExpenseReimburseStatusTracker", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ApprovalLevelId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ApprovalStatusTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("CurrencyTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DepartmentId")
+                        .HasColumnType("int");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
@@ -558,8 +613,68 @@ namespace AtoCash.Migrations
                     b.Property<DateTime>("ExpReimReqDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("ExpenseReimburseRequestId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobRoleId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TotalClaimAmount")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("WorkTaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovalLevelId");
+
+                    b.HasIndex("ApprovalStatusTypeId");
+
+                    b.HasIndex("CurrencyTypeId");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ExpenseReimburseRequestId");
+
+                    b.HasIndex("JobRoleId");
+
+                    b.HasIndex("ProjectId");
+
+                    b.HasIndex("SubProjectId");
+
+                    b.HasIndex("WorkTaskId");
+
+                    b.ToTable("ExpenseReimburseStatusTrackers");
+                });
+
+            modelBuilder.Entity("AtoCash.Models.ExpenseSubClaim", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("DocumentIDs")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double>("ExpenseReimbClaimAmount")
                         .HasColumnType("float");
+
+                    b.Property<int>("ExpenseReimburseRequestId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ExpenseTypeId")
                         .HasColumnType("int");
@@ -575,38 +690,23 @@ namespace AtoCash.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<int?>("ProjectId")
-                        .HasColumnType("int");
+                    b.Property<float>("Tax")
+                        .HasColumnType("real");
 
-                    b.Property<int?>("SubProjectId")
-                        .HasColumnType("int");
+                    b.Property<double>("TaxAmount")
+                        .HasColumnType("float");
 
                     b.Property<string>("Vendor")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("WorkTaskId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ApprovalStatusTypeId");
-
-                    b.HasIndex("CurrencyTypeId");
-
-                    b.HasIndex("DepartmentId");
-
-                    b.HasIndex("EmployeeId");
+                    b.HasIndex("ExpenseReimburseRequestId");
 
                     b.HasIndex("ExpenseTypeId");
 
-                    b.HasIndex("ProjectId");
-
-                    b.HasIndex("SubProjectId");
-
-                    b.HasIndex("WorkTaskId");
-
-                    b.ToTable("ExpenseReimburseRequests");
+                    b.ToTable("ExpenseSubClaims");
                 });
 
             modelBuilder.Entity("AtoCash.Models.ExpenseType", b =>
@@ -632,6 +732,26 @@ namespace AtoCash.Migrations
                     b.HasIndex("StatusTypeId");
 
                     b.ToTable("ExpenseTypes");
+                });
+
+            modelBuilder.Entity("AtoCash.Models.FileDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ActualFileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UniqueFileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FileDocuments");
                 });
 
             modelBuilder.Entity("AtoCash.Models.JobRole", b =>
@@ -848,9 +968,6 @@ namespace AtoCash.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CurrentStatus")
-                        .HasColumnType("int");
-
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
@@ -910,7 +1027,6 @@ namespace AtoCash.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Comments")
-                        .IsRequired()
                         .HasColumnType("nvarchar(250)");
 
                     b.Property<int?>("DepartmentId")
@@ -1166,10 +1282,6 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AtoCash.Models.ExpenseReimburseRequest", "ExpenseReimburseRequest")
-                        .WithMany()
-                        .HasForeignKey("ExpenseReimburseRequestId");
-
                     b.HasOne("AtoCash.Models.PettyCashRequest", "PettyCashRequest")
                         .WithMany()
                         .HasForeignKey("PettyCashRequestId");
@@ -1191,8 +1303,6 @@ namespace AtoCash.Migrations
                     b.Navigation("Department");
 
                     b.Navigation("Employee");
-
-                    b.Navigation("ExpenseReimburseRequest");
 
                     b.Navigation("PettyCashRequest");
 
@@ -1407,12 +1517,6 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AtoCash.Models.ExpenseType", "ExpenseType")
-                        .WithMany()
-                        .HasForeignKey("ExpenseTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("AtoCash.Models.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId");
@@ -1433,13 +1537,105 @@ namespace AtoCash.Migrations
 
                     b.Navigation("Employee");
 
-                    b.Navigation("ExpenseType");
+                    b.Navigation("Project");
+
+                    b.Navigation("SubProject");
+
+                    b.Navigation("WorkTask");
+                });
+
+            modelBuilder.Entity("AtoCash.Models.ExpenseReimburseStatusTracker", b =>
+                {
+                    b.HasOne("AtoCash.Models.ApprovalLevel", "ApprovalLevel")
+                        .WithMany()
+                        .HasForeignKey("ApprovalLevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.ApprovalStatusType", "ApprovalStatusType")
+                        .WithMany()
+                        .HasForeignKey("ApprovalStatusTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.CurrencyType", "CurrencyType")
+                        .WithMany()
+                        .HasForeignKey("CurrencyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentId");
+
+                    b.HasOne("AtoCash.Models.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.ExpenseReimburseRequest", "ExpenseReimburseRequest")
+                        .WithMany()
+                        .HasForeignKey("ExpenseReimburseRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.JobRole", "JobRole")
+                        .WithMany()
+                        .HasForeignKey("JobRoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId");
+
+                    b.HasOne("AtoCash.Models.SubProject", "SubProject")
+                        .WithMany()
+                        .HasForeignKey("SubProjectId");
+
+                    b.HasOne("AtoCash.Models.WorkTask", "WorkTask")
+                        .WithMany()
+                        .HasForeignKey("WorkTaskId");
+
+                    b.Navigation("ApprovalLevel");
+
+                    b.Navigation("ApprovalStatusType");
+
+                    b.Navigation("CurrencyType");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("ExpenseReimburseRequest");
+
+                    b.Navigation("JobRole");
 
                     b.Navigation("Project");
 
                     b.Navigation("SubProject");
 
                     b.Navigation("WorkTask");
+                });
+
+            modelBuilder.Entity("AtoCash.Models.ExpenseSubClaim", b =>
+                {
+                    b.HasOne("AtoCash.Models.ExpenseReimburseRequest", "ExpenseReimburseRequest")
+                        .WithMany()
+                        .HasForeignKey("ExpenseReimburseRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AtoCash.Models.ExpenseType", "ExpenseType")
+                        .WithMany()
+                        .HasForeignKey("ExpenseTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ExpenseReimburseRequest");
+
+                    b.Navigation("ExpenseType");
                 });
 
             modelBuilder.Entity("AtoCash.Models.ExpenseType", b =>

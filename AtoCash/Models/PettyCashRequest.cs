@@ -95,5 +95,7 @@ namespace AtoCash.Models
 
         public DateTime? ApprovedDate { get; set; }
 
+        public bool ShowEditDelete { get; set; }
+
     }
 }

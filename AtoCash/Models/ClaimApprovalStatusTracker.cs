@@ -24,11 +24,6 @@ namespace AtoCash.Models
         public virtual PettyCashRequest PettyCashRequest { get; set; }
         public int? PettyCashRequestId { get; set; }
 
-        [ForeignKey("ExpenseReimburseRequestId")]
-        public virtual ExpenseReimburseRequest ExpenseReimburseRequest { get; set; }
-        public int? ExpenseReimburseRequestId { get; set; }
-
-
         //Approver Department
         [ForeignKey("DepartmentId")]
         public virtual Department Department { get; set; }
@@ -77,7 +72,6 @@ namespace AtoCash.Models
         public string EmployeeName { get; set; }
 
         public int? PettyCashRequestId { get; set; }
-        public int? ExpenseReimburseRequestId { get; set; }
 
         public int? DepartmentId { get; set; }
         public string DepartmentName { get; set; }

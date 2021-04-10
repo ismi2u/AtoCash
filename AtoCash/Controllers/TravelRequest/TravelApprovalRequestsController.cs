@@ -52,7 +52,6 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
                 travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
                 travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
-                travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
                 travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
                 travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
                 travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
@@ -97,7 +96,6 @@ namespace AtoCash.Controllers
             travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
             travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
             travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
-            travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
             travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
             travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
             travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
@@ -128,6 +126,11 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
+            //get the employee's approval level for comparison with approver level  to decide "ShowEditDelete" bool
+            int reqEmpApprLevelId = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(id).RoleId).FirstOrDefault().ApprovalLevelId;
+            int reqEmpApprLevel = _context.ApprovalLevels.Find(reqEmpApprLevelId).Level;
+
+
             var TravelApprovalRequests = await _context.TravelApprovalRequests.Where(p => p.EmployeeId == id).ToListAsync();
 
             if (TravelApprovalRequests == null)
@@ -148,7 +151,6 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
                 travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
                 travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
-                travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
                 travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
                 travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
                 travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
@@ -161,6 +163,14 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
                 travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
 
+                int NextApproverInPending = _context.TravelApprovalStatusTrackers.Where(t =>
+                        t.ApprovalStatusTypeId == (int)EApprovalStatus.Pending &&
+                        t.TravelApprovalRequestId == travelApprovalRequest.Id).Select( s=> s.ApprovalLevel.Level).FirstOrDefault();
+
+                //set the bookean flat to TRUE if No approver has yet approved the Request else FALSE
+                    travelApprovalRequestDTO.ShowEditDelete = reqEmpApprLevel + 1 == NextApproverInPending ? true : false;
+
+                //;
 
                 TravelApprovalRequestDTOs.Add(travelApprovalRequestDTO);
             }
@@ -202,7 +212,6 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
                 travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
                 travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
-                travelApprovalRequestDTO.CurrentStatus = travelApprovalRequest.CurrentStatus;
                 travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
                 travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
                 travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
@@ -305,12 +314,11 @@ namespace AtoCash.Controllers
             travelApprovalRequest.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
             travelApprovalRequest.TravelPurpose = travelApprovalRequestDTO.TravelPurpose;
             travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDTO.ReqRaisedDate;
-            travelApprovalRequest.CurrentStatus = travelApprovalRequestDTO.CurrentStatus;
             travelApprovalRequest.DepartmentId = travelApprovalRequestDTO.DepartmentId;
             travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
             travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
             travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
-
+            travelApprovalRequest.ApprovalStatusTypeId = travelApprovalRequestDTO.ApprovalStatusTypeId;
 
             _context.TravelApprovalRequests.Update(travelApprovalRequest);
             //_context.Entry(travelApprovalRequest).State = EntityState.Modified;
@@ -434,8 +442,7 @@ namespace AtoCash.Controllers
             travelApprovalRequest.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
             travelApprovalRequest.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
             travelApprovalRequest.TravelPurpose = travelApprovalRequestDTO.TravelPurpose;
-            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDTO.ReqRaisedDate;
-            travelApprovalRequest.CurrentStatus = travelApprovalRequestDTO.CurrentStatus;
+            travelApprovalRequest.ReqRaisedDate = DateTime.Now;
             travelApprovalRequest.DepartmentId = travelApprovalRequestDTO.DepartmentId;
             travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
             travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
@@ -546,8 +553,7 @@ namespace AtoCash.Controllers
                 TravelStartDate = travelApprovalRequestDto.TravelStartDate,
                 TravelEndDate = travelApprovalRequestDto.TravelEndDate,
                 TravelPurpose = travelApprovalRequestDto.TravelPurpose,
-                ReqRaisedDate = travelApprovalRequestDto.ReqRaisedDate,
-                CurrentStatus = (int)EApprovalStatus.Pending,
+                ReqRaisedDate = DateTime.Now,
                 DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId,
                 ProjectId = travelApprovalRequestDto.ProjectId,
                 SubProjectId = travelApprovalRequestDto.SubProjectId,
@@ -599,7 +605,6 @@ namespace AtoCash.Controllers
                     FinalApprovedDate = DateTime.Now,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved,
                     Comments = "Travel Request in Proceess"
-                    //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
             }
             else
@@ -667,22 +672,7 @@ namespace AtoCash.Controllers
         }
 
        
-        private enum ApprovalStatus
-        {
-            Initiating = 1,
-            Pending,
-            InReview,
-            Approved,
-            Rejected
-
-        }
-
-        private enum ClaimType
-        {
-            CashAdvance = 1,
-            ExpenseReim
-
-        }
+      
 
     }
 }

@@ -293,8 +293,7 @@ namespace AtoCash.Controllers
                        travelreq.TravelPurpose,
                        travelreq.Department.DeptName,
                        travelreq.Project.ProjectName,
-                       travelreq.ReqRaisedDate,
-                       travelreq.CurrentStatus
+                       travelreq.ReqRaisedDate
                         );
                 }
                 // Creating the Excel workbook 
@@ -373,8 +372,7 @@ namespace AtoCash.Controllers
                        travelreq.TravelPurpose,
                        travelreq.Department.DeptName,
                        travelreq.Project.ProjectName,
-                       travelreq.ReqRaisedDate,
-                       travelreq.CurrentStatus
+                       travelreq.ReqRaisedDate
                         );
                 }
                 // Creating the Excel workbook 

@@ -30,13 +30,13 @@ namespace AtoCash.Controllers
         {
             List<CostCentreVM> ListCostCentreVM = new List<CostCentreVM>();
 
-            var costCentres = await _context.CostCentres.Where(c => c.StatusTypeId == (int)StatusType.Active).ToListAsync();
+            var costCentres = await _context.CostCentres.Where(c => c.StatusTypeId == (int)EStatusType.Active).ToListAsync();
             foreach (CostCentre costCentre in costCentres)
             {
                 CostCentreVM costCentreVM = new CostCentreVM
                 {
                     Id = costCentre.Id,
-                    CostCentreCode = costCentre.CostCentreCode,
+                    CostCentreCode = costCentre.CostCentreCode + " " + costCentre.CostCentreDesc,
                 };
 
                 ListCostCentreVM.Add(costCentreVM);
@@ -190,12 +190,7 @@ namespace AtoCash.Controllers
         }
 
 
-        private enum StatusType
-        {
-            Active = 1,
-            Inactive
-
-        }
+     
         //
     }
 }

@@ -30,7 +30,7 @@ namespace AtoCash.Controllers.BasicControlrs
         {
             List<CurrencyTypeVM> ListCurrencyTypeVM = new();
 
-            var currencyTypes = await _context.CurrencyTypes.Where(c => c.StatusTypeId == (int)StatusType.Active).ToListAsync();
+            var currencyTypes = await _context.CurrencyTypes.Where(c => c.StatusTypeId == (int)EStatusType.Active).ToListAsync();
             foreach (CurrencyType currencyType in currencyTypes)
             {
                 CurrencyTypeVM currencyTypeVM = new()
@@ -194,12 +194,6 @@ namespace AtoCash.Controllers.BasicControlrs
             return _context.CurrencyTypes.Any(e => e.Id == id);
         }
 
-        private enum StatusType
-        {
-            Active = 1,
-            Inactive
-
-        }
         //
     }
 }

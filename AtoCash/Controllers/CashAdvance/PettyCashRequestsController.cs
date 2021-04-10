@@ -51,6 +51,7 @@ namespace AtoCash.Controllers
                 pettyCashRequestDTO.CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null;
                 pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
                 pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
+                pettyCashRequestDTO.CashReqDate = pettyCashRequest.CashReqDate;
                 pettyCashRequestDTO.Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode : null;
                 pettyCashRequestDTO.ProjectId = pettyCashRequest.ProjectId;
                 pettyCashRequestDTO.Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null;
@@ -90,6 +91,7 @@ namespace AtoCash.Controllers
             pettyCashRequestDTO.CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null;
             pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
             pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
+            pettyCashRequestDTO.CashReqDate = pettyCashRequest.CashReqDate;
             pettyCashRequestDTO.Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode : null;
             pettyCashRequestDTO.ProjectId = pettyCashRequest.ProjectId;
             pettyCashRequestDTO.Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null;
@@ -117,6 +119,10 @@ namespace AtoCash.Controllers
                 return NoContent();
             }
 
+            //get the employee's approval level for comparison with approver level  to decide "ShowEditDelete" bool
+            int reqEmpApprLevelId = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(id).RoleId).FirstOrDefault().ApprovalLevelId;
+            int reqEmpApprLevel = _context.ApprovalLevels.Find(reqEmpApprLevelId).Level;
+
             var pettyCashRequests = await _context.PettyCashRequests.Where(p => p.EmployeeId == id).ToListAsync();
 
             if (pettyCashRequests == null)
@@ -128,25 +134,33 @@ namespace AtoCash.Controllers
 
             foreach (var pettyCashRequest in pettyCashRequests)
             {
-                PettyCashRequestDTO pettyCashRequestDTO = new()
-                {
-                    Id = pettyCashRequest.Id,
-                    EmployeeId = pettyCashRequest.EmployeeId,
-                    EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
-                     CurrencyTypeId = pettyCashRequest.CurrencyTypeId,
-                      CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null,
-                PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
-                    PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
-                    CashReqDate = pettyCashRequest.CashReqDate,
-                    DepartmentId = pettyCashRequest.DepartmentId,
-                    Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode + _context.Departments.Find(pettyCashRequest.DepartmentId).DeptName : null,
-                    ProjectId = pettyCashRequest.ProjectId,
-                    Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null,
-                    SubProjectId = pettyCashRequest.SubProjectId,
-                    SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null,
-                    WorkTaskId = pettyCashRequest.WorkTaskId,
-                    WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null
-                };
+                PettyCashRequestDTO pettyCashRequestDTO = new();
+
+                pettyCashRequestDTO.Id = pettyCashRequest.Id;
+                pettyCashRequestDTO.EmployeeId = pettyCashRequest.EmployeeId;
+                pettyCashRequestDTO.EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName();
+                pettyCashRequestDTO.CurrencyTypeId = pettyCashRequest.CurrencyTypeId;
+                pettyCashRequestDTO.CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null;
+                pettyCashRequestDTO.PettyClaimAmount = pettyCashRequest.PettyClaimAmount;
+                pettyCashRequestDTO.PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc;
+                pettyCashRequestDTO.CashReqDate = pettyCashRequest.CashReqDate;
+                pettyCashRequestDTO.DepartmentId = pettyCashRequest.DepartmentId;
+                pettyCashRequestDTO.Department = pettyCashRequest.DepartmentId != null ? _context.Departments.Find(pettyCashRequest.DepartmentId).DeptCode + _context.Departments.Find(pettyCashRequest.DepartmentId).DeptName : null;
+                pettyCashRequestDTO.ProjectId = pettyCashRequest.ProjectId;
+                pettyCashRequestDTO.Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null;
+                pettyCashRequestDTO.SubProjectId = pettyCashRequest.SubProjectId;
+                pettyCashRequestDTO.SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null;
+                pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
+                pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null;
+
+                int NextApproverInPending = _context.ClaimApprovalStatusTrackers.Where(t =>
+                        t.ApprovalStatusTypeId == (int)EApprovalStatus.Pending &&
+                        t.PettyCashRequestId == pettyCashRequest.Id).Select(s => s.ApprovalLevel.Level).FirstOrDefault();
+
+                //set the bookean flat to TRUE if No approver has yet approved the Request else FALSE
+                pettyCashRequestDTO.ShowEditDelete = reqEmpApprLevel + 1 == NextApproverInPending ? true : false;
+
+                ///
                 PettyCashRequestDTOs.Add(pettyCashRequestDTO);
             }
 
@@ -255,13 +269,6 @@ namespace AtoCash.Controllers
 
             return Ok(pettyCashRequests.Count);
         }
-
-
-
-
-
-
-
 
 
 
@@ -491,7 +498,6 @@ namespace AtoCash.Controllers
                 {
                     EmployeeId = pettyCashRequestDto.EmployeeId,
                     PettyCashRequestId = pettyCashRequestDto.Id,
-                    ExpenseReimburseRequestId = null,
                     DepartmentId = null,
                     ProjectId = pettyCashRequestDto.ProjectId,
                     RoleId = approver.RoleId,
@@ -499,8 +505,8 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = empApprLevel, // default approval level is 2 for Project based request
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
-                    ApprovalStatusTypeId = (int)ApprovalStatus.Approved, //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
-                    Comments = "Awaiting Approver Action"
+                    ApprovalStatusTypeId = (int)EApprovalStatus.Approved, //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    Comments = "Self Approved Request"
                 };
 
 
@@ -513,7 +519,6 @@ namespace AtoCash.Controllers
                 {
                     EmployeeId = pettyCashRequestDto.EmployeeId,
                     PettyCashRequestId = pettyCashRequestDto.Id,
-                    ExpenseReimburseRequestId = null,
                     DepartmentId = null,
                     ProjectId = pettyCashRequestDto.ProjectId,
                     RoleId = approver.RoleId,
@@ -521,7 +526,7 @@ namespace AtoCash.Controllers
                     ApprovalLevelId = 2, // default approval level is 2 for Project based request
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = null,
-                    ApprovalStatusTypeId = (int)ApprovalStatus.Pending, //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                    ApprovalStatusTypeId = (int)EApprovalStatus.Pending, //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                     Comments = "Awaiting Approver Action"
                 };
 
@@ -554,7 +559,7 @@ namespace AtoCash.Controllers
                 EmployeeId = pettyCashRequestDto.EmployeeId,
                 PettyCashRequestId = pettyCashRequestDto.Id,
                 ExpenseReimburseReqId = null,
-                RequestTypeId = (int)ClaimType.CashAdvance,
+                RequestTypeId = (int)ERequestType.CashAdvance,
                 DepartmentId = null,
                 ProjectId = pettyCashRequestDto.ProjectId,
                 SubProjectId = pettyCashRequestDto.SubProjectId,
@@ -563,7 +568,7 @@ namespace AtoCash.Controllers
                 CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
                 Amount = pettyCashRequestDto.PettyClaimAmount,
                 CostCentreId = _context.Departments.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId).CostCentreId,
-                ApprovalStatusId = (int)ApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+                ApprovalStatusId = (int)EApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
             });
             await _context.SaveChangesAsync();
             #endregion
@@ -645,14 +650,13 @@ namespace AtoCash.Controllers
                 {
                     EmployeeId = pettyCashRequestDto.EmployeeId,
                     PettyCashRequestId = pettyCashRequestDto.Id,
-                    ExpenseReimburseRequestId = null,
                     DepartmentId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId,
                     ProjectId = null,
                     RoleId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId,
                     ApprovalLevelId = empApprLevel,
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
-                    ApprovalStatusTypeId =  (int)ApprovalStatus.Approved,
+                    ApprovalStatusTypeId =  (int)EApprovalStatus.Approved,
                     Comments = "Awaiting Approver Action"
                     //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
@@ -683,14 +687,13 @@ namespace AtoCash.Controllers
                     {
                         EmployeeId = pettyCashRequestDto.EmployeeId,
                         PettyCashRequestId = pettyCashRequestDto.Id,
-                        ExpenseReimburseRequestId = null,
                         DepartmentId = approver.DepartmentId,
                         ProjectId = null,
                         RoleId = approver.RoleId,
                         ApprovalLevelId = ApprMap.ApprovalLevelId,
                         ReqDate = DateTime.Now,
                         FinalApprovedDate = null,
-                        ApprovalStatusTypeId = isFirstApprover ? (int)ApprovalStatus.Pending : (int)ApprovalStatus.Initiating,
+                        ApprovalStatusTypeId = isFirstApprover ? (int)EApprovalStatus.Pending : (int)EApprovalStatus.Initiating,
                         Comments = "Awaiting Approver Action"
                         //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                     };
@@ -728,7 +731,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.EmployeeId = reqEmpid;
             disbursementsAndClaimsMaster.PettyCashRequestId = pcrq.Id;
             disbursementsAndClaimsMaster.ExpenseReimburseReqId = null;
-            disbursementsAndClaimsMaster.RequestTypeId = (int)ClaimType.CashAdvance;
+            disbursementsAndClaimsMaster.RequestTypeId = (int)ERequestType.CashAdvance;
             disbursementsAndClaimsMaster.DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId;
             disbursementsAndClaimsMaster.ProjectId = null;
             disbursementsAndClaimsMaster.SubProjectId = null;
@@ -737,7 +740,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId;
             disbursementsAndClaimsMaster.Amount = empReqAmount;
             disbursementsAndClaimsMaster.CostCentreId = _context.Departments.Find(_context.Employees.Find(reqEmpid).DepartmentId).CostCentreId;
-            disbursementsAndClaimsMaster.ApprovalStatusId = isSelfApprovedRequest ? (int)ApprovalStatus.Approved: (int)ApprovalStatus.Pending;
+            disbursementsAndClaimsMaster.ApprovalStatusId = isSelfApprovedRequest ? (int)EApprovalStatus.Approved: (int)EApprovalStatus.Pending;
 
             _context.DisbursementsAndClaimsMasters.Add(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();
@@ -746,22 +749,6 @@ namespace AtoCash.Controllers
         }
 
 
-        private enum ApprovalStatus
-        {
-            Initiating = 1,
-            Pending,
-            InReview,
-            Approved,
-            Rejected
-
-        }
-
-        private enum ClaimType
-        {
-            CashAdvance = 1,
-            ExpenseReim
-
-        }
 
     }
 }

@@ -31,7 +31,7 @@ namespace AtoCash.Controllers
         {
             List<ProjectVM> ListProjectVM = new List<ProjectVM>();
 
-            var projects = await _context.Projects.Where(p => p.StatusTypeId == (int)StatusType.Active).ToListAsync();
+            var projects = await _context.Projects.Where(p => p.StatusTypeId == (int)EStatusType.Active).ToListAsync();
             foreach (Project project in projects)
             {
                 ProjectVM projectVM = new ProjectVM
@@ -64,7 +64,7 @@ namespace AtoCash.Controllers
                     ProjectName = proj.ProjectName,
                     CostCentreId = proj.CostCentreId,
                     ProjectDesc = proj.ProjectDesc,
-                     StatusTypeId = proj.StatusTypeId,
+                    StatusTypeId = proj.StatusTypeId,
                     StatusType = _context.StatusTypes.Find(proj.StatusTypeId).Status
                 };
 
@@ -227,12 +227,7 @@ namespace AtoCash.Controllers
         }
 
 
-        private enum StatusType
-        {
-            Active = 1,
-            Inactive
-
-        }
+       
         //
     }
 }

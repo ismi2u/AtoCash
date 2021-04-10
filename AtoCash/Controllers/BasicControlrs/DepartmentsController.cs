@@ -31,7 +31,7 @@ namespace AtoCash.Controllers
         {
             List<DepartmentVM> ListDepartmentVM = new List<DepartmentVM>();
 
-            var departments = await _context.Departments.Where(d => d.StatusTypeId == (int)StatusType.Active).ToListAsync();
+            var departments = await _context.Departments.Where(d => d.StatusTypeId == (int)EStatusType.Active).ToListAsync();
             foreach (Department department in departments)
             {
                 DepartmentVM departmentVM = new DepartmentVM
@@ -194,12 +194,7 @@ namespace AtoCash.Controllers
             return _context.Departments.Any(e => e.Id == id);
         }
 
-        private enum StatusType
-        {
-            Active = 1,
-            Inactive
-
-        }
+       
         //
     }
 }

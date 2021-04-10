@@ -31,7 +31,7 @@ namespace AtoCash.Controllers
         {
             List<ExpenseTypeVM> ListExpenseTypeVM = new();
 
-            var expenseTypes = await _context.ExpenseTypes.Where(c => c.StatusTypeId == (int)StatusType.Active).ToListAsync();
+            var expenseTypes = await _context.ExpenseTypes.Where(c => c.StatusTypeId == (int)EStatusType.Active).ToListAsync();
             foreach (ExpenseType expenseType in expenseTypes)
             {
                 ExpenseTypeVM expenseTypeVM = new()
@@ -147,37 +147,37 @@ namespace AtoCash.Controllers
             ExpenseType expenseType = new();
             expenseType.ExpenseTypeName = expenseTypeDTO.ExpenseTypeName;
             expenseType.ExpenseTypeDesc = expenseTypeDTO.ExpenseTypeDesc;
-
+            expenseType.StatusTypeId = expenseTypeDTO.StatusTypeId;
             _context.ExpenseTypes.Add(expenseType);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetExpenseType", new { id = expenseType.Id }, expenseType);
         }
 
-        // DELETE: api/ExpenseTypes/5
-        [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<IActionResult> DeleteExpenseType(int id)
-        {
+        //// DELETE: api/ExpenseTypes/5
+        //[HttpDelete("{id}")]
+        //[Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        //public async Task<IActionResult> DeleteExpenseType(int id)
+        //{
 
-            var expReimburse = _context.ExpenseReimburseRequests.Where(d => d.ExpenseTypeId == id).FirstOrDefault();
+        //    var expReimburse = _context.ExpenseReimburseRequests.Where(d => d.ExpenseTypeId == id).FirstOrDefault();
 
-            if (expReimburse != null)
-            {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Expense-Type in use for Expense Reimburse!" });
-            }
+        //    if (expReimburse != null)
+        //    {
+        //        return Conflict(new RespStatus { Status = "Failure", Message = "Expense-Type in use for Expense Reimburse!" });
+        //    }
 
-            var expenseType = await _context.ExpenseTypes.FindAsync(id);
-            if (expenseType == null)
-            {
-                return NoContent();
-            }
+        //    var expenseType = await _context.ExpenseTypes.FindAsync(id);
+        //    if (expenseType == null)
+        //    {
+        //        return NoContent();
+        //    }
 
-            _context.ExpenseTypes.Remove(expenseType);
-            await _context.SaveChangesAsync();
+        //    _context.ExpenseTypes.Remove(expenseType);
+        //    await _context.SaveChangesAsync();
 
-            return Ok(new RespStatus { Status = "Success", Message = "Expense-Type" });
-        }
+        //    return Ok(new RespStatus { Status = "Success", Message = "Expense-Type" });
+        //}
 
         private bool ExpenseTypeExists(int id)
         {
@@ -185,12 +185,7 @@ namespace AtoCash.Controllers
         }
 
 
-        private enum StatusType
-        {
-            Active = 1,
-            Inactive
-
-        }
+  
         ///
 
 

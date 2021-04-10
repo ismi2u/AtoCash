@@ -104,6 +104,20 @@ namespace AtoCash.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FileDocuments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UniqueFileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ActualFileName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileDocuments", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "JobRoles",
                 columns: table => new
                 {
@@ -575,17 +589,11 @@ namespace AtoCash.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    ExpenseReportTitle = table.Column<string>(type: "nvarchar(250)", nullable: false),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    ExpenseReimbClaimAmount = table.Column<double>(type: "float", nullable: false),
-                    Documents = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ExpReimReqDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    InvoiceNo = table.Column<string>(type: "nvarchar(50)", nullable: false),
-                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Vendor = table.Column<string>(type: "nvarchar(50)", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(20)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(250)", nullable: false),
                     CurrencyTypeId = table.Column<int>(type: "int", nullable: false),
-                    ExpenseTypeId = table.Column<int>(type: "int", nullable: false),
+                    TotalClaimAmount = table.Column<double>(type: "float", nullable: false),
+                    ExpReimReqDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     SubProjectId = table.Column<int>(type: "int", nullable: true),
@@ -618,12 +626,6 @@ namespace AtoCash.Migrations
                         name: "FK_ExpenseReimburseRequests_Employees_EmployeeId",
                         column: x => x.EmployeeId,
                         principalTable: "Employees",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_ExpenseReimburseRequests_ExpenseTypes_ExpenseTypeId",
-                        column: x => x.ExpenseTypeId,
-                        principalTable: "ExpenseTypes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
@@ -722,7 +724,6 @@ namespace AtoCash.Migrations
                     TravelEndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TravelPurpose = table.Column<string>(type: "nvarchar(150)", nullable: false),
                     ReqRaisedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CurrentStatus = table.Column<int>(type: "int", nullable: false),
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     SubProjectId = table.Column<int>(type: "int", nullable: true),
@@ -772,6 +773,127 @@ namespace AtoCash.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExpenseReimburseStatusTrackers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    ExpenseReimburseRequestId = table.Column<int>(type: "int", nullable: false),
+                    CurrencyTypeId = table.Column<int>(type: "int", nullable: false),
+                    TotalClaimAmount = table.Column<double>(type: "float", nullable: false),
+                    ExpReimReqDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: true),
+                    ProjectId = table.Column<int>(type: "int", nullable: true),
+                    SubProjectId = table.Column<int>(type: "int", nullable: true),
+                    WorkTaskId = table.Column<int>(type: "int", nullable: true),
+                    JobRoleId = table.Column<int>(type: "int", nullable: false),
+                    ApprovalLevelId = table.Column<int>(type: "int", nullable: false),
+                    ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false),
+                    ApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(250)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpenseReimburseStatusTrackers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_ApprovalLevels_ApprovalLevelId",
+                        column: x => x.ApprovalLevelId,
+                        principalTable: "ApprovalLevels",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_ApprovalStatusTypes_ApprovalStatusTypeId",
+                        column: x => x.ApprovalStatusTypeId,
+                        principalTable: "ApprovalStatusTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_CurrencyTypes_CurrencyTypeId",
+                        column: x => x.CurrencyTypeId,
+                        principalTable: "CurrencyTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_Departments_DepartmentId",
+                        column: x => x.DepartmentId,
+                        principalTable: "Departments",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
+                        principalTable: "Employees",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_ExpenseReimburseRequests_ExpenseReimburseRequestId",
+                        column: x => x.ExpenseReimburseRequestId,
+                        principalTable: "ExpenseReimburseRequests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_JobRoles_JobRoleId",
+                        column: x => x.JobRoleId,
+                        principalTable: "JobRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_SubProjects_SubProjectId",
+                        column: x => x.SubProjectId,
+                        principalTable: "SubProjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ExpenseReimburseStatusTrackers_WorkTasks_WorkTaskId",
+                        column: x => x.WorkTaskId,
+                        principalTable: "WorkTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ExpenseSubClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ExpenseReimburseRequestId = table.Column<int>(type: "int", nullable: false),
+                    ExpenseTypeId = table.Column<int>(type: "int", nullable: false),
+                    ExpenseReimbClaimAmount = table.Column<double>(type: "float", nullable: false),
+                    DocumentIDs = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    InvoiceNo = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    Tax = table.Column<float>(type: "real", nullable: false),
+                    TaxAmount = table.Column<double>(type: "float", nullable: false),
+                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Vendor = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(20)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(250)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExpenseSubClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ExpenseSubClaims_ExpenseReimburseRequests_ExpenseReimburseRequestId",
+                        column: x => x.ExpenseReimburseRequestId,
+                        principalTable: "ExpenseReimburseRequests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                    table.ForeignKey(
+                        name: "FK_ExpenseSubClaims_ExpenseTypes_ExpenseTypeId",
+                        column: x => x.ExpenseTypeId,
+                        principalTable: "ExpenseTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClaimApprovalStatusTrackers",
                 columns: table => new
                 {
@@ -779,7 +901,6 @@ namespace AtoCash.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EmployeeId = table.Column<int>(type: "int", nullable: false),
                     PettyCashRequestId = table.Column<int>(type: "int", nullable: true),
-                    ExpenseReimburseRequestId = table.Column<int>(type: "int", nullable: true),
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: false),
@@ -816,12 +937,6 @@ namespace AtoCash.Migrations
                         principalTable: "Employees",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_ClaimApprovalStatusTrackers_ExpenseReimburseRequests_ExpenseReimburseRequestId",
-                        column: x => x.ExpenseReimburseRequestId,
-                        principalTable: "ExpenseReimburseRequests",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ClaimApprovalStatusTrackers_JobRoles_RoleId",
                         column: x => x.RoleId,
@@ -950,7 +1065,7 @@ namespace AtoCash.Migrations
                     ReqDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FinalApprovedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ApprovalStatusTypeId = table.Column<int>(type: "int", nullable: false),
-                    Comments = table.Column<string>(type: "nvarchar(250)", nullable: false)
+                    Comments = table.Column<string>(type: "nvarchar(250)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1072,11 +1187,6 @@ namespace AtoCash.Migrations
                 name: "IX_ClaimApprovalStatusTrackers_EmployeeId",
                 table: "ClaimApprovalStatusTrackers",
                 column: "EmployeeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClaimApprovalStatusTrackers_ExpenseReimburseRequestId",
-                table: "ClaimApprovalStatusTrackers",
-                column: "ExpenseReimburseRequestId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClaimApprovalStatusTrackers_PettyCashRequestId",
@@ -1224,11 +1334,6 @@ namespace AtoCash.Migrations
                 column: "EmployeeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExpenseReimburseRequests_ExpenseTypeId",
-                table: "ExpenseReimburseRequests",
-                column: "ExpenseTypeId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ExpenseReimburseRequests_ProjectId",
                 table: "ExpenseReimburseRequests",
                 column: "ProjectId");
@@ -1242,6 +1347,66 @@ namespace AtoCash.Migrations
                 name: "IX_ExpenseReimburseRequests_WorkTaskId",
                 table: "ExpenseReimburseRequests",
                 column: "WorkTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_ApprovalLevelId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "ApprovalLevelId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_ApprovalStatusTypeId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "ApprovalStatusTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_CurrencyTypeId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "CurrencyTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_DepartmentId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "DepartmentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_EmployeeId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_ExpenseReimburseRequestId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "ExpenseReimburseRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_JobRoleId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "JobRoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_ProjectId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_SubProjectId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "SubProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseReimburseStatusTrackers_WorkTaskId",
+                table: "ExpenseReimburseStatusTrackers",
+                column: "WorkTaskId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseSubClaims_ExpenseReimburseRequestId",
+                table: "ExpenseSubClaims",
+                column: "ExpenseReimburseRequestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExpenseSubClaims_ExpenseTypeId",
+                table: "ExpenseSubClaims",
+                column: "ExpenseTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ExpenseTypes_StatusTypeId",
@@ -1414,6 +1579,15 @@ namespace AtoCash.Migrations
                 name: "EmpCurrentPettyCashBalances");
 
             migrationBuilder.DropTable(
+                name: "ExpenseReimburseStatusTrackers");
+
+            migrationBuilder.DropTable(
+                name: "ExpenseSubClaims");
+
+            migrationBuilder.DropTable(
+                name: "FileDocuments");
+
+            migrationBuilder.DropTable(
                 name: "ProjectManagements");
 
             migrationBuilder.DropTable(
@@ -1426,22 +1600,22 @@ namespace AtoCash.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "ExpenseReimburseRequests");
-
-            migrationBuilder.DropTable(
                 name: "PettyCashRequests");
 
             migrationBuilder.DropTable(
                 name: "RequestTypes");
 
             migrationBuilder.DropTable(
+                name: "ExpenseReimburseRequests");
+
+            migrationBuilder.DropTable(
+                name: "ExpenseTypes");
+
+            migrationBuilder.DropTable(
                 name: "ApprovalLevels");
 
             migrationBuilder.DropTable(
                 name: "TravelApprovalRequests");
-
-            migrationBuilder.DropTable(
-                name: "ExpenseTypes");
 
             migrationBuilder.DropTable(
                 name: "ApprovalStatusTypes");
