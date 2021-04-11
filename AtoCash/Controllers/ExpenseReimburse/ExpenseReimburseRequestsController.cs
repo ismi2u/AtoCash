@@ -217,36 +217,39 @@ namespace AtoCash.Controllers
 
 
         // PUT: api/ExpenseReimburseRequests/5
-        [HttpPut("{id}")]
+        [HttpPut]
         //[Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<IActionResult> PutExpenseReimburseRequest(int id, ExpenseReimburseRequestDTO expenseReimbRequestDTO)
+        public async Task<IActionResult> PutExpenseReimburseRequest(List<ExpenseReimburseRequestDTO> ListExpenseReimbRequestDTO)
         {
-            if (id != expenseReimbRequestDTO.Id)
+            if (ListExpenseReimbRequestDTO.Count == 0)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
+                return Ok(new RespStatus { Status = "Failure", Message = "No" });
             }
 
-            var expenseReimbRequest = await _context.ExpenseReimburseRequests.FindAsync(id);
+            foreach (ExpenseReimburseRequestDTO expenseReimbRequestDTO in ListExpenseReimbRequestDTO)
+            {
+                var expenseReimbRequest = await _context.ExpenseReimburseRequests.FindAsync(expenseReimbRequestDTO.Id);
 
-            expenseReimbRequest.Id = expenseReimbRequestDTO.Id;
-            expenseReimbRequest.EmployeeId = expenseReimbRequestDTO.EmployeeId;
-            expenseReimbRequest.ExpenseReportTitle = expenseReimbRequestDTO.ExpenseReportTitle;
-            expenseReimbRequest.CurrencyTypeId = expenseReimbRequestDTO.CurrencyTypeId;
-            expenseReimbRequest.TotalClaimAmount = expenseReimbRequestDTO.TotalClaimAmount;
+                expenseReimbRequest.Id = expenseReimbRequestDTO.Id;
+                expenseReimbRequest.EmployeeId = expenseReimbRequestDTO.EmployeeId;
+                expenseReimbRequest.ExpenseReportTitle = expenseReimbRequestDTO.ExpenseReportTitle;
+                expenseReimbRequest.CurrencyTypeId = expenseReimbRequestDTO.CurrencyTypeId;
+                expenseReimbRequest.TotalClaimAmount = expenseReimbRequestDTO.TotalClaimAmount;
 
-            expenseReimbRequest.DepartmentId = expenseReimbRequestDTO.DepartmentId;
-            expenseReimbRequest.ProjectId = expenseReimbRequestDTO.ProjectId;
+                expenseReimbRequest.DepartmentId = expenseReimbRequestDTO.DepartmentId;
+                expenseReimbRequest.ProjectId = expenseReimbRequestDTO.ProjectId;
 
-            expenseReimbRequest.SubProjectId = expenseReimbRequestDTO.SubProjectId;
+                expenseReimbRequest.SubProjectId = expenseReimbRequestDTO.SubProjectId;
 
-            expenseReimbRequest.WorkTaskId = expenseReimbRequestDTO.WorkTaskId;
+                expenseReimbRequest.WorkTaskId = expenseReimbRequestDTO.WorkTaskId;
 
-            expenseReimbRequest.ExpReimReqDate = expenseReimbRequestDTO.ExpReimReqDate;
-            expenseReimbRequest.ApprovedDate = expenseReimbRequestDTO.ApprovedDate;
-            expenseReimbRequest.ApprovalStatusTypeId = expenseReimbRequestDTO.ApprovalStatusTypeId;
+                expenseReimbRequest.ExpReimReqDate = expenseReimbRequestDTO.ExpReimReqDate;
+                expenseReimbRequest.ApprovedDate = expenseReimbRequestDTO.ApprovedDate;
+                expenseReimbRequest.ApprovalStatusTypeId = expenseReimbRequestDTO.ApprovalStatusTypeId;
 
-            await Task.Run(() => _context.ExpenseReimburseRequests.Update(expenseReimbRequest));
+                await Task.Run(() => _context.ExpenseReimburseRequests.Update(expenseReimbRequest));
 
+            }
             //_context.Entry(expenseReimburseRequestDTO).State = EntityState.Modified;
 
             try
@@ -314,13 +317,13 @@ namespace AtoCash.Controllers
         //<List<FileContentResult>
         public async Task<ActionResult> GetDocumentsBySubClaimsId(int id)
         {
-            List<string> documentIds =  _context.ExpenseSubClaims.Find(id).DocumentIDs.Split(",").ToList();
+            List<string> documentIds = _context.ExpenseSubClaims.Find(id).DocumentIDs.Split(",").ToList();
             string documentsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "Images");
             //var content = new MultipartContent();
 
             List<FileContentResult> ListOfDocuments = new();
             var provider = new FileExtensionContentTypeProvider();
-            
+
             foreach (string doc in documentIds)
             {
                 var fd = _context.FileDocuments.Find(id);
@@ -351,19 +354,19 @@ namespace AtoCash.Controllers
 
             var provider = new FileExtensionContentTypeProvider();
 
-                var fd = _context.FileDocuments.Find(id);
-                string uniqueFileName = fd.UniqueFileName;
-                string actualFileName = fd.ActualFileName;
+            var fd = _context.FileDocuments.Find(id);
+            string uniqueFileName = fd.UniqueFileName;
+            string actualFileName = fd.ActualFileName;
 
-                string filePath = Path.Combine(documentsFolder, uniqueFileName);
-                var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
-                if (!provider.TryGetContentType(filePath, out var contentType))
-                {
-                    contentType = "application/octet-stream";
-                }
+            string filePath = Path.Combine(documentsFolder, uniqueFileName);
+            var bytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            if (!provider.TryGetContentType(filePath, out var contentType))
+            {
+                contentType = "application/octet-stream";
+            }
 
-                FileContentResult thisfile = File(bytes, contentType, Path.GetFileName(filePath));
-            
+            FileContentResult thisfile = File(bytes, contentType, Path.GetFileName(filePath));
+
             return Ok(thisfile);
         }
 

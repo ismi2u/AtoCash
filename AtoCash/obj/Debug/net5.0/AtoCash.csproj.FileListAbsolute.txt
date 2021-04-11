@@ -532,4 +532,3 @@ C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\AtoCash.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\ref\AtoCash.dll
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\AtoCash.pdb
 C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\obj\Debug\net5.0\AtoCash.genruntimeconfig.cache
-C:\Users\MohamedKhan\source\repos\AtoCash\AtoCash\bin\Debug\net5.0\Images\8b84add2-d4dc-45b8-888e-d2d71ac5e2c3_atocash.json

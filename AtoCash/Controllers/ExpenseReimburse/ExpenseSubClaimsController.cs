@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers.ExpenseReimburse
 {
@@ -27,37 +28,176 @@ namespace AtoCash.Controllers.ExpenseReimburse
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ExpenseSubClaim>>> GetExpenseSubClaims()
         {
-            return await _context.ExpenseSubClaims.ToListAsync();
+           List<ExpenseSubClaim> expenseSubClaims = await _context.ExpenseSubClaims.ToListAsync();
+
+
+            List<ExpenseSubClaimDTO> expenseSubClaimDTOs = new();
+
+            foreach (ExpenseSubClaim expenseSubClaim in expenseSubClaims)
+            {
+                // Expense reimburse request Id
+                int expReimbReqId = _context.ExpenseSubClaims.Find(expenseSubClaim.Id).ExpenseReimburseRequestId;
+                ExpenseReimburseRequest expReimReq = _context.ExpenseReimburseRequests.Find(expReimbReqId);
+                int empId = _context.ExpenseReimburseRequests.Find(expReimbReqId).EmployeeId;
+                string empFullName = _context.Employees.Find(empId).GetFullName();
+                //
+
+                ExpenseSubClaimDTO expenseSubClaimsDto = new();
+                expenseSubClaimsDto.Id = expenseSubClaim.Id;
+                expenseSubClaimsDto.EmployeeId = empId;
+                expenseSubClaimsDto.EmployeeName = empFullName;
+                expenseSubClaimsDto.ExpenseReimbClaimAmount = expenseSubClaim.ExpenseReimbClaimAmount;
+                expenseSubClaimsDto.DocumentIDs = expenseSubClaim.DocumentIDs;
+                expenseSubClaimsDto.ExpReimReqDate = expReimReq.ExpReimReqDate;
+                expenseSubClaimsDto.InvoiceNo = expenseSubClaim.InvoiceNo;
+                expenseSubClaimsDto.InvoiceDate = expenseSubClaim.InvoiceDate;
+                expenseSubClaimsDto.Tax = expenseSubClaim.Tax;
+                expenseSubClaimsDto.TaxAmount = expenseSubClaim.TaxAmount;
+                expenseSubClaimsDto.Vendor = expenseSubClaim.Vendor;
+                expenseSubClaimsDto.Location = expenseSubClaim.Location;
+                expenseSubClaimsDto.Description = expenseSubClaim.Description;
+                expenseSubClaimsDto.CurrencyTypeId = expReimReq.CurrencyTypeId;
+                expenseSubClaimsDto.CurrencyType = _context.CurrencyTypes.Find(expReimReq.CurrencyTypeId).CurrencyCode;
+                expenseSubClaimsDto.ExpenseTypeId = expenseSubClaim.ExpenseTypeId;
+                expenseSubClaimsDto.ExpenseType = _context.ExpenseTypes.Find(expenseSubClaim.ExpenseTypeId).ExpenseTypeName;
+                expenseSubClaimsDto.Department = _context.Departments.Find(expReimReq.DepartmentId).DeptName;
+                expenseSubClaimsDto.DepartmentId = expReimReq.DepartmentId;
+                expenseSubClaimsDto.Project = _context.Projects.Find(expReimReq.ProjectId).ProjectName;
+                expenseSubClaimsDto.ProjectId = expReimReq.ProjectId;
+                expenseSubClaimsDto.SubProject = _context.SubProjects.Find(expReimReq.SubProjectId).SubProjectName;
+                expenseSubClaimsDto.SubProjectId = expReimReq.SubProjectId;
+                expenseSubClaimsDto.WorkTask = _context.WorkTasks.Find(expReimReq.WorkTaskId).TaskName;
+                expenseSubClaimsDto.WorkTaskId = expReimReq.WorkTaskId;
+
+                expenseSubClaimsDto.ApprovalStatusType = _context.ApprovalStatusTypes.Find(expReimReq.ApprovalStatusTypeId).Status;
+                expenseSubClaimsDto.ApprovalStatusTypeId = expReimReq.ApprovalStatusTypeId;
+                expenseSubClaimsDto.ApprovedDate = expReimReq.ApprovedDate;
+
+
+                expenseSubClaimDTOs.Add(expenseSubClaimsDto);
+            }
+
+
+            return Ok(expenseSubClaimDTOs);
         }
 
         // GET: api/ExpenseSubClaims/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<ExpenseSubClaim>> GetExpenseSubClaim(int id)
+        public async Task<ActionResult<ExpenseSubClaimDTO>> GetExpenseSubClaim(int id)
         {
             var expenseSubClaim = await _context.ExpenseSubClaims.FindAsync(id);
 
             if (expenseSubClaim == null)
             {
-                return NotFound();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense Id is not Valid!" });
             }
 
-            return expenseSubClaim;
+
+            // Expense reimburse request Id
+            int expReimbReqId = _context.ExpenseSubClaims.Find(expenseSubClaim.Id).ExpenseReimburseRequestId;
+            ExpenseReimburseRequest expReimReq = _context.ExpenseReimburseRequests.Find(expReimbReqId);
+            int empId = _context.ExpenseReimburseRequests.Find(expReimbReqId).EmployeeId;
+            string empFullName = _context.Employees.Find(empId).GetFullName();
+            //
+
+            ExpenseSubClaimDTO expenseSubClaimsDto = new();
+            expenseSubClaimsDto.Id = expenseSubClaim.Id;
+            expenseSubClaimsDto.EmployeeId = empId;
+            expenseSubClaimsDto.EmployeeName = empFullName;
+            expenseSubClaimsDto.ExpenseReimbClaimAmount = expenseSubClaim.ExpenseReimbClaimAmount;
+            expenseSubClaimsDto.DocumentIDs = expenseSubClaim.DocumentIDs;
+            expenseSubClaimsDto.ExpReimReqDate = expReimReq.ExpReimReqDate;
+            expenseSubClaimsDto.InvoiceNo = expenseSubClaim.InvoiceNo;
+            expenseSubClaimsDto.InvoiceDate = expenseSubClaim.InvoiceDate;
+            expenseSubClaimsDto.Tax = expenseSubClaim.Tax;
+            expenseSubClaimsDto.TaxAmount = expenseSubClaim.TaxAmount;
+            expenseSubClaimsDto.Vendor = expenseSubClaim.Vendor;
+            expenseSubClaimsDto.Location = expenseSubClaim.Location;
+            expenseSubClaimsDto.Description = expenseSubClaim.Description;
+            expenseSubClaimsDto.CurrencyTypeId = expReimReq.CurrencyTypeId;
+            expenseSubClaimsDto.CurrencyType = _context.CurrencyTypes.Find(expReimReq.CurrencyTypeId).CurrencyCode;
+            expenseSubClaimsDto.ExpenseTypeId = expenseSubClaim.ExpenseTypeId;
+            expenseSubClaimsDto.ExpenseType = _context.ExpenseTypes.Find(expenseSubClaim.ExpenseTypeId).ExpenseTypeName;
+            expenseSubClaimsDto.Department = _context.Departments.Find(expReimReq.DepartmentId).DeptName;
+            expenseSubClaimsDto.DepartmentId = expReimReq.DepartmentId;
+            expenseSubClaimsDto.Project = _context.Projects.Find(expReimReq.ProjectId).ProjectName;
+            expenseSubClaimsDto.ProjectId = expReimReq.ProjectId;
+            expenseSubClaimsDto.SubProject = _context.SubProjects.Find(expReimReq.SubProjectId).SubProjectName;
+            expenseSubClaimsDto.SubProjectId = expReimReq.SubProjectId;
+            expenseSubClaimsDto.WorkTask = _context.WorkTasks.Find(expReimReq.WorkTaskId).TaskName;
+            expenseSubClaimsDto.WorkTaskId = expReimReq.WorkTaskId;
+
+            expenseSubClaimsDto.ApprovalStatusType = _context.ApprovalStatusTypes.Find(expReimReq.ApprovalStatusTypeId).Status;
+            expenseSubClaimsDto.ApprovalStatusTypeId = expReimReq.ApprovalStatusTypeId;
+            expenseSubClaimsDto.ApprovedDate = expReimReq.ApprovedDate;
+
+
+            
+
+            return Ok(expenseSubClaimsDto);
         }
 
 
         // GET: api/ExpenseSubClaims/5
         [HttpGet("{id}")]
         [ActionName("GetExpenseSubClaimsByExpenseId")]
-        public async Task<ActionResult<ExpenseSubClaim>> GetExpenseSubClaimsByExpenseId(int id)
+        public async Task<ActionResult<List<ExpenseSubClaimDTO>>> GetExpenseSubClaimsByExpenseId(int id)
         {
-            var expenseSubClaims = await _context.ExpenseSubClaims.Where(e => e.ExpenseReimburseRequestId == id).ToListAsync();
-
-            if (expenseSubClaims.Count == 0)
+            if (id == 0)
             {
-                return NotFound();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense Id is not Valid!" });
             }
 
-            return Ok(expenseSubClaims);
+            var expenseSubClaims = await _context.ExpenseSubClaims.Where(e => e.ExpenseReimburseRequestId == id).ToListAsync();
+            
+            
+            List<ExpenseSubClaimDTO> expenseSubClaimDTOs = new();
+   
+            foreach (ExpenseSubClaim expenseSubClaim in expenseSubClaims)
+            {
+                // Expense reimburse request Id
+                int expReimbReqId =    _context.ExpenseSubClaims.Find(expenseSubClaim.Id).ExpenseReimburseRequestId;
+                ExpenseReimburseRequest expReimReq = _context.ExpenseReimburseRequests.Find(expReimbReqId);
+                int empId = _context.ExpenseReimburseRequests.Find(expReimbReqId).EmployeeId;
+                string empFullName = _context.Employees.Find(empId).GetFullName();
+                //
+
+                ExpenseSubClaimDTO expenseSubClaimsDto = new();
+                expenseSubClaimsDto.Id = expenseSubClaim.Id;
+                expenseSubClaimsDto.EmployeeId = empId;
+                expenseSubClaimsDto.EmployeeName = empFullName;
+                expenseSubClaimsDto.ExpenseReimbClaimAmount = expenseSubClaim.ExpenseReimbClaimAmount;
+                expenseSubClaimsDto.DocumentIDs = expenseSubClaim.DocumentIDs;
+                expenseSubClaimsDto.ExpReimReqDate = expReimReq.ExpReimReqDate;
+                expenseSubClaimsDto.InvoiceNo = expenseSubClaim.InvoiceNo;
+                expenseSubClaimsDto.InvoiceDate = expenseSubClaim.InvoiceDate;
+                expenseSubClaimsDto.Tax = expenseSubClaim.Tax;
+                expenseSubClaimsDto.TaxAmount = expenseSubClaim.TaxAmount;
+                expenseSubClaimsDto.Vendor = expenseSubClaim.Vendor;
+                expenseSubClaimsDto.Location = expenseSubClaim.Location;
+                expenseSubClaimsDto.Description = expenseSubClaim.Description;
+                expenseSubClaimsDto.CurrencyTypeId = expReimReq.CurrencyTypeId;
+                expenseSubClaimsDto.CurrencyType = _context.CurrencyTypes.Find(expReimReq.CurrencyTypeId).CurrencyCode;
+                expenseSubClaimsDto.ExpenseTypeId = expenseSubClaim.ExpenseTypeId;
+                expenseSubClaimsDto.ExpenseType = _context.ExpenseTypes.Find(expenseSubClaim.ExpenseTypeId).ExpenseTypeName;
+                expenseSubClaimsDto.Department = _context.Departments.Find(expReimReq.DepartmentId).DeptName;
+                expenseSubClaimsDto.DepartmentId = expReimReq.DepartmentId;
+                expenseSubClaimsDto.Project = _context.Projects.Find(expReimReq.ProjectId).ProjectName;
+                expenseSubClaimsDto.ProjectId = expReimReq.ProjectId;
+                expenseSubClaimsDto.SubProject = _context.SubProjects.Find(expReimReq.SubProjectId).SubProjectName;
+                expenseSubClaimsDto.SubProjectId = expReimReq.SubProjectId;
+                expenseSubClaimsDto.WorkTask = _context.WorkTasks.Find(expReimReq.WorkTaskId).TaskName;
+                expenseSubClaimsDto.WorkTaskId = expReimReq.WorkTaskId;
+
+                expenseSubClaimsDto.ApprovalStatusType = _context.ApprovalStatusTypes.Find(expReimReq.ApprovalStatusTypeId).Status;
+                expenseSubClaimsDto.ApprovalStatusTypeId = expReimReq.ApprovalStatusTypeId;
+                expenseSubClaimsDto.ApprovedDate = expReimReq.ApprovedDate;
+
+
+                expenseSubClaimDTOs.Add(expenseSubClaimsDto);
+            }
+
+            return Ok(expenseSubClaimDTOs);
         }
         // PUT: api/ExpenseSubClaims/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

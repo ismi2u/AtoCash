@@ -8,26 +8,30 @@ services:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=Pa55word2019!123
     ports:
-      - "14333:1433"
+      - "1433:1433"
     volumes:
       - atocashdatavol:/var/opt/mssql/data
     networks:
       mynetwork:
       
   atocash:
-    image: ismi2u/atocash:dev
+    image: ismi2u/atocash:latest
     command: tail -f /dev/null
     container_name: appserver
     tty: true
     ports:
-      - "8080:80"
+      - "5000:80"
+      - "5001:443"
     networks:
       mynetwork:
+    volumes:
+      - atocashappvol:/app/Images
     depends_on:
      - sqldata
 
 volumes:
     atocashdatavol:
+    atocashappvol:
     
 networks:
     mynetwork:

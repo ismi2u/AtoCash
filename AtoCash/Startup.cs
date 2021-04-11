@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +46,7 @@ namespace AtoCash
             //StagingServer : "server=143.110.188.154,1433; 
 
 
-            services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StagingServer")));
+            services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WithinContainerSQLConnectionString")));
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AtoCashDbContext>();
             //services.AddHttpsRedirection(options => options.HttpsPort = 443);
@@ -114,7 +115,23 @@ namespace AtoCash
             app.UseHttpsRedirection();
             app.UseCors("myCorsPolicy");
             app.UseRouting();
-            
+            //app.UseForwardedHeaders(new ForwardedHeadersOptions
+            //{
+            //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            //});
+
+            var forwardingOptions = new ForwardedHeadersOptions()
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            };
+            forwardingOptions.KnownNetworks.Clear(); // Loopback by default, this should be temporary
+            forwardingOptions.KnownProxies.Clear(); // Update to include
+
+            app.UseForwardedHeaders(forwardingOptions);
+
+
+
+
             app.UseAuthentication(); //add before MVC
             app.UseAuthorization();
 
