@@ -903,6 +903,8 @@ namespace AtoCash.Migrations
                     PettyCashRequestId = table.Column<int>(type: "int", nullable: true),
                     DepartmentId = table.Column<int>(type: "int", nullable: true),
                     ProjectId = table.Column<int>(type: "int", nullable: true),
+                    SubProjectId = table.Column<int>(type: "int", nullable: true),
+                    WorkTaskId = table.Column<int>(type: "int", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: false),
                     ApprovalLevelId = table.Column<int>(type: "int", nullable: false),
                     ReqDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -955,6 +957,18 @@ namespace AtoCash.Migrations
                         principalTable: "Projects",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClaimApprovalStatusTrackers_SubProjects_SubProjectId",
+                        column: x => x.SubProjectId,
+                        principalTable: "SubProjects",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_ClaimApprovalStatusTrackers_WorkTasks_WorkTaskId",
+                        column: x => x.WorkTaskId,
+                        principalTable: "WorkTasks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -973,7 +987,9 @@ namespace AtoCash.Migrations
                     WorkTaskId = table.Column<int>(type: "int", nullable: true),
                     RecordDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CurrencyTypeId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<double>(type: "float", nullable: false),
+                    ClaimAmount = table.Column<double>(type: "float", nullable: false),
+                    AmountToWallet = table.Column<double>(type: "float", nullable: true),
+                    AmountToCredit = table.Column<double>(type: "float", nullable: true),
                     CostCentreId = table.Column<int>(type: "int", nullable: false),
                     ApprovalStatusId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -1202,6 +1218,16 @@ namespace AtoCash.Migrations
                 name: "IX_ClaimApprovalStatusTrackers_RoleId",
                 table: "ClaimApprovalStatusTrackers",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimApprovalStatusTrackers_SubProjectId",
+                table: "ClaimApprovalStatusTrackers",
+                column: "SubProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ClaimApprovalStatusTrackers_WorkTaskId",
+                table: "ClaimApprovalStatusTrackers",
+                column: "WorkTaskId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CostCentres_StatusTypeId",

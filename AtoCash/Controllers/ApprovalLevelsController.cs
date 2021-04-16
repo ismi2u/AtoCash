@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
     public class ApprovalLevelsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -73,7 +73,7 @@ namespace AtoCash.Controllers
         // PUT: api/ApprovalLevels/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutApprovalLevel(int id, ApprovalLevelDTO approvalLevelDTO)
         {
             if (id != approvalLevelDTO.Id)
@@ -84,7 +84,6 @@ namespace AtoCash.Controllers
             var approvalLevel = await _context.ApprovalLevels.FindAsync(id);
 
             approvalLevel.Id = approvalLevelDTO.Id;
-            approvalLevel.Level = approvalLevelDTO.Level;
             approvalLevel.LevelDesc = approvalLevelDTO.LevelDesc;
 
             _context.ApprovalLevels.Update(approvalLevel);
@@ -111,7 +110,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ApprovalLevels
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<ActionResult<ApprovalLevel>> PostApprovalLevel(ApprovalLevelDTO approvalLevelDto)
         {
 
@@ -121,10 +120,14 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level Already Exists" });
             }
 
-            
-            if (approvalLevelDto.Level !=  _context.ApprovalLevels.Select(x => x.Level).Max() + 1)
+
+
+            if (approvalLevelDto.Level != 1)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level need to be Linear integer" });
+                if (approvalLevelDto.Level != _context.ApprovalLevels.Select(x => x.Level).Max() + 1)
+                {
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level need to be Linear integer" });
+                }
             }
 
             ApprovalLevel approvalLevel = new()
@@ -144,7 +147,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalLevels/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteApprovalLevel(int id)
         {
             var approvalLevel = await _context.ApprovalLevels.FindAsync(id);

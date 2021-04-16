@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
     public class DisbursementsAndClaimsMastersController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -45,7 +45,7 @@ namespace AtoCash.Controllers
                     SubProjectId = disbursementsAndClaimsMaster.SubProjectId,
                     WorkTaskId = disbursementsAndClaimsMaster.WorkTaskId,
                     RecordDate = disbursementsAndClaimsMaster.RecordDate,
-                    Amount = disbursementsAndClaimsMaster.Amount,
+                    ClaimAmount = disbursementsAndClaimsMaster.ClaimAmount,
                     CostCentreId = disbursementsAndClaimsMaster.CostCentreId,
                     ApprovalStatusId = disbursementsAndClaimsMaster.ApprovalStatusId
                 };
@@ -80,7 +80,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMasterDTO.SubProjectId = disbursementsAndClaimsMaster.SubProjectId;
             disbursementsAndClaimsMasterDTO.WorkTaskId = disbursementsAndClaimsMaster.WorkTaskId;
             disbursementsAndClaimsMasterDTO.RecordDate = disbursementsAndClaimsMaster.RecordDate;
-            disbursementsAndClaimsMasterDTO.Amount = disbursementsAndClaimsMaster.Amount;
+            disbursementsAndClaimsMasterDTO.ClaimAmount = disbursementsAndClaimsMaster.ClaimAmount;
             disbursementsAndClaimsMasterDTO.CostCentreId = disbursementsAndClaimsMaster.CostCentreId;
             disbursementsAndClaimsMasterDTO.ApprovalStatusId = disbursementsAndClaimsMaster.ApprovalStatusId;
 
@@ -89,7 +89,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/DisbursementsAndClaimsMasters/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutDisbursementsAndClaimsMaster(int id, DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDto)
         {
             if (id != disbursementsAndClaimsMasterDto.Id)
@@ -109,7 +109,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.SubProjectId = disbursementsAndClaimsMasterDto.SubProjectId;
             disbursementsAndClaimsMaster.WorkTaskId = disbursementsAndClaimsMasterDto.WorkTaskId;
             disbursementsAndClaimsMaster.RecordDate = disbursementsAndClaimsMasterDto.RecordDate;
-            disbursementsAndClaimsMaster.Amount = disbursementsAndClaimsMasterDto.Amount;
+            disbursementsAndClaimsMaster.ClaimAmount = disbursementsAndClaimsMasterDto.ClaimAmount;
             disbursementsAndClaimsMaster.CostCentreId = disbursementsAndClaimsMasterDto.CostCentreId;
             disbursementsAndClaimsMaster.ApprovalStatusId = disbursementsAndClaimsMasterDto.ApprovalStatusId;
 
@@ -138,7 +138,7 @@ namespace AtoCash.Controllers
 
         // POST: api/DisbursementsAndClaimsMasters
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<ActionResult<DisbursementsAndClaimsMaster>> PostDisbursementsAndClaimsMaster(DisbursementsAndClaimsMasterDTO disbursementsAndClaimsMasterDto)
         {
             DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new DisbursementsAndClaimsMaster
@@ -151,7 +151,7 @@ namespace AtoCash.Controllers
                 SubProjectId = disbursementsAndClaimsMasterDto.SubProjectId,
                 WorkTaskId = disbursementsAndClaimsMasterDto.WorkTaskId,
                 RecordDate = disbursementsAndClaimsMasterDto.RecordDate,
-                Amount = disbursementsAndClaimsMasterDto.Amount,
+                ClaimAmount = disbursementsAndClaimsMasterDto.ClaimAmount,
                 CostCentreId = disbursementsAndClaimsMasterDto.CostCentreId,
                 ApprovalStatusId = disbursementsAndClaimsMasterDto.ApprovalStatusId
             };
@@ -166,7 +166,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/DisbursementsAndClaimsMasters/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteDisbursementsAndClaimsMaster(int id)
         {
             var disbursementsAndClaimsMaster = await _context.DisbursementsAndClaimsMasters.FindAsync(id);

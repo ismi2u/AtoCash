@@ -120,14 +120,14 @@ namespace AtoCash
             //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
             //});
 
-            var forwardingOptions = new ForwardedHeadersOptions()
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            };
-            forwardingOptions.KnownNetworks.Clear(); // Loopback by default, this should be temporary
-            forwardingOptions.KnownProxies.Clear(); // Update to include
+            //var forwardingOptions = new ForwardedHeadersOptions()
+            //{
+            //    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            //};
+            //forwardingOptions.KnownNetworks.Clear(); // Loopback by default, this should be temporary
+            //forwardingOptions.KnownProxies.Clear(); // Update to include
 
-            app.UseForwardedHeaders(forwardingOptions);
+            //app.UseForwardedHeaders(forwardingOptions);
 
 
 

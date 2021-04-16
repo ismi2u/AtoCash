@@ -20,7 +20,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Users")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, Users")]
     public class ReportsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -58,7 +58,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("CashReimburseReportByEmployee")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
         public async Task<IActionResult> GetCashAdvanceReportRequestByEmployee(CashAdvanceSearchModel searchModel)
         {
            //if (!LoggedInEmpid == searchModel.EmpId)
@@ -95,9 +95,9 @@ namespace AtoCash.Controllers
                     if (searchModel.RecordDateTo.HasValue)
                         result = result.Where(x => x.RecordDate <= searchModel.RecordDateTo);
                     if (searchModel.AmountFrom > 0)
-                        result = result.Where(x => x.Amount == searchModel.AmountFrom);
+                        result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
                     if (searchModel.AmountTo > 0)
-                        result = result.Where(x => x.Amount == searchModel.AmountTo);
+                        result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
                     if (searchModel.CostCentreId.HasValue)
                         result = result.Where(x => x.CostCentreId == searchModel.CostCentreId);
                     if (searchModel.ApprovalStatusId.HasValue)
@@ -129,7 +129,7 @@ namespace AtoCash.Controllers
                             empCashAdvance.SubProject.SubProjectName,
                             empCashAdvance.WorkTask.TaskName,
                             empCashAdvance.RecordDate,
-                            empCashAdvance.Amount,
+                            empCashAdvance.ClaimAmount,
                             empCashAdvance.CostCentre.CostCentreCode,
                             empCashAdvance.ApprovalStatusType.Status
                             );
@@ -143,10 +143,96 @@ namespace AtoCash.Controllers
             return Conflict(new RespStatus() { Status = "Failure", Message = "User Id not valid" });
         }
 
+        [HttpPost]
+        [ActionName("CashReimburseDataByEmployee")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
+        public async Task<IActionResult> CashReimburseDataByEmployee(CashAdvanceSearchModel searchModel)
+        {
+            //if (!LoggedInEmpid == searchModel.EmpId)
+            // {
+            //     return Ok(new RespStatus() { Status = "Failure", Message = "Employee reports only!" });
+            // }
+
+            int? empid = searchModel.EmpId;
+
+            if (empid != null)
+            {
+                var emp = await _context.Employees.FindAsync(empid); //employee object
+                string empFullName = emp.FirstName + emp.MiddleName + emp.LastName;
+
+                //restrict employees to generate only their content not of other employees
+                var result = _context.DisbursementsAndClaimsMasters.Where(x => x.EmployeeId == searchModel.EmpId).AsQueryable();
+
+                if (searchModel != null)
+                {
+                    //For  string use the below
+                    //if (!string.IsNullOrEmpty(searchModel.Name))
+                    //    result = result.Where(x => x.Name.Contains(searchModel.Name));
+
+                    if (searchModel.RequestTypeId.HasValue)
+                        result = result.Where(x => x.RequestTypeId == searchModel.RequestTypeId);
+                    if (searchModel.DepartmentId.HasValue)
+                        result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
+                    if (searchModel.ProjectId.HasValue)
+                        result = result.Where(x => x.ProjectId == searchModel.ProjectId);
+                    if (searchModel.SubProjectId.HasValue)
+                        result = result.Where(x => x.SubProjectId == searchModel.SubProjectId);
+                    if (searchModel.RecordDateFrom.HasValue)
+                        result = result.Where(x => x.RecordDate >= searchModel.RecordDateFrom);
+                    if (searchModel.RecordDateTo.HasValue)
+                        result = result.Where(x => x.RecordDate <= searchModel.RecordDateTo);
+                    if (searchModel.AmountFrom > 0)
+                        result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
+                    if (searchModel.AmountTo > 0)
+                        result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
+                    if (searchModel.CostCentreId.HasValue)
+                        result = result.Where(x => x.CostCentreId == searchModel.CostCentreId);
+                    if (searchModel.ApprovalStatusId.HasValue)
+                        result = result.Where(x => x.ApprovalStatusId == searchModel.ApprovalStatusId);
+
+
+                    DataTable dt = new DataTable();
+                    dt.Columns.AddRange(new DataColumn[10]
+                        {
+                    new DataColumn("EmployeeName", typeof(string)),
+                    new DataColumn("PettyCashRequestId", typeof(int)),
+                    new DataColumn("RequestType",typeof(string)),
+                    new DataColumn("ProjectName",typeof(string)),
+                    new DataColumn("SubProject", typeof(string)),
+                    new DataColumn("WorkTask",typeof(string)),
+                    new DataColumn("RecordDate",typeof(DateTime)),
+                    new DataColumn("Amount", typeof(Double)),
+                    new DataColumn("CostCentre", typeof(string)),
+                    new DataColumn("ApprovalStatus", typeof(string))
+                        });
+
+                    foreach (var empCashAdvance in result)
+                    {
+                        dt.Rows.Add(
+                            empFullName,
+                            empCashAdvance.PettyCashRequestId,
+                            empCashAdvance.RequestType.RequestName,
+                            empCashAdvance.Project.ProjectName,
+                            empCashAdvance.SubProject.SubProjectName,
+                            empCashAdvance.WorkTask.TaskName,
+                            empCashAdvance.RecordDate,
+                            empCashAdvance.ClaimAmount,
+                            empCashAdvance.CostCentre.CostCentreCode,
+                            empCashAdvance.ApprovalStatusType.Status
+                            );
+                    }
+                    // Creating the Excel workbook 
+                    // Add the datatable to the Excel workbook
+
+                    return Ok( dt);
+                }
+            }
+            return Conflict(new RespStatus() { Status = "Failure", Message = "User Id not valid" });
+        }
 
         [HttpPost]
         [ActionName("CashReimburseReportByAdmin")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> GetCashAdvanceReportReqestByAdmin(CashAdvanceSearchModel searchModel)
         {
             int? empId = searchModel.EmpId;
@@ -176,9 +262,9 @@ namespace AtoCash.Controllers
                 if (searchModel.RecordDateTo.HasValue)
                     result = result.Where(x => x.RecordDate <= searchModel.RecordDateTo);
                 if (searchModel.AmountFrom > 0)
-                    result = result.Where(x => x.Amount == searchModel.AmountFrom);
+                    result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
                 if (searchModel.AmountTo > 0)
-                    result = result.Where(x => x.Amount == searchModel.AmountTo);
+                    result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
                 if (searchModel.CostCentreId.HasValue)
                     result = result.Where(x => x.CostCentreId == searchModel.CostCentreId);
                 if (searchModel.ApprovalStatusId.HasValue)
@@ -209,7 +295,7 @@ namespace AtoCash.Controllers
                         empCashAdvance.SubProject.SubProjectName,
                         empCashAdvance.WorkTask.TaskName,
                         empCashAdvance.RecordDate,
-                        empCashAdvance.Amount,
+                        empCashAdvance.ClaimAmount,
                         empCashAdvance.CostCentre.CostCentreCode,
                         empCashAdvance.ApprovalStatusType.Status
                         );
@@ -229,7 +315,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("TravelRequestReportByEmployee")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
         public async Task<IActionResult> GetTravelRequestReportByEmployee(TravelRequestSearchModel searchModel)
         {
             //if (!LoggedInEmpid == searchModel.EmpId)
@@ -309,7 +395,7 @@ namespace AtoCash.Controllers
 
         [HttpPost]
         [ActionName("TravelRequestReportByAdmin")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> GetTravelRequestReportByAdmin(TravelRequestSearchModel searchModel)
         {
             int? empId = searchModel.EmpId;

@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, Manager, User")]
     public class ProjectsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -133,7 +133,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/Projects/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutProject(int id, ProjectDTO projectDto)
         {
             if (id != projectDto.Id)
@@ -174,7 +174,7 @@ namespace AtoCash.Controllers
 
         // POST: api/Projects
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<ActionResult<Project>> PostProject(ProjectDTO projectDto)
         {
             var project = _context.Projects.Where(c => c.ProjectName == projectDto.ProjectName).FirstOrDefault();
@@ -200,7 +200,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/Projects/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteProject(int id)
         {
             var subProj = _context.SubProjects.Where(s => s.ProjectId == id).FirstOrDefault();

@@ -15,7 +15,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User, Manager")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User, Manager")]
     public class ClaimApprovalStatusTrackersController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -111,7 +111,7 @@ namespace AtoCash.Controllers
         // PUT: api/ClaimApprovalStatusTrackers/5
 
         [HttpPut]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, Manager")]
         public async Task<IActionResult> PutClaimApprovalStatusTracker(List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDto)
         {
 
@@ -160,7 +160,10 @@ namespace AtoCash.Controllers
                         int CurClaimApprovalLevel = _context.ApprovalLevels.Find(claimApprovalStatusTrackerDto.ApprovalLevelId).Level;
                         int nextClaimApprovalLevel = CurClaimApprovalLevel + 1;
                         int qApprovalLevelId;
-                        if (_context.ApprovalLevels.Where(x => x.Level == nextClaimApprovalLevel).FirstOrDefault() != null)
+
+                        int apprGroupId = _context.ClaimApprovalStatusTrackers.Find(claimApprovalStatusTrackerDto.Id).ApprovalGroupId;
+
+                        if (_context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == apprGroupId && a.ApprovalLevelId == nextClaimApprovalLevel).FirstOrDefault() != null)
                         {
                             qApprovalLevelId = _context.ApprovalLevels.Where(x => x.Level == nextClaimApprovalLevel).FirstOrDefault().Id;
                         }
@@ -178,6 +181,7 @@ namespace AtoCash.Controllers
                         {
                             claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == qPettyCashRequestId &&
                                 c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
+                                 c.ApprovalGroupId == empApprGroupId &&
                                 c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
                             claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
 
@@ -187,6 +191,7 @@ namespace AtoCash.Controllers
                             //final approver hence update PettyCashRequest
                             claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == qPettyCashRequestId &&
                                c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
+                                c.ApprovalGroupId == empApprGroupId &&
                                c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
                             //claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                             claimitem.FinalApprovedDate = DateTime.Now;
@@ -202,7 +207,9 @@ namespace AtoCash.Controllers
                         //Save to database
                         _context.Update(claimitem);
                         await _context.SaveChangesAsync();
-                        var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == empApprGroupId).OrderBy(a => a.ApprovalLevel).ToList();
+
+                        int reqApprGroupId = _context.Employees.Find(claimApprovalStatusTrackerDto.EmployeeId).ApprovalGroupId;
+                        var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).Where(a => a.ApprovalGroupId == reqApprGroupId).OrderBy(o => o.ApprovalLevel.Level).ToList();
 
                         foreach (var ApprMap in getEmpClaimApproversAllLevels)
                         {
@@ -211,7 +218,7 @@ namespace AtoCash.Controllers
                             if (ApprMap.ApprovalLevelId == claimApprovalStatusTracker.ApprovalLevelId + 1)
                             {
                                 int role_id = ApprMap.RoleId;
-                                var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
+                                var approver = _context.Employees.Where(e => e.RoleId == role_id && e.ApprovalGroupId == reqApprGroupId).FirstOrDefault();
 
                                 //##### 4. Send email to the Approver
                                 //####################################
@@ -277,7 +284,7 @@ namespace AtoCash.Controllers
         // POST: api/ClaimApprovalStatusTrackers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, Manager, User")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, Manager, User")]
         public async Task<ActionResult<ClaimApprovalStatusTracker>> PostClaimApprovalStatusTracker(ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto)
         {
             ClaimApprovalStatusTracker claimApprovalStatusTracker = new()
@@ -293,7 +300,7 @@ namespace AtoCash.Controllers
                 FinalApprovedDate = claimApprovalStatusTrackerDto.FinalApprovedDate,
                 ApprovalStatusTypeId = (int)EApprovalStatus.Pending,
                 Comments = claimApprovalStatusTrackerDto.Comments
-        };
+            };
 
             _context.ClaimApprovalStatusTrackers.Add(claimApprovalStatusTracker);
             await _context.SaveChangesAsync();
@@ -303,7 +310,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ClaimApprovalStatusTrackers/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteClaimApprovalStatusTracker(int id)
         {
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
@@ -438,11 +445,24 @@ namespace AtoCash.Controllers
 
             foreach (ClaimApprovalStatusTracker claim in claimRequestTracks)
             {
+                string claimApproverName = null;
+
+                if (claim.ProjectId > 0)
+                {
+                    claimApproverName = _context.Employees.Where(e => e.Id == _context.Projects.Find(claim.ProjectId).ProjectManagerId)
+                        .Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault();
+                }
+                else
+                {
+                    claimApproverName =  _context.Employees.Where(x => x.RoleId == claim.RoleId && x.ApprovalGroupId == claim.ApprovalGroupId)
+                        .Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault();
+                }
+
                 ApprovalStatusFlowVM approvalStatusFlow = new()
                 {
                     ApprovalLevel = claim.ApprovalLevelId,
                     ApproverRole = _context.JobRoles.Find(claim.RoleId).RoleName,
-                    ApproverName = _context.Employees.Where(x => x.RoleId == claim.RoleId).Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault(),
+                    ApproverName = claimApproverName,
                     ApprovedDate = claim.FinalApprovedDate,
                     ApprovalStatusType = _context.ApprovalStatusTypes.Find(claim.ApprovalStatusTypeId).Status
 
@@ -454,7 +474,7 @@ namespace AtoCash.Controllers
 
         }
 
-       
+
 
 
         ////

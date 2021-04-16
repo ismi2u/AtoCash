@@ -20,7 +20,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
     public class ExpenseReimburseRequestsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -218,13 +218,16 @@ namespace AtoCash.Controllers
 
         // PUT: api/ExpenseReimburseRequests/5
         [HttpPut]
-        //[Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        //[Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutExpenseReimburseRequest(List<ExpenseReimburseRequestDTO> ListExpenseReimbRequestDTO)
         {
             if (ListExpenseReimbRequestDTO.Count == 0)
             {
                 return Ok(new RespStatus { Status = "Failure", Message = "No" });
             }
+
+
+
 
             foreach (ExpenseReimburseRequestDTO expenseReimbRequestDTO in ListExpenseReimbRequestDTO)
             {
@@ -400,7 +403,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ExpenseReimburseRequests/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteExpenseReimburseRequest(int id)
         {
             var expenseReimburseRequest = await _context.ExpenseReimburseRequests.FindAsync(id);
@@ -428,7 +431,12 @@ namespace AtoCash.Controllers
 
             #region
             int reqEmpid = expenseReimburseRequestDto.EmployeeId;
-            int empApprGroupId = _context.Employees.Find(reqEmpid).ApprovalGroupId;
+            Employee reqEmp = _context.Employees.Find(reqEmpid);
+            int reqApprGroupId = reqEmp.ApprovalGroupId;
+            int reqRoleId = reqEmp.RoleId;
+            int maxApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId).ToList().Select(x => x.ApprovalLevel).Max(a => a.Level);
+            int reqApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId && a.RoleId == reqRoleId).Select(x => x.ApprovalLevel).FirstOrDefault().Level;
+            bool isSelfApprovedRequest = false;
             ////
 
             ExpenseReimburseRequest expenseReimburseRequest = new();
@@ -440,9 +448,9 @@ namespace AtoCash.Controllers
             expenseReimburseRequest.TotalClaimAmount = dblTotalClaimAmount; //Currently Zero but added as per the request
             expenseReimburseRequest.ExpReimReqDate = DateTime.Now;
             expenseReimburseRequest.DepartmentId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId;
-            //expenseReimburseRequest.ProjectId = expenseReimburseRequestDto.ProjectId;
-            //expenseReimburseRequest.SubProjectId = expenseReimburseRequestDto.SubProjectId;
-            //expenseReimburseRequest.WorkTaskId = expenseReimburseRequestDto.WorkTaskId;
+            expenseReimburseRequest.ProjectId = null;
+            expenseReimburseRequest.SubProjectId = null;
+            expenseReimburseRequest.WorkTaskId = null;
             expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
             //expenseReimburseRequest.ApprovedDate = expenseReimburseRequestDto.ApprovedDate;
 
@@ -483,16 +491,17 @@ namespace AtoCash.Controllers
 
 
             ///////////////////////////// Check if self Approved Request /////////////////////////////
-            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
-            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(reqEmpid).RoleId).FirstOrDefault().Id;
-            bool isSelfApprovedRequest = false;
+
             //if highest approver is requesting Petty cash request himself
-            if (maxApprLevel == empApprLevel)
+            if (maxApprLevel == reqApprLevel)
             {
                 isSelfApprovedRequest = true;
             }
             //////////////////////////////////////////////////////////////////////////////////////////
-            var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == expenseReimburseRequestDto.EmployeeId).ToList().OrderBy(a => a.ApprovalLevel);
+            //var test = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).ToList().OrderBy(o => o.ApprovalLevel.Level);
+            int reqApprovGroupId = _context.Employees.Find(reqEmpid).ApprovalGroupId;
+            var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).Where(a => a.ApprovalGroupId == reqApprovGroupId).OrderBy(o => o.ApprovalLevel.Level).ToList();
+
             var ReqEmpRoleId = _context.Employees.Where(e => e.Id == reqEmpid).FirstOrDefault().RoleId;
             var ReqEmpHisOwnApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == ReqEmpRoleId);
             bool isFirstApprover = true;
@@ -509,7 +518,8 @@ namespace AtoCash.Controllers
                     DepartmentId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId,
                     ProjectId = null, //Approver Project Id
                     JobRoleId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).RoleId,
-                    ApprovalLevelId = empApprLevel,
+                    ApprovalGroupId = reqApprGroupId,
+                    ApprovalLevelId = reqApprLevel,
                     ApprovedDate = null,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved, //1-Pending, 2-Approved, 3-Rejected
                     Comments = "Self Approved Request"
@@ -522,9 +532,15 @@ namespace AtoCash.Controllers
                 foreach (ApprovalRoleMap ApprMap in getEmpClaimApproversAllLevels)
                 {
                     int role_id = ApprMap.RoleId;
-                    var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
+                    var approver = _context.Employees.Where(e => e.RoleId == role_id && e.ApprovalGroupId == reqApprGroupId).FirstOrDefault();
+                    if (approver == null)
+                    {
+                        continue;
+                    }
+                    int approverLevelid = _context.ApprovalRoleMaps.Where(x => x.RoleId == approver.RoleId && x.ApprovalGroupId == reqApprGroupId).FirstOrDefault().ApprovalLevelId;
+                    int approverLevel = _context.ApprovalLevels.Find(approverLevelid).Level;
 
-                    if (ReqEmpRoleId >= approver.RoleId)
+                    if (reqApprLevel >= approverLevel)
                     {
                         continue;
                     }
@@ -540,6 +556,7 @@ namespace AtoCash.Controllers
                         DepartmentId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId,
                         ProjectId = null, //Approver Project Id
                         JobRoleId = approver.RoleId,
+                        ApprovalGroupId = reqApprGroupId,
                         ApprovalLevelId = ApprMap.ApprovalLevelId,
                         ApprovedDate = null,
                         ApprovalStatusTypeId = isFirstApprover ? (int)EApprovalStatus.Pending : (int)EApprovalStatus.Initiating,
@@ -581,7 +598,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.WorkTaskId = expenseReimburseRequestDto.WorkTaskId;
             disbursementsAndClaimsMaster.RecordDate = DateTime.Now;
             disbursementsAndClaimsMaster.CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId;
-            disbursementsAndClaimsMaster.Amount = dblTotalClaimAmount;
+            disbursementsAndClaimsMaster.ClaimAmount = dblTotalClaimAmount;
             disbursementsAndClaimsMaster.CostCentreId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCentreId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
@@ -635,7 +652,8 @@ namespace AtoCash.Controllers
             }
             //////////////////////////////////////////////////////////////////////////////////////////
             ///
-            var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == expenseReimburseRequestDto.EmployeeId).ToList().OrderBy(a => a.ApprovalLevel);
+            //int reqApprovGroupId = _context.Employees.Find(empid).ApprovalGroupId;
+            //var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).Where(a => a.ApprovalGroupId == reqApprovGroupId).OrderBy(o => o.ApprovalLevel.Level).ToList();
 
             if (isSelfApprovedRequest)
             {
@@ -649,6 +667,7 @@ namespace AtoCash.Controllers
                     DepartmentId = approver.DepartmentId,
                     ProjectId = null, //Approver Project Id
                     JobRoleId = approver.RoleId,
+                    ApprovalGroupId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).ApprovalGroupId,
                     ApprovalLevelId = empApprLevel,
                     ApprovedDate = null,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved, //1-Pending, 2-Approved, 3-Rejected
@@ -671,6 +690,7 @@ namespace AtoCash.Controllers
                     DepartmentId = approver.DepartmentId,
                     ProjectId = null, //Approver Project Id
                     JobRoleId = approver.RoleId,
+                    ApprovalGroupId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).ApprovalGroupId,
                     ApprovalLevelId = empApprLevel,
                     ApprovedDate = null,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Pending, //1-Pending, 2-Approved, 3-Rejected
@@ -709,7 +729,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.WorkTaskId = expenseReimburseRequestDto.WorkTaskId;
             disbursementsAndClaimsMaster.RecordDate = DateTime.Now;
             disbursementsAndClaimsMaster.CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId;
-            disbursementsAndClaimsMaster.Amount = expenseReimburseRequestDto.TotalClaimAmount;
+            disbursementsAndClaimsMaster.ClaimAmount = expenseReimburseRequestDto.TotalClaimAmount;
             disbursementsAndClaimsMaster.CostCentreId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCentreId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);

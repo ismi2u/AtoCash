@@ -40,6 +40,10 @@ namespace AtoCash.Models
         public virtual Project Project { get; set; }
         public int? ProjectId { get; set; }
 
+        //Approver ApprovalLevel
+        [Required]
+        public int ApprovalGroupId { get; set; }
+
 
         //Approver Role => Multiple Approvers, hence their roles
         [Required]
@@ -86,6 +90,7 @@ namespace AtoCash.Models
         public int? ProjectId { get; set; }
         public string ProjectName { get; set; }
 
+        public int ApprovalGroupId { get; set; }
         public int RoleId { get; set; }
         public string JobRole { get; set; }
         public int ApprovalLevelId { get; set; }

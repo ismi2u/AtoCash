@@ -209,6 +209,12 @@ namespace AtoCash.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SubProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("WorkTaskId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApprovalLevelId");
@@ -224,6 +230,10 @@ namespace AtoCash.Migrations
                     b.HasIndex("ProjectId");
 
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("SubProjectId");
+
+                    b.HasIndex("WorkTaskId");
 
                     b.ToTable("ClaimApprovalStatusTrackers");
                 });
@@ -319,11 +329,17 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<double>("Amount")
+                    b.Property<double?>("AmountToCredit")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("AmountToWallet")
                         .HasColumnType("float");
 
                     b.Property<int>("ApprovalStatusId")
                         .HasColumnType("int");
+
+                    b.Property<double>("ClaimAmount")
+                        .HasColumnType("float");
 
                     b.Property<int>("CostCentreId")
                         .HasColumnType("int");
@@ -1296,6 +1312,14 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AtoCash.Models.SubProject", "SubProject")
+                        .WithMany()
+                        .HasForeignKey("SubProjectId");
+
+                    b.HasOne("AtoCash.Models.WorkTask", "WorkTask")
+                        .WithMany()
+                        .HasForeignKey("WorkTaskId");
+
                     b.Navigation("ApprovalLevel");
 
                     b.Navigation("ApprovalStatusType");
@@ -1309,6 +1333,10 @@ namespace AtoCash.Migrations
                     b.Navigation("Project");
 
                     b.Navigation("Role");
+
+                    b.Navigation("SubProject");
+
+                    b.Navigation("WorkTask");
                 });
 
             modelBuilder.Entity("AtoCash.Models.CostCentre", b =>

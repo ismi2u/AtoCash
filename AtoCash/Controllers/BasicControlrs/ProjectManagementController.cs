@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
     public class ProjectManagementController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -71,7 +71,7 @@ namespace AtoCash.Controllers
 
         [HttpGet("{id}")]
         [ActionName("GetProjectsByEmployee")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
         public async Task<ActionResult<IEnumerable<ProjectVM>>> GetProjectsByEmployee(int id)
         {
             var ProjMgmtItems = _context.ProjectManagements.Include("Projects").Where(p => p.EmployeeId == id).Select(s => new { s.ProjectId, s.Project.ProjectName, s.Project.ProjectDesc });
@@ -96,7 +96,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/ProjectManagement/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutProjectManagement(int id, ProjectManagementDTO projectManagementDto)
         {
             if (id != projectManagementDto.Id)
@@ -135,7 +135,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ProjectManagement
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<ActionResult<ProjectManagement>> PostProjectManagement(ProjectManagementDTO projectManagementDTO)
         {
             var projassigned = _context.ProjectManagements.Where(p => p.EmployeeId == projectManagementDTO.EmployeeId && p.EmployeeId == projectManagementDTO.ProjectId).FirstOrDefault();
@@ -161,7 +161,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ProjectManagement/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteProjectManagement(int id)
         {
             var projectManagement = await _context.ProjectManagements.FindAsync(id);

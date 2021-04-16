@@ -53,6 +53,8 @@ namespace AtoCash.Models
         public virtual WorkTask WorkTask { get; set; }
         public int? WorkTaskId { get; set; }
 
+        [Required]
+        public int ApprovalGroupId { get; set; }
 
         //Approver Role
         [Required]
@@ -104,6 +106,8 @@ namespace AtoCash.Models
         public int? SubProjectId { get; set; }
         public string SubProject { get; set; }
 
+
+        public int ApprovalGroupId { get; set; }
         public int ApprovalLevelId { get; set; }
 
         public int JobRoleId { get; set; }

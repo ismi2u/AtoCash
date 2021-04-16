@@ -15,7 +15,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    //[Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    //[Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
 
 
     public class TravelApprovalRequestsController : ControllerBase
@@ -393,7 +393,7 @@ namespace AtoCash.Controllers
         // DELETE: api/TravelApprovalRequests/5
         [HttpDelete("{id}")]
         [ActionName("DeleteTravelApprovalRequest")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteTravelApprovalRequest(int id)
         {
             var travelApprovalRequest = await _context.TravelApprovalRequests.FindAsync(id);
@@ -481,6 +481,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.DepartmentId = null;
                 travelApprovalStatusTracker.ProjectId = travelApprovalRequestDTO.ProjectId;
                 travelApprovalStatusTracker.RoleId = approver.RoleId;
+                travelApprovalStatusTracker.ApprovalGroupId = _context.Employees.Find(travelApprovalRequestDTO.EmployeeId).ApprovalGroupId;
                 travelApprovalStatusTracker.ApprovalLevelId = empApprLevel; // default approval level is 2 for Project based request
                 travelApprovalStatusTracker.ReqDate = DateTime.Now;
                 travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
@@ -497,6 +498,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.ProjectId = travelApprovalRequestDTO.ProjectId;
                 travelApprovalStatusTracker.RoleId = approver.RoleId;
                 // get the next ProjectManager approval.
+                travelApprovalStatusTracker.ApprovalGroupId = _context.Employees.Find(travelApprovalRequestDTO.EmployeeId).ApprovalGroupId;
                 travelApprovalStatusTracker.ApprovalLevelId = 2; // default approval level is 2 for Project based request
                 travelApprovalStatusTracker.ReqDate = DateTime.Now;
                 travelApprovalStatusTracker.FinalApprovedDate = null;
@@ -544,8 +546,14 @@ namespace AtoCash.Controllers
         {
             //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
             #region
+
             int reqEmpid = travelApprovalRequestDto.EmployeeId;
-            int empApprGroupId = _context.Employees.Find(reqEmpid).ApprovalGroupId;
+            Employee reqEmp = _context.Employees.Find(reqEmpid);
+            int reqApprGroupId = reqEmp.ApprovalGroupId;
+            int reqRoleId = reqEmp.RoleId;
+            int maxApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId).ToList().Select(x => x.ApprovalLevel).Max(a => a.Level);
+            int reqApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId && a.RoleId == reqRoleId).Select(x => x.ApprovalLevel).FirstOrDefault().Level;
+            bool isSelfApprovedRequest = false;
 
             var travelApprovalRequest = new TravelApprovalRequest()
             {
@@ -569,24 +577,26 @@ namespace AtoCash.Controllers
             travelApprovalRequestDto.Id = travelApprovalRequest.Id;
 
             #endregion
-
-            //##### STEP 3. ClaimsApprovalTracker to be updated for all the allowed Approvers
+            
+            
             #region
+            //##### STEP 3. ClaimsApprovalTracker to be updated for all the allowed Approvers
+
             ///////////////////////////// Check if self Approved Request /////////////////////////////
-            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
-            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(reqEmpid).RoleId).FirstOrDefault().Id;
-            bool isSelfApprovedRequest = false;
+           
+
             //if highest approver is requesting Petty cash request himself
-            if (maxApprLevel == empApprLevel)
+            if (maxApprLevel == reqApprLevel)
             {
                 isSelfApprovedRequest = true;
             }
             //////////////////////////////////////////////////////////////////////////////////////////
 
-            var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).ToList().OrderBy(o => o.ApprovalLevel.Level);
 
-            var ReqEmpRoleId = _context.Employees.Where(e => e.Id == reqEmpid).FirstOrDefault().RoleId;
-            var ReqEmpHisOwnApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == ReqEmpRoleId);
+            var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps
+                                .Include(a => a.ApprovalLevel)
+                                .Where(a => a.ApprovalGroupId == reqApprGroupId)
+                                .OrderBy(o => o.ApprovalLevel.Level).ToList();
             bool isFirstApprover = true;
 
             if(isSelfApprovedRequest)
@@ -600,7 +610,8 @@ namespace AtoCash.Controllers
                     DepartmentId = _context.Employees.Find(travelApprovalRequestDto.EmployeeId).DepartmentId,
                     ProjectId = null,
                     RoleId = _context.Employees.Find(travelApprovalRequestDto.EmployeeId).RoleId,
-                    ApprovalLevelId = empApprLevel,
+                    ApprovalLevelId = reqApprLevel,
+                    ApprovalGroupId = reqApprGroupId,
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved,
@@ -613,13 +624,19 @@ namespace AtoCash.Controllers
                 {
 
                     int role_id = ApprMap.RoleId;
-                    var approver = _context.Employees.Where(e => e.RoleId == role_id).FirstOrDefault();
-
-                    if (ReqEmpRoleId >= approver.RoleId)
+                    var approver = _context.Employees.Where(e => e.RoleId == role_id && e.ApprovalGroupId == reqApprGroupId).FirstOrDefault();
+                    if (approver == null)
                     {
                         continue;
                     }
 
+                    int approverLevelid = _context.ApprovalRoleMaps.Where(x => x.RoleId == approver.RoleId && x.ApprovalGroupId == reqApprGroupId).FirstOrDefault().ApprovalLevelId;
+                    int approverLevel = _context.ApprovalLevels.Find(approverLevelid).Level;
+
+                    if (reqApprLevel >= approverLevel)
+                    {
+                        continue;
+                    }
 
 
                     TravelApprovalStatusTracker travelApprovalStatusTracker = new()
@@ -632,6 +649,7 @@ namespace AtoCash.Controllers
                         ProjectId = null,
                         RoleId = approver.RoleId,
                         ApprovalLevelId = ApprMap.ApprovalLevelId,
+                        ApprovalGroupId = reqApprGroupId,
                         ReqDate = DateTime.Now,
                         FinalApprovedDate = null,
                         ApprovalStatusTypeId = isFirstApprover ? (int)EApprovalStatus.Pending : (int)EApprovalStatus.Initiating,

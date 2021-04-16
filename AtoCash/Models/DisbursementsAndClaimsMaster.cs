@@ -63,7 +63,13 @@ namespace AtoCash.Models
 
 
         [Required]
-        public Double Amount { get; set; }
+        public Double ClaimAmount { get; set; }
+
+
+        public Double? AmountToWallet { get; set; }
+
+
+        public Double? AmountToCredit { get; set; }
 
 
         [Required]
@@ -94,7 +100,9 @@ namespace AtoCash.Models
         public DateTime RecordDate { get; set; }
 
         public int CurrencyTypeId { get; set; }
-        public Double Amount { get; set; }
+        public Double ClaimAmount { get; set; }
+        public Double? AmountToWallet { get; set; }
+        public Double? AmountToCredit { get; set; }
         public int CostCentreId { get; set; }
         public int ApprovalStatusId { get; set; }
 

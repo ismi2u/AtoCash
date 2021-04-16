@@ -14,7 +14,7 @@ namespace AtoCash.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
     public class ApprovalRoleMapsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -76,7 +76,7 @@ namespace AtoCash.Controllers
 
         // PUT: api/ApprovalRoleMaps/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutApprovalRoleMap(int id, ApprovalRoleMapDTO approvalRoleMapDto)
         {
             if (id != approvalRoleMapDto.Id)
@@ -117,7 +117,7 @@ namespace AtoCash.Controllers
 
         // POST: api/ApprovalRoleMaps
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<ActionResult<ApprovalRoleMap>> PostApprovalRoleMap(ApprovalRoleMapDTO approvalRoleMapDto)
         {
             var AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.RoleId == approvalRoleMapDto.RoleId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
@@ -126,6 +126,13 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Approval Role Map Already Exists" });
             }
 
+
+            //Check for Duplicate Levels in the same group
+             AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
+            if (AprvRolMap != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Group Duplicate Approval Levels are Not allowed !" });
+            }
 
             ApprovalRoleMap approvalRoleMap = new ApprovalRoleMap
             {
@@ -143,7 +150,7 @@ namespace AtoCash.Controllers
 
         // DELETE: api/ApprovalRoleMaps/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteApprovalRoleMap(int id)
         {
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);

@@ -14,7 +14,7 @@ namespace AtoCash.Controllers.BasicControlrs
 {
     [Route("api/[controller]/[Action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
     public class CurrencyTypesController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
@@ -100,7 +100,7 @@ namespace AtoCash.Controllers.BasicControlrs
         // PUT: api/CurrencyTypes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutCurrencyType(int id, CurrencyTypeDTO currencyTypeDTO)
         {
             if (id != currencyTypeDTO.Id)
@@ -140,11 +140,11 @@ namespace AtoCash.Controllers.BasicControlrs
         // POST: api/CurrencyTypes
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
-        public async Task<ActionResult<CurrencyType>> PostCurrencyType(CurrencyType currencyType)
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
+        public async Task<ActionResult<CurrencyType>> PostCurrencyType(CurrencyTypeDTO currencyTypeDto)
         {
 
-            var curncyType = _context.CurrencyTypes.Where(c => c.CurrencyCode == currencyType.CurrencyCode).FirstOrDefault();
+            var curncyType = _context.CurrencyTypes.Where(c => c.CurrencyCode == currencyTypeDto.CurrencyCode).FirstOrDefault();
             if (curncyType != null)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Currency Already Exists" });
@@ -152,20 +152,20 @@ namespace AtoCash.Controllers.BasicControlrs
 
             CurrencyType currencyTyp = new();
 
-            currencyTyp.CurrencyCode = currencyType.CurrencyCode;
-            currencyTyp.CurrencyName = currencyType.CurrencyName;
-            currencyTyp.Country = currencyType.Country;
-            currencyTyp.StatusTypeId = currencyType.StatusTypeId;
+            currencyTyp.CurrencyCode = currencyTypeDto.CurrencyCode;
+            currencyTyp.CurrencyName = currencyTypeDto.CurrencyName;
+            currencyTyp.Country = currencyTypeDto.Country;
+            currencyTyp.StatusTypeId = currencyTypeDto.StatusTypeId;
 
             _context.CurrencyTypes.Add(currencyTyp);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCurrencyType", new { id = currencyType.Id }, currencyType);
+            return CreatedAtAction("GetCurrencyType", new { id = currencyTypeDto.Id }, currencyTyp);
         }
 
         // DELETE: api/CurrencyTypes/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "AtominosAdmin, Finmgr, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteCurrencyType(int id)
         {
             var emp = _context.Employees.Where(e => e.CurrencyTypeId == id).FirstOrDefault();

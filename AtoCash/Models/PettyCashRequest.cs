@@ -72,8 +72,8 @@ namespace AtoCash.Models
 
         public string CurrencyType { get; set; }
         public int CurrencyTypeId { get; set; }
-        public Double PettyClaimAmount { get; set; }
 
+        public Double PettyClaimAmount { get; set; }
         public string PettyClaimRequestDesc { get; set; }
 
         public DateTime CashReqDate { get; set; }

@@ -35,6 +35,18 @@ namespace AtoCash.Models
         public int? ProjectId { get; set; }
 
 
+        [ForeignKey("SubProjectId")]
+        public virtual SubProject SubProject { get; set; }
+        public int? SubProjectId { get; set; }
+
+
+        [ForeignKey("WorkTaskId")]
+        public virtual WorkTask WorkTask { get; set; }
+        public int? WorkTaskId { get; set; }
+
+        [Required]
+        public int ApprovalGroupId { get; set; }
+
         //Approver Role
         [Required]
         [ForeignKey("RoleId")]
@@ -84,6 +96,9 @@ namespace AtoCash.Models
 
         public int? WorkTaskId { get; set; }
         public string WorkTask { get; set; }
+
+
+        public int ApprovalGroupId { get; set; }
 
         public int RoleId { get; set; }
         public string JobRole { get; set; }

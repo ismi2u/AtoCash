@@ -13,7 +13,7 @@ namespace AtoCash.Authentication
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    [Authorize(Roles = "AtominosAdmin, Finmgr, Admin, User")]
+    [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
     public class AdministrationController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> roleManager;
