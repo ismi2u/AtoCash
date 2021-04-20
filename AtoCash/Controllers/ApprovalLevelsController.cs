@@ -159,7 +159,7 @@ namespace AtoCash.Controllers
             _context.ApprovalLevels.Remove(approvalLevel);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Approval Level Deleted!" });
         }
 
         private bool ApprovalLevelExists(int id)

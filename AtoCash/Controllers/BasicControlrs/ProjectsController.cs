@@ -37,8 +37,7 @@ namespace AtoCash.Controllers
                 ProjectVM projectVM = new ProjectVM
                 {
                     Id = project.Id,
-                    ProjectName = project.ProjectName,
-                    ProjectDesc = project.ProjectDesc
+                    ProjectName = project.ProjectName + "-" + project.ProjectDesc
                 };
 
                 ListProjectVM.Add(projectVM);
@@ -218,7 +217,7 @@ namespace AtoCash.Controllers
             _context.Projects.Remove(project);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Project Deleted!" });
         }
 
         private bool ProjectExists(int id)

@@ -34,17 +34,56 @@ namespace AtoCash.Controllers
 
             foreach (ApprovalRoleMap approvalRoleMap in approvalRoleMaps)
             {
-                ApprovalRoleMapDTO approvalRoleMapDTO = new ApprovalRoleMapDTO
-                {
-                    Id = approvalRoleMap.Id,
-                    ApprovalGroupId = approvalRoleMap.ApprovalGroupId,
-                    ApprovalGroup = _context.ApprovalGroups.Find(approvalRoleMap.ApprovalGroupId).ApprovalGroupCode,
-                    RoleId = approvalRoleMap.RoleId,
-                    Role = _context.JobRoles.Find(approvalRoleMap.RoleId).RoleCode,
-                    ApprovalLevelId = approvalRoleMap.ApprovalLevelId,
-                    ApprovalLevel = _context.ApprovalLevels.Find(approvalRoleMap.ApprovalLevelId).Level
+                ApprovalRoleMapDTO approvalRoleMapDTO = new();
 
-                };
+
+                approvalRoleMapDTO.Id = approvalRoleMap.Id;
+                approvalRoleMapDTO.ApprovalGroupId = approvalRoleMap.ApprovalGroupId;
+                approvalRoleMapDTO.ApprovalGroup = _context.ApprovalGroups.Find(approvalRoleMap.ApprovalGroupId).ApprovalGroupCode;
+                approvalRoleMapDTO.RoleId = approvalRoleMap.RoleId;
+                approvalRoleMapDTO.Role = _context.JobRoles.Find(approvalRoleMap.RoleId).RoleCode;
+                approvalRoleMapDTO.ApprovalLevelId = approvalRoleMap.ApprovalLevelId;
+                approvalRoleMapDTO.ApprovalLevel = _context.ApprovalLevels.Find(approvalRoleMap.ApprovalLevelId).Level;
+
+
+                int empCount = _context.Employees.Where(e => e.ApprovalGroupId == approvalRoleMap.ApprovalGroupId && e.RoleId == approvalRoleMap.RoleId).Count();
+                var employeeAssigned = _context.Employees.Where(e => e.ApprovalGroupId == approvalRoleMap.ApprovalGroupId && e.RoleId == approvalRoleMap.RoleId).FirstOrDefault();
+                
+                string empName = string.Empty;
+                int ApprvLevel = _context.ApprovalLevels.Find(approvalRoleMap.ApprovalLevelId).Level;
+                if (ApprvLevel != 1)
+                {
+                    if (employeeAssigned != null)
+                    {
+                        empName = employeeAssigned.GetFullName();
+                    }
+                    else
+                    {
+                        empName = "UnAssigned";
+                    }
+                }
+                else
+                {
+
+                    if (empCount > 1)
+                    {
+                        if (employeeAssigned != null)
+                        {
+                            empName = "Total Employees Assigned =" + empCount;
+                        }
+                       
+                    }
+                    else if(empCount == 1)
+                    {
+                        empName = employeeAssigned.GetFullName();
+                    }
+                     else
+                    {
+                        empName = "UnAssigned";
+                    }
+                }
+                approvalRoleMapDTO.EmployeeName = empName;
+
 
                 ListApprovalRoleMapDTO.Add(approvalRoleMapDTO);
 
@@ -84,7 +123,7 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
- 
+
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);
 
             approvalRoleMap.Id = approvalRoleMapDto.Id;
@@ -128,7 +167,7 @@ namespace AtoCash.Controllers
 
 
             //Check for Duplicate Levels in the same group
-             AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
+            AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
             if (AprvRolMap != null)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Group Duplicate Approval Levels are Not allowed !" });
@@ -162,7 +201,7 @@ namespace AtoCash.Controllers
             _context.ApprovalRoleMaps.Remove(approvalRoleMap);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Approval Role Map Deleted!" });
         }
 
         private bool ApprovalRoleMapExists(int id)

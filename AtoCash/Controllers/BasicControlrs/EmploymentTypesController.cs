@@ -116,7 +116,7 @@ namespace AtoCash.Controllers
             _context.EmploymentTypes.Remove(employmentType);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Employment Type Deleted!" });
         }
 
         private bool EmploymentTypeExists(int id)

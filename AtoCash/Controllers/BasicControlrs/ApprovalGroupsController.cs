@@ -135,7 +135,7 @@ namespace AtoCash.Controllers
             _context.ApprovalGroups.Remove(approvalGroup);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Approval Group Deleted!" });
         }
 
         private bool ApprovalGroupExists(int id)

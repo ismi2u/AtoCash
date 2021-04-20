@@ -113,7 +113,7 @@ namespace AtoCash.Controllers
             _context.ApprovalStatusTypes.Remove(approvalStatusType);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Approval Status Type Deleted!" });
         }
 
         private bool ApprovalStatusTypeExists(int id)

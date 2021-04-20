@@ -186,7 +186,7 @@ namespace AtoCash.Controllers
             _context.Departments.Remove(department);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Department Deleted!" });
         }
 
         private bool DepartmentExists(int id)

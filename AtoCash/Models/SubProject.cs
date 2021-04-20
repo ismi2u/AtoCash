@@ -42,6 +42,5 @@ namespace AtoCash.Models
     {
         public int Id { get; set; }
         public string SubProjectName { get; set; }
-        public string SubProjectDesc { get; set; }
     }
 }

@@ -61,7 +61,7 @@ namespace AtoCash.Controllers
 
             }
 
-            return ListClaimApprovalStatusTrackerDTO;
+            return ListClaimApprovalStatusTrackerDTO.OrderByDescending(o => o.ReqDate).ToList();
         }
 
         // GET: api/ClaimApprovalStatusTrackers/5
@@ -122,6 +122,7 @@ namespace AtoCash.Controllers
 
 
             bool isNextApproverAvailable = true;
+            bool bRejectMessage = false;
             foreach (ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDto in ListClaimApprovalStatusTrackerDto)
             {
                 var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(claimApprovalStatusTrackerDto.Id);
@@ -132,6 +133,10 @@ namespace AtoCash.Controllers
                     continue;
                 }
 
+                if (claimApprovalStatusTrackerDto.ApprovalStatusTypeId == (int)EApprovalStatus.Rejected)
+                {
+                    bRejectMessage = true;
+                }
                 claimApprovalStatusTracker.Id = claimApprovalStatusTrackerDto.Id;
                 claimApprovalStatusTracker.EmployeeId = claimApprovalStatusTrackerDto.EmployeeId;
                 claimApprovalStatusTracker.PettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId;
@@ -179,11 +184,17 @@ namespace AtoCash.Controllers
                         //if claimitem is not null change the status
                         if (isNextApproverAvailable)
                         {
+
+
                             claimitem = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == qPettyCashRequestId &&
                                 c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
                                  c.ApprovalGroupId == empApprGroupId &&
                                 c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
-                            claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
+
+                            if (claimitem != null)
+                            {
+                                claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
+                            }
 
                         }
                         else
@@ -196,6 +207,14 @@ namespace AtoCash.Controllers
                             //claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                             claimitem.FinalApprovedDate = DateTime.Now;
 
+
+                            //final Approver hence updating ExpenseReimburseRequest table
+                            var pettyCashRequest = _context.PettyCashRequests.Find(qPettyCashRequestId);
+                            pettyCashRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                            pettyCashRequest.ApprovedDate = DateTime.Now;
+                            _context.Update(pettyCashRequest);
+
+
                             //DisbursementAndClaimsMaster update the record to Approved (ApprovalStatusId
                             int disbAndClaimItemId = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == claimitem.PettyCashRequestId).FirstOrDefault().Id;
                             var disbAndClaimItem = await _context.DisbursementsAndClaimsMasters.FindAsync(disbAndClaimItemId);
@@ -205,7 +224,7 @@ namespace AtoCash.Controllers
                         }
 
                         //Save to database
-                        _context.Update(claimitem);
+                        if (claimitem != null) { _context.Update(claimitem); };
                         await _context.SaveChangesAsync();
 
                         int reqApprGroupId = _context.Employees.Find(claimApprovalStatusTrackerDto.EmployeeId).ApprovalGroupId;
@@ -276,7 +295,20 @@ namespace AtoCash.Controllers
                 throw;
             }
 
-            return Ok(new RespStatus { Status = "Success", Message = "Cash Advances is/are Approved!" });
+            RespStatus respStatus = new();
+            
+            if (bRejectMessage)
+            {
+                respStatus.Status = "Success";
+                respStatus.Message = "Cash Advance(s) Rejected!";
+            }
+            else
+            {
+                respStatus.Status = "Success";
+                respStatus.Message = "Cash Advance(s) Approved!";
+            }
+
+            return Ok(respStatus);
         }
 
 
@@ -322,7 +354,7 @@ namespace AtoCash.Controllers
             _context.ClaimApprovalStatusTrackers.Remove(claimApprovalStatusTracker);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Claim Deleted!" });
         }
 
         //private bool ClaimApprovalStatusTrackerExists(int id)
@@ -356,7 +388,9 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Role Id is Invalid" });
             }
 
-            var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending);
+            var test = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending ).ToList();
+
+            var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending || r.RoleId == roleid && r.ApprovalStatusTypeId == 2);
             List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new();
 
             foreach (ClaimApprovalStatusTracker claimApprovalStatusTracker in claimApprovalStatusTrackers)
@@ -387,7 +421,7 @@ namespace AtoCash.Controllers
             }
 
 
-            return Ok(ListClaimApprovalStatusTrackerDTO);
+            return Ok(ListClaimApprovalStatusTrackerDTO.OrderByDescending(o => o.ReqDate).ToList());
 
         }
 
@@ -458,15 +492,14 @@ namespace AtoCash.Controllers
                         .Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault();
                 }
 
-                ApprovalStatusFlowVM approvalStatusFlow = new()
-                {
-                    ApprovalLevel = claim.ApprovalLevelId,
-                    ApproverRole = _context.JobRoles.Find(claim.RoleId).RoleName,
-                    ApproverName = claimApproverName,
-                    ApprovedDate = claim.FinalApprovedDate,
-                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(claim.ApprovalStatusTypeId).Status
+                ApprovalStatusFlowVM approvalStatusFlow = new();
+                approvalStatusFlow.ApprovalLevel = claim.ApprovalLevelId;
+                approvalStatusFlow.ApproverRole = claim.ProjectId == null ? _context.JobRoles.Find(claim.RoleId).RoleName : "Project Manager";
+                approvalStatusFlow.ApproverName = claimApproverName;
+                approvalStatusFlow.ApprovedDate = claim.FinalApprovedDate;
+                approvalStatusFlow.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claim.ApprovalStatusTypeId).Status;
 
-                };
+
                 ListApprovalStatusFlow.Add(approvalStatusFlow);
             }
 

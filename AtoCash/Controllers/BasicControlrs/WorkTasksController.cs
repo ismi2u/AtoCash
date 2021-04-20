@@ -37,8 +37,7 @@ namespace AtoCash.Controllers
                 WorkTaskVM workTaskVM = new WorkTaskVM
                 {
                     Id = workTask.Id,
-                    TaskName = workTask.TaskName,
-                    TaskDesc = workTask.TaskDesc
+                    TaskName = workTask.TaskName + "-" + workTask.TaskDesc
                 };
 
                 ListWorkTaskVM.Add(workTaskVM);
@@ -228,7 +227,7 @@ namespace AtoCash.Controllers
             _context.WorkTasks.Remove(workTask);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Work-Task Deleted!" });
         }
 
         private bool WorkTaskExists(int id)

@@ -133,12 +133,22 @@ namespace AtoCash.Controllers
         [ActionName("GetEmpCashBalanceVsAdvanced")]
         public ActionResult<CashbalVsAdvancedVM> GetEmpCashBalanceVsAdvanced(int id)
         {
-            CashbalVsAdvancedVM cashbalVsAdvancedVM = new CashbalVsAdvancedVM()
+            if (id ==0) // atominos admin doesnt have a wallet balance
             {
-                CurCashBal = _context.EmpCurrentPettyCashBalances.Find(id).CurBalance,
-                MaxCashAllowed = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed
+                return Ok(new CashbalVsAdvancedVM()
+                {
+                    CurCashBal = 0,
+                    MaxCashAllowed = 0
 
-            };
+                });
+            }
+
+            CashbalVsAdvancedVM cashbalVsAdvancedVM = new();
+
+            cashbalVsAdvancedVM.CurCashBal = _context.EmpCurrentPettyCashBalances.Where(b => b.EmployeeId == id).FirstOrDefault().CurBalance;
+            cashbalVsAdvancedVM.MaxCashAllowed = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed;
+
+
             return Ok(cashbalVsAdvancedVM);
         }
 

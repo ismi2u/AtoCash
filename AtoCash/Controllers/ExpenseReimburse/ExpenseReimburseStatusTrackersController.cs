@@ -85,15 +85,12 @@ namespace AtoCash.Controllers.ExpenseReimburse
                         .Select(s => s.FirstName + " " + s.MiddleName + " " + s.LastName).FirstOrDefault();
                 }
 
-                ApprovalStatusFlowVM approvalStatusFlow = new()
-                {
-                    ApprovalLevel = claim.ApprovalLevelId,
-                    ApproverRole = _context.JobRoles.Find(claim.JobRoleId).RoleName,
-                    ApproverName = claimApproverName,
-                    ApprovedDate = claim.ApprovedDate,
-                    ApprovalStatusType = _context.ApprovalStatusTypes.Find(claim.ApprovalStatusTypeId).Status
-
-                };
+                ApprovalStatusFlowVM approvalStatusFlow = new();
+                approvalStatusFlow.ApprovalLevel = claim.ApprovalLevelId;
+                approvalStatusFlow.ApproverRole = claim.ProjectId == null ? _context.JobRoles.Find(claim.JobRoleId).RoleName : "Project Manager";
+                approvalStatusFlow.ApproverName = claimApproverName;
+                approvalStatusFlow.ApprovedDate = claim.ApprovedDate;
+                approvalStatusFlow.ApprovalStatusType = _context.ApprovalStatusTypes.Find(claim.ApprovalStatusTypeId).Status;
                 ListApprovalStatusFlow.Add(approvalStatusFlow);
             }
 
@@ -160,7 +157,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
             }
 
 
-            return Ok(ListExpenseReimburseStatusTrackerDTO);
+            return Ok(ListExpenseReimburseStatusTrackerDTO.OrderByDescending(o => o.ExpReimReqDate).ToList());
 
         }
 
@@ -203,6 +200,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
 
 
             bool isNextApproverAvailable = true;
+            bool bRejectMessage = false;
             foreach (ExpenseReimburseStatusTrackerDTO expenseReimburseStatusTrackerDto in ListExpenseReimburseStatusTrackerDto)
             {
                 var expenseReimburseStatusTracker = await _context.ExpenseReimburseStatusTrackers.FindAsync(expenseReimburseStatusTrackerDto.Id);
@@ -213,6 +211,10 @@ namespace AtoCash.Controllers.ExpenseReimburse
                     continue;
                 }
 
+                if (expenseReimburseStatusTrackerDto.ApprovalStatusTypeId == (int)EApprovalStatus.Rejected)
+                {
+                    bRejectMessage = true;
+                }
                 expenseReimburseStatusTracker.Id = expenseReimburseStatusTrackerDto.Id;
                 expenseReimburseStatusTracker.EmployeeId = expenseReimburseStatusTrackerDto.EmployeeId;
                 expenseReimburseStatusTracker.ExpenseReimburseRequestId = expenseReimburseStatusTrackerDto.ExpenseReimburseRequestId;
@@ -267,7 +269,11 @@ namespace AtoCash.Controllers.ExpenseReimburse
                                 c.ApprovalStatusTypeId == qApprovalStatusTypeId &&
                                  c.ApprovalGroupId == empApprGroupId &&
                                 c.ApprovalLevelId == qApprovalLevelId).FirstOrDefault();
-                            claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
+
+                            if (claimitem != null)
+                            {
+                                claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
+                            }
 
                         }
                         else
@@ -280,6 +286,14 @@ namespace AtoCash.Controllers.ExpenseReimburse
                             //claimitem.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                             claimitem.ApprovedDate = DateTime.Now;
 
+
+                            //final Approver hence updating ExpenseReimburseRequest table
+                            var expenseReimburseRequest = _context.ExpenseReimburseRequests.Find(qExpReimRequestId);
+                            expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                            expenseReimburseRequest.ApprovedDate = DateTime.Now;
+                            _context.Update(expenseReimburseRequest);
+
+
                             //DisbursementAndClaimsMaster update the record to Approved (ApprovalStatusId
                             int disbAndClaimItemId = _context.DisbursementsAndClaimsMasters.Where(d => d.ExpenseReimburseReqId == claimitem.ExpenseReimburseRequestId).FirstOrDefault().Id;
                             var disbAndClaimItem = await _context.DisbursementsAndClaimsMasters.FindAsync(disbAndClaimItemId);
@@ -289,7 +303,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                         }
 
                         //Save to database
-                        _context.Update(claimitem);
+                        if (claimitem != null) { _context.Update(claimitem); };
                         await _context.SaveChangesAsync();
                         int reqApprGroupId = _context.Employees.Find(expenseReimburseStatusTrackerDto.EmployeeId).ApprovalGroupId;
                         var getEmpClaimApproversAllLevels = _context.ApprovalRoleMaps.Include(a => a.ApprovalLevel).Where(a => a.ApprovalGroupId == reqApprGroupId).OrderBy(o => o.ApprovalLevel.Level).ToList();
@@ -305,16 +319,20 @@ namespace AtoCash.Controllers.ExpenseReimburse
 
                                 //##### 4. Send email to the Approver
                                 //####################################
+
+
+
+
                                 var approverMailAddress = approver.Email;
-                                string subject = "Expense Reimburse Request " + expenseReimburseStatusTracker.ExpenseReimburseRequestId.ToString();
-                                Employee emp = await _context.Employees.FindAsync(expenseReimburseStatusTracker.EmployeeId);
                                 var expReimReqt = _context.ExpenseReimburseRequests.Find(expenseReimburseStatusTracker.ExpenseReimburseRequestId);
-                                string content = "Expense Reimburse Request by " + emp.FirstName + "<br/>Total Claim for the amount of " + expReimReqt.TotalClaimAmount + "<br/>towards " + expReimReqt.ExpenseReportTitle;
+                                string subject = expReimReqt.ExpenseReportTitle + " - #" + expenseReimburseStatusTracker.ExpenseReimburseRequest.Id.ToString();
+                                Employee emp = _context.Employees.Find(expenseReimburseStatusTracker.EmployeeId);
+                                string content = "Expense Reimbursement request Approval sought by " + emp.FirstName + "<br/>for the amount of " + expReimReqt.TotalClaimAmount + "<br/>towards " + expReimReqt.ExpenseReportTitle;
                                 var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
 
                                 await _emailSender.SendEmailAsync(messagemail);
-
                                 break;
+
 
                             }
                         }
@@ -359,32 +377,22 @@ namespace AtoCash.Controllers.ExpenseReimburse
                 throw;
             }
 
-            return Ok(new RespStatus { Status = "Success", Message = "Expense-Reimburse Requests is/are Approved!" });
 
-            //if (id != expenseReimburseStatusTracker.Id)
-            //{
-            //    return BadRequest();
-            //}
+            RespStatus respStatus = new();
 
-            //_context.Entry(expenseReimburseStatusTracker).State = EntityState.Modified;
+            if (bRejectMessage)
+            {
+                respStatus.Status = "Success";
+                respStatus.Message = "Expense-Reimburse Request(s) Rejected!";
+            }
+            else
+            {
+                respStatus.Status = "Success";
+                respStatus.Message = "Expense-Reimburse Request(s) Approved!";
+            }
 
-            //try
-            //{
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!ExpenseReimburseStatusTrackerExists(id))
-            //    {
-            //        return NotFound();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
-
-            //return NoContent();
+            return Ok(respStatus);
+           
         }
 
         // POST: api/ExpenseReimburseStatusTrackers

@@ -68,7 +68,7 @@ namespace AtoCash.Controllers
                 ListTravelApprovalRequestDTO.Add(travelApprovalRequestDTO);
             }
 
-            return ListTravelApprovalRequestDTO;
+            return ListTravelApprovalRequestDTO.OrderByDescending(o => o.ReqRaisedDate).ToList();
         }
 
 
@@ -176,97 +176,35 @@ namespace AtoCash.Controllers
             }
 
 
-            return Ok(TravelApprovalRequestDTOs);
+            return Ok(TravelApprovalRequestDTOs.OrderByDescending(o => o.ReqRaisedDate).ToList());
         }
 
 
-
         [HttpGet("{id}")]
-        [ActionName("CountTravelApprovalRequestRaisedByEmployee")]
-        public async Task<ActionResult<int>> CountTravelApprovalRequestRaisedByEmployee(int id)
+        [ActionName("CountAllTravelRequestRaisedByEmployee")]
+        public async Task<ActionResult> CountAllTravelRequestRaisedByEmployee(int id)
         {
             var employee = await _context.Employees.FindAsync(id);
 
             if (employee == null)
             {
-                return NoContent();
+                return Ok(0);
             }
 
-            var TravelApprovalRequests = await _context.TravelApprovalRequests.Where(p => p.EmployeeId == id).ToListAsync();
+            var travelApprovalRequests = await _context.TravelApprovalRequests.Where(p => p.EmployeeId == id).ToListAsync();
 
-            if (TravelApprovalRequests == null)
+            if (travelApprovalRequests == null)
             {
-                return NoContent();
+                return Ok(0);
             }
 
-            List<TravelApprovalRequestDTO> TravelApprovalRequestDTOs = new();
+            int TotalCount = _context.TravelApprovalRequests.Where(c => c.EmployeeId == id).Count();
+            int PendingCount = _context.TravelApprovalRequests.Where(c => c.EmployeeId == id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Pending).Count();
+            int RejectedCount = _context.TravelApprovalRequests.Where(c => c.EmployeeId == id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Rejected).Count();
+            int ApprovedCount = _context.TravelApprovalRequests.Where(c => c.EmployeeId == id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
 
-            foreach (var travelApprovalRequest in TravelApprovalRequests)
-            {
-                TravelApprovalRequestDTO travelApprovalRequestDTO = new();
-
-                travelApprovalRequestDTO.Id = travelApprovalRequest.Id;
-                travelApprovalRequestDTO.EmployeeId = travelApprovalRequest.EmployeeId;
-                travelApprovalRequestDTO.EmployeeName = _context.Employees.Find(travelApprovalRequest.EmployeeId).GetFullName();
-                travelApprovalRequestDTO.TravelStartDate = travelApprovalRequest.TravelStartDate;
-                travelApprovalRequestDTO.TravelEndDate = travelApprovalRequest.TravelEndDate;
-                travelApprovalRequestDTO.TravelPurpose = travelApprovalRequest.TravelPurpose;
-                travelApprovalRequestDTO.ReqRaisedDate = travelApprovalRequest.ReqRaisedDate;
-                travelApprovalRequestDTO.DepartmentId = travelApprovalRequest.DepartmentId;
-                travelApprovalRequestDTO.Department = travelApprovalRequest.DepartmentId != null ? _context.Departments.Find(travelApprovalRequest.DepartmentId).DeptCode : null;
-                travelApprovalRequestDTO.ProjectId = travelApprovalRequest.ProjectId;
-                travelApprovalRequestDTO.Project = travelApprovalRequest.ProjectId != null ? _context.Projects.Find(travelApprovalRequest.ProjectId).ProjectName : null;
-                travelApprovalRequestDTO.SubProjectId = travelApprovalRequest.SubProjectId;
-                travelApprovalRequestDTO.SubProject = travelApprovalRequest.SubProjectId != null ? _context.SubProjects.Find(travelApprovalRequest.SubProjectId).SubProjectName : null;
-                travelApprovalRequestDTO.WorkTaskId = travelApprovalRequest.WorkTaskId;
-                travelApprovalRequestDTO.WorkTask = travelApprovalRequest.WorkTaskId != null ? _context.WorkTasks.Find(travelApprovalRequest.WorkTaskId).TaskName : null;
-                travelApprovalRequestDTO.ApprovalStatusTypeId = travelApprovalRequest.ApprovalStatusTypeId;
-                travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
-                travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
-
-
-                TravelApprovalRequestDTOs.Add(travelApprovalRequestDTO);
-            }
-
-
-            return Ok(TravelApprovalRequestDTOs.Count);
+            return Ok(new { TotalCount, PendingCount, RejectedCount, ApprovedCount });
         }
-
-
-        [HttpGet("{id}")]
-        [ActionName("CountTravelApprovalReqInPendingRaisedByEmployee")]
-        public async Task<ActionResult<int>> CountTravelApprovalReqInPendingRaisedByEmployee(int id)
-        {
-            var employee = await _context.Employees.FindAsync(id);
-
-            if (employee == null)
-            {
-                return NoContent();
-            }
-
-            //debug
-            //(int)EApprovalStatus.Pending
-            List<TravelApprovalStatusTracker> lists = _context.TravelApprovalStatusTrackers.Where(t => t.EmployeeId == id).ToList();
-
-            var travelApprovalsOfEmployee = await _context.TravelApprovalStatusTrackers.Where(t => t.EmployeeId == id).Select(p => p.TravelApprovalRequestId).Distinct().ToListAsync();
-
-            foreach (var item in travelApprovalsOfEmployee)
-            {
-                string test = item.ToString();
-
-            }
-
-            if (travelApprovalsOfEmployee == null)
-            {
-                return NoContent();
-            }
-
-
-
-            return Ok(travelApprovalsOfEmployee.Count);
-
-        }
-
 
 
         [HttpGet]
@@ -405,7 +343,7 @@ namespace AtoCash.Controllers
             _context.TravelApprovalRequests.Remove(travelApprovalRequest);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Travel Approval Request Deleted!" });
         }
 
         private bool TravelApprovalRequestExists(int id)
@@ -431,6 +369,9 @@ namespace AtoCash.Controllers
             int projManagerid = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).ProjectManagerId;
             var approver = _context.Employees.Find(projManagerid);
             int reqEmpid = travelApprovalRequestDTO.EmployeeId;
+            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
+            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(reqEmpid).RoleId).FirstOrDefault().Id;
+            bool isSelfApprovedRequest = false;
             #endregion
 
             //### 1. If Employee Travel Request enter a record in TravelApprovalRequestTracker
@@ -462,9 +403,7 @@ namespace AtoCash.Controllers
             #region
 
             ///////////////////////////// Check if self Approved Request /////////////////////////////
-            int maxApprLevel = _context.ApprovalRoleMaps.Max(a => a.ApprovalLevelId);
-            int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(reqEmpid).RoleId).FirstOrDefault().Id;
-            bool isSelfApprovedRequest = false;
+
             //if highest approver is requesting Petty cash request himself
             if (maxApprLevel == empApprLevel)
             {
@@ -566,7 +505,7 @@ namespace AtoCash.Controllers
                 ProjectId = travelApprovalRequestDto.ProjectId,
                 SubProjectId = travelApprovalRequestDto.SubProjectId,
                 WorkTaskId = travelApprovalRequestDto.WorkTaskId,
-                ApprovalStatusTypeId = (int)EApprovalStatus.Initiating
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending
 
 
             };

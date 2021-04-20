@@ -135,7 +135,7 @@ namespace AtoCash.Controllers
             _context.JobRoles.Remove(role);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Jobrole Deleted!" });
         }
 
         private bool RoleExists(int id)

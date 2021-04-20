@@ -38,7 +38,9 @@ namespace AtoCash.Controllers
                 {
                     Id = projMgt.Id,
                     ProjectId = projMgt.ProjectId,
-                    EmployeeId = projMgt.EmployeeId
+                    ProjectName = _context.Projects.Find(projMgt.ProjectId).ProjectName,
+                    EmployeeId = projMgt.EmployeeId,
+                    EmployeeName = _context.Employees.Find(projMgt.EmployeeId).GetFullName()
                 };
 
                 ListProjectManagementDTO.Add(projectmgmtDTO);
@@ -71,7 +73,6 @@ namespace AtoCash.Controllers
 
         [HttpGet("{id}")]
         [ActionName("GetProjectsByEmployee")]
-        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
         public async Task<ActionResult<IEnumerable<ProjectVM>>> GetProjectsByEmployee(int id)
         {
             var ProjMgmtItems = _context.ProjectManagements.Include("Projects").Where(p => p.EmployeeId == id).Select(s => new { s.ProjectId, s.Project.ProjectName, s.Project.ProjectDesc });
@@ -82,8 +83,8 @@ namespace AtoCash.Controllers
                 ProjectVM projectVM = new ProjectVM
                 {
                     Id = ProjMgmt.ProjectId,
-                    ProjectName = ProjMgmt.ProjectName,
-                    ProjectDesc = ProjMgmt.ProjectDesc
+                    ProjectName = ProjMgmt.ProjectName
+
                 };
 
                 ListProjectVM.Add(projectVM);
@@ -91,6 +92,72 @@ namespace AtoCash.Controllers
            
          
             return ListProjectVM;
+
+        }
+
+
+        /// <summary>
+        /// Get employees by Project Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>if the employee is assigned to the project or Not </returns>
+
+        [HttpGet("{id}")]
+        [ActionName("GetEmployeesByProjectId")]
+        public async Task<ActionResult<List<GetEmployeesForProject>>> GetEmployeesByProjectId(int id)
+        {
+            //var ProjMgmtItems = await _context.ProjectManagements.Where(p => p.ProjectId == id).ToListAsync();
+            List<GetEmployeesForProject> ListProjectEmployees = new();
+
+            var allEmployees = await _context.Employees.ToListAsync();
+
+
+            foreach (Employee emp in allEmployees)
+            {
+                GetEmployeesForProject projEmployee = new();
+
+                projEmployee.EmployeeId = emp.Id;
+                projEmployee.EmployeeName = _context.Employees.Find(emp.Id).GetFullName();
+                projEmployee.isAssigned = _context.ProjectManagements.Where(p => p.EmployeeId == emp.Id && p.ProjectId == id).Any() ? true : false;
+
+                ListProjectEmployees.Add(projEmployee);
+            }
+
+            return Ok(ListProjectEmployees);
+
+        }
+
+
+        [HttpPost]
+        [ActionName("AddEmployeesToProject")]
+        public async Task<ActionResult> AddEmployeesToProject(AddEmployeesToProjectId model)
+        {
+
+            int projId = model.ProjectId;
+            var project = _context.Projects.Find(projId);
+
+           if(projId == 0 || project == null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "ProjectId is Invalid" });
+            }
+
+           //remove previous entries.
+           List<ProjectManagement> ProjMgmtItems = await _context.ProjectManagements.Where(p => p.ProjectId == projId).ToListAsync();
+            _context.ProjectManagements.RemoveRange(ProjMgmtItems);
+
+
+            //add new entries
+            foreach(var empid in model.EmployeeIds)
+            {
+                ProjectManagement projectManagement = new();
+                projectManagement.EmployeeId = empid;
+                projectManagement.ProjectId = projId;
+
+                _context.ProjectManagements.Add(projectManagement);
+            }
+
+            await _context.SaveChangesAsync();
+            return Ok(new RespStatus { Status = "Success", Message = "Project assigned to Employees!" });
 
         }
 
@@ -138,7 +205,8 @@ namespace AtoCash.Controllers
         [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<ActionResult<ProjectManagement>> PostProjectManagement(ProjectManagementDTO projectManagementDTO)
         {
-            var projassigned = _context.ProjectManagements.Where(p => p.EmployeeId == projectManagementDTO.EmployeeId && p.EmployeeId == projectManagementDTO.ProjectId).FirstOrDefault();
+
+            var projassigned = _context.ProjectManagements.Where(p => p.EmployeeId == projectManagementDTO.EmployeeId && p.ProjectId == projectManagementDTO.ProjectId).FirstOrDefault();
 
             if (projassigned !=null)
             {
@@ -156,7 +224,7 @@ namespace AtoCash.Controllers
             await _context.SaveChangesAsync();
 
 
-            return CreatedAtAction("GetProjectManagement", new { id = projectManagement.Id }, projectManagement);
+            return Ok(new RespStatus { Status = "Success", Message = "Employee is assigned to the Project" });
         }
 
         // DELETE: api/ProjectManagement/5
@@ -173,7 +241,7 @@ namespace AtoCash.Controllers
             _context.ProjectManagements.Remove(projectManagement);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Project Maangement Item Deleted!" });
         }
 
         private bool ProjectManagementExists(int id)

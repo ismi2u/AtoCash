@@ -118,13 +118,13 @@ namespace AtoCash.Controllers.ExpenseReimburse
             expenseSubClaimsDto.CurrencyType = _context.CurrencyTypes.Find(expReimReq.CurrencyTypeId).CurrencyCode;
             expenseSubClaimsDto.ExpenseTypeId = expenseSubClaim.ExpenseTypeId;
             expenseSubClaimsDto.ExpenseType = _context.ExpenseTypes.Find(expenseSubClaim.ExpenseTypeId).ExpenseTypeName;
-            expenseSubClaimsDto.Department = _context.Departments.Find(expReimReq.DepartmentId).DeptName;
+            expenseSubClaimsDto.Department = expReimReq.DepartmentId != null ? _context.Departments.Find(expReimReq.DepartmentId).DeptName : null;
             expenseSubClaimsDto.DepartmentId = expReimReq.DepartmentId;
-            expenseSubClaimsDto.Project = _context.Projects.Find(expReimReq.ProjectId).ProjectName;
+            expenseSubClaimsDto.Project = expReimReq.ProjectId != null ? _context.Projects.Find(expReimReq.ProjectId).ProjectName : null;
             expenseSubClaimsDto.ProjectId = expReimReq.ProjectId;
-            expenseSubClaimsDto.SubProject = _context.SubProjects.Find(expReimReq.SubProjectId).SubProjectName;
+            expenseSubClaimsDto.SubProject = expReimReq.SubProjectId != null ? _context.SubProjects.Find(expReimReq.SubProjectId).SubProjectName : null;
             expenseSubClaimsDto.SubProjectId = expReimReq.SubProjectId;
-            expenseSubClaimsDto.WorkTask = _context.WorkTasks.Find(expReimReq.WorkTaskId).TaskName;
+            expenseSubClaimsDto.WorkTask = expReimReq.WorkTaskId != null ? _context.WorkTasks.Find(expReimReq.WorkTaskId).TaskName : null;
             expenseSubClaimsDto.WorkTaskId = expReimReq.WorkTaskId;
 
             expenseSubClaimsDto.ApprovalStatusType = _context.ApprovalStatusTypes.Find(expReimReq.ApprovalStatusTypeId).Status;
@@ -180,13 +180,15 @@ namespace AtoCash.Controllers.ExpenseReimburse
                 expenseSubClaimsDto.CurrencyType = _context.CurrencyTypes.Find(expReimReq.CurrencyTypeId).CurrencyCode;
                 expenseSubClaimsDto.ExpenseTypeId = expenseSubClaim.ExpenseTypeId;
                 expenseSubClaimsDto.ExpenseType = _context.ExpenseTypes.Find(expenseSubClaim.ExpenseTypeId).ExpenseTypeName;
-                expenseSubClaimsDto.Department = _context.Departments.Find(expReimReq.DepartmentId).DeptName;
+                expenseSubClaimsDto.Department = expReimReq.DepartmentId != null ? _context.Departments.Find(expReimReq.DepartmentId).DeptName : null;
                 expenseSubClaimsDto.DepartmentId = expReimReq.DepartmentId;
-                expenseSubClaimsDto.Project = _context.Projects.Find(expReimReq.ProjectId).ProjectName;
+
+                
+                expenseSubClaimsDto.Project = expReimReq.ProjectId != null ? _context.Projects.Find(expReimReq.ProjectId).ProjectName : null;
                 expenseSubClaimsDto.ProjectId = expReimReq.ProjectId;
-                expenseSubClaimsDto.SubProject = _context.SubProjects.Find(expReimReq.SubProjectId).SubProjectName;
+                expenseSubClaimsDto.SubProject = expReimReq.SubProjectId != null ? _context.SubProjects.Find(expReimReq.SubProjectId).SubProjectName : null;
                 expenseSubClaimsDto.SubProjectId = expReimReq.SubProjectId;
-                expenseSubClaimsDto.WorkTask = _context.WorkTasks.Find(expReimReq.WorkTaskId).TaskName;
+                expenseSubClaimsDto.WorkTask = expReimReq.WorkTaskId != null ? _context.WorkTasks.Find(expReimReq.WorkTaskId).TaskName : null;
                 expenseSubClaimsDto.WorkTaskId = expReimReq.WorkTaskId;
 
                 expenseSubClaimsDto.ApprovalStatusType = _context.ApprovalStatusTypes.Find(expReimReq.ApprovalStatusTypeId).Status;
@@ -254,7 +256,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
             _context.ExpenseSubClaims.Remove(expenseSubClaim);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Expsense Sub Claim Deleted!" });
         }
 
         private bool ExpenseSubClaimExists(int id)

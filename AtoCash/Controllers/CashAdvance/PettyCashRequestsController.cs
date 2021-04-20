@@ -65,7 +65,7 @@ namespace AtoCash.Controllers
                 ListPettyCashRequestDTO.Add(pettyCashRequestDTO);
             }
 
-            return ListPettyCashRequestDTO;
+            return ListPettyCashRequestDTO.OrderByDescending(o=> o.CashReqDate).ToList();
         }
 
 
@@ -99,7 +99,8 @@ namespace AtoCash.Controllers
             pettyCashRequestDTO.SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null;
             pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
             pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null;
-
+            pettyCashRequestDTO.ApprovalStatusTypeId = pettyCashRequest.ApprovalStatusTypeId;
+            pettyCashRequestDTO.ApprovedDate = pettyCashRequest.ApprovedDate;
 
             return pettyCashRequestDTO;
         }
@@ -152,6 +153,9 @@ namespace AtoCash.Controllers
                 pettyCashRequestDTO.SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null;
                 pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
                 pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null;
+                pettyCashRequestDTO.ApprovalStatusTypeId = pettyCashRequest.ApprovalStatusTypeId;
+                pettyCashRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(pettyCashRequest.ApprovalStatusTypeId).Status;
+                pettyCashRequestDTO.ApprovedDate = pettyCashRequest.ApprovedDate;
 
                 int NextApproverInPending = _context.ClaimApprovalStatusTrackers.Where(t =>
                         t.ApprovalStatusTypeId == (int)EApprovalStatus.Pending &&
@@ -165,90 +169,37 @@ namespace AtoCash.Controllers
             }
 
 
-            return Ok(PettyCashRequestDTOs);
+            return Ok(PettyCashRequestDTOs.OrderByDescending(o => o.CashReqDate).ToList());
         }
 
 
 
         [HttpGet("{id}")]
-        [ActionName("CountPettyCashRequestRaisedByEmployee")]
-        public async Task<ActionResult<int>> CountPettyCashRequestRaisedByEmployee(int id)
+        [ActionName("CountAllPettyCashRequestRaisedByEmployee")]
+        public async Task<ActionResult> CountAllPettyCashRequestRaisedByEmployee(int id)
         {
             var employee = await _context.Employees.FindAsync(id);
 
             if (employee == null)
             {
-                return NoContent();
+                return Ok(0);
             }
 
             var pettyCashRequests = await _context.PettyCashRequests.Where(p => p.EmployeeId == id).ToListAsync();
 
             if (pettyCashRequests == null)
             {
-                return NoContent();
+                return Ok(0);
             }
 
-            List<PettyCashRequestDTO> PettyCashRequestDTOs = new();
+            int TotalCount = _context.PettyCashRequests.Where(c => c.EmployeeId == id).Count();
+            int PendingCount = _context.PettyCashRequests.Where(c => c.EmployeeId == id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Pending).Count();
+            int RejectedCount = _context.PettyCashRequests.Where(c => c.EmployeeId == id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Rejected).Count();
+            int ApprovedCount = _context.PettyCashRequests.Where(c => c.EmployeeId == id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
 
-            foreach (var pettyCashRequest in pettyCashRequests)
-            {
-                PettyCashRequestDTO pettyCashRequestDTO = new()
-                {
-                    Id = pettyCashRequest.Id,
-                    EmployeeName = _context.Employees.Find(pettyCashRequest.EmployeeId).GetFullName(),
-                    CurrencyTypeId = pettyCashRequest.CurrencyTypeId,
-                    CurrencyType = pettyCashRequest.CurrencyType != null ? _context.CurrencyTypes.Find(pettyCashRequest.CurrencyType).CurrencyName : null,
-                    PettyClaimAmount = pettyCashRequest.PettyClaimAmount,
-                    PettyClaimRequestDesc = pettyCashRequest.PettyClaimRequestDesc,
-                    CashReqDate = pettyCashRequest.CashReqDate,
-                    ProjectId = pettyCashRequest.ProjectId,
-                    Project = pettyCashRequest.ProjectId != null ? _context.Projects.Find(pettyCashRequest.ProjectId).ProjectName : null,
-                    SubProjectId = pettyCashRequest.SubProjectId,
-                    SubProject = pettyCashRequest.SubProjectId != null ? _context.SubProjects.Find(pettyCashRequest.SubProjectId).SubProjectName : null,
-                    WorkTaskId = pettyCashRequest.WorkTaskId,
-                    WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null
-                };
-                PettyCashRequestDTOs.Add(pettyCashRequestDTO);
-            }
-
-
-            return Ok(PettyCashRequestDTOs.Count);
+            return Ok(new { TotalCount, PendingCount, RejectedCount, ApprovedCount });
         }
 
-
-        [HttpGet("{id}")]
-        [ActionName("CountPettyCashReqInPendingRaisedByEmployee")]
-        public async Task<ActionResult<int>> CountPettyCashReqInPendingRaisedByEmployee(int id)
-        {
-            var employee = await _context.Employees.FindAsync(id);
-
-            if (employee == null)
-            {
-                return NoContent();
-            }
-
-            //debug
-            //(int)ApprovalStatus.Pending
-            List<ClaimApprovalStatusTracker> lists = _context.ClaimApprovalStatusTrackers.Where(c => c.EmployeeId == id).ToList();
-
-            var claimApprovalsOfEmployee = await _context.ClaimApprovalStatusTrackers.Where(c => c.EmployeeId == id).Select(p => p.PettyCashRequestId).Distinct().ToListAsync();
-
-            foreach (var item in claimApprovalsOfEmployee)
-            {
-                string test = item.ToString();
-
-            }
-
-            if (claimApprovalsOfEmployee == null)
-            {
-                return NoContent();
-            }
-
-
-
-            return Ok(claimApprovalsOfEmployee.Count);
-
-        }
 
 
 
@@ -408,7 +359,7 @@ namespace AtoCash.Controllers
             _context.PettyCashRequests.Remove(pettyCashRequest);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Cash Advance Request Deleted!" });
         }
 
         private bool PettyCashRequestExists(int id)
@@ -444,7 +395,6 @@ namespace AtoCash.Controllers
             }
 
             return _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).Select(b => b.CurBalance).FirstOrDefault();
-
 
         }
 

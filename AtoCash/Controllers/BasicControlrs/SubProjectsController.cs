@@ -36,8 +36,7 @@ namespace AtoCash.Controllers
                 SubProjectVM subProjectVM = new SubProjectVM
                 {
                     Id = subProject.Id,
-                    SubProjectName = subProject.SubProjectName,
-                    SubProjectDesc = subProject.SubProjectDesc
+                    SubProjectName = subProject.SubProjectName + "-" + subProject.SubProjectDesc
                 };
 
                 ListSubProjectVM.Add(subProjectVM);
@@ -226,7 +225,7 @@ namespace AtoCash.Controllers
             _context.SubProjects.Remove(subProject);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Sub-Project Deleted!" });
         }
 
         private bool SubProjectExists(int id)

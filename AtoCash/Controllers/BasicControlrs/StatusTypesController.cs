@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AtoCash.Data;
 using AtoCash.Models;
 using Microsoft.AspNetCore.Authorization;
+using AtoCash.Authentication;
 
 namespace AtoCash.Controllers.BasicControlrs
 {
@@ -129,7 +130,7 @@ namespace AtoCash.Controllers.BasicControlrs
             _context.StatusTypes.Remove(statusType);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Status Type Deleted!" });
         }
 
         private bool StatusTypeExists(int id)

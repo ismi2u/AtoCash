@@ -147,7 +147,7 @@ namespace AtoCash.Controllers
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Unique EmpCode/Mobile/Email required" });
             }
-            
+
 
 
             //var emplye = _context.Employees.Where(e => e.FirstName == employeeDto.FirstName && e.MiddleName == employeeDto.MiddleName && e.LastName == employeeDto.LastName).FirstOrDefault();
@@ -264,7 +264,21 @@ namespace AtoCash.Controllers
             {
                 employee.Email = employeeDto.Email;
             }
+
+
             _context.Employees.Add(employee);
+            await _context.SaveChangesAsync();
+
+
+            //Add PettyCash Balance
+            Double empPettyCashAmountEligible = _context.JobRoles.Find(employee.RoleId).MaxPettyCashAllowed;
+            _context.EmpCurrentPettyCashBalances.Add(new EmpCurrentPettyCashBalance()
+            {
+                EmployeeId = employee.Id,
+                CurBalance = empPettyCashAmountEligible,
+                UpdatedOn = DateTime.Now
+            });
+
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
@@ -284,7 +298,8 @@ namespace AtoCash.Controllers
             _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Employee Deleted!" });
+
         }
 
         private bool EmployeeExists(int id)

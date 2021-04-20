@@ -43,6 +43,5 @@ namespace AtoCash.Models
     {
         public int Id { get; set; }
         public string TaskName { get; set; }
-        public string TaskDesc { get; set; }
     }
 }

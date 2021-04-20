@@ -136,7 +136,7 @@ namespace AtoCash.Controllers
             _context.RequestTypes.Remove(requestType);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Request Type Deleted!" });
         }
 
         private bool RequestTypeExists(int id)
