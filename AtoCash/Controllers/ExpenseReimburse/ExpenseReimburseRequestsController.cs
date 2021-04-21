@@ -516,7 +516,7 @@ namespace AtoCash.Controllers
 
                 _context.ExpenseSubClaims.Add(expenseSubClaim);
                 await _context.SaveChangesAsync();
-                dblTotalClaimAmount = dblTotalClaimAmount + expenseSubClaimDto.ExpenseReimbClaimAmount;
+                dblTotalClaimAmount = dblTotalClaimAmount + expenseSubClaimDto.TaxAmount  + expenseSubClaimDto.ExpenseReimbClaimAmount;
 
             }
 
@@ -638,7 +638,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.RecordDate = DateTime.Now;
             disbursementsAndClaimsMaster.CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId;
             disbursementsAndClaimsMaster.ClaimAmount = dblTotalClaimAmount;
-            disbursementsAndClaimsMaster.CostCentreId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCentreId;
+            disbursementsAndClaimsMaster.CostCenterId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCenterId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();
@@ -655,7 +655,7 @@ namespace AtoCash.Controllers
 
             //### 1. If Employee Eligible for Cash Claim enter a record and reduce the available amount for next claim
             #region
-            int costCentreId = _context.Projects.Find(expenseReimburseRequestDto.ProjectId).CostCentreId;
+            int costCenterId = _context.Projects.Find(expenseReimburseRequestDto.ProjectId).CostCenterId;
             int projManagerid = _context.Projects.Find(expenseReimburseRequestDto.ProjectId).ProjectManagerId;
             var approver = _context.Employees.Find(projManagerid);
             int reqEmpid = expenseReimburseRequestDto.EmployeeId;
@@ -806,7 +806,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.RecordDate = DateTime.Now;
             disbursementsAndClaimsMaster.CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId;
             disbursementsAndClaimsMaster.ClaimAmount = dblTotalClaimAmount;
-            disbursementsAndClaimsMaster.CostCentreId = costCentreId;
+            disbursementsAndClaimsMaster.CostCenterId = costCenterId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();

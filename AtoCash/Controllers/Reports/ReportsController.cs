@@ -98,8 +98,8 @@ namespace AtoCash.Controllers
                         result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
                     if (searchModel.AmountTo > 0)
                         result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
-                    if (searchModel.CostCentreId.HasValue)
-                        result = result.Where(x => x.CostCentreId == searchModel.CostCentreId);
+                    if (searchModel.CostCenterId.HasValue)
+                        result = result.Where(x => x.CostCenterId == searchModel.CostCenterId);
                     if (searchModel.ApprovalStatusId.HasValue)
                         result = result.Where(x => x.ApprovalStatusId == searchModel.ApprovalStatusId);
 
@@ -115,7 +115,7 @@ namespace AtoCash.Controllers
                     new DataColumn("WorkTask",typeof(string)),
                     new DataColumn("RecordDate",typeof(DateTime)),
                     new DataColumn("Amount", typeof(Double)),
-                    new DataColumn("CostCentre", typeof(string)),
+                    new DataColumn("CostCenter", typeof(string)),
                     new DataColumn("ApprovalStatus", typeof(string))
                         });
 
@@ -130,7 +130,7 @@ namespace AtoCash.Controllers
                             empCashAdvance.WorkTask.TaskName,
                             empCashAdvance.RecordDate,
                             empCashAdvance.ClaimAmount,
-                            empCashAdvance.CostCentre.CostCentreCode,
+                            empCashAdvance.CostCenter.CostCenterCode,
                             empCashAdvance.ApprovalStatusType.Status
                             );
                     }
@@ -185,8 +185,8 @@ namespace AtoCash.Controllers
                         result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
                     if (searchModel.AmountTo > 0)
                         result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
-                    if (searchModel.CostCentreId.HasValue)
-                        result = result.Where(x => x.CostCentreId == searchModel.CostCentreId);
+                    if (searchModel.CostCenterId.HasValue)
+                        result = result.Where(x => x.CostCenterId == searchModel.CostCenterId);
                     if (searchModel.ApprovalStatusId.HasValue)
                         result = result.Where(x => x.ApprovalStatusId == searchModel.ApprovalStatusId);
 
@@ -202,7 +202,7 @@ namespace AtoCash.Controllers
                     new DataColumn("WorkTask",typeof(string)),
                     new DataColumn("RecordDate",typeof(DateTime)),
                     new DataColumn("Amount", typeof(Double)),
-                    new DataColumn("CostCentre", typeof(string)),
+                    new DataColumn("CostCenter", typeof(string)),
                     new DataColumn("ApprovalStatus", typeof(string))
                         });
 
@@ -217,7 +217,7 @@ namespace AtoCash.Controllers
                             empCashAdvance.WorkTask.TaskName,
                             empCashAdvance.RecordDate,
                             empCashAdvance.ClaimAmount,
-                            empCashAdvance.CostCentre.CostCentreCode,
+                            empCashAdvance.CostCenter.CostCenterCode,
                             empCashAdvance.ApprovalStatusType.Status
                             );
                     }
@@ -265,8 +265,8 @@ namespace AtoCash.Controllers
                     result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
                 if (searchModel.AmountTo > 0)
                     result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
-                if (searchModel.CostCentreId.HasValue)
-                    result = result.Where(x => x.CostCentreId == searchModel.CostCentreId);
+                if (searchModel.CostCenterId.HasValue)
+                    result = result.Where(x => x.CostCenterId == searchModel.CostCenterId);
                 if (searchModel.ApprovalStatusId.HasValue)
                     result = result.Where(x => x.ApprovalStatusId == searchModel.ApprovalStatusId);
 
@@ -281,7 +281,7 @@ namespace AtoCash.Controllers
                     new DataColumn("WorkTask",typeof(string)),
                     new DataColumn("RecordDate",typeof(DateTime)),
                     new DataColumn("Amount", typeof(Double)),
-                    new DataColumn("CostCentre", typeof(string)),
+                    new DataColumn("CostCenter", typeof(string)),
                     new DataColumn("ApprovalStatus", typeof(string))
                     });
 
@@ -296,7 +296,7 @@ namespace AtoCash.Controllers
                         empCashAdvance.WorkTask.TaskName,
                         empCashAdvance.RecordDate,
                         empCashAdvance.ClaimAmount,
-                        empCashAdvance.CostCentre.CostCentreCode,
+                        empCashAdvance.CostCenter.CostCenterCode,
                         empCashAdvance.ApprovalStatusType.Status
                         );
                 }

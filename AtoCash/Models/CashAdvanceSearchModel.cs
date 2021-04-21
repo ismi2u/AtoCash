@@ -19,7 +19,7 @@ namespace AtoCash.Models
         public DateTime? RecordDateTo { get; set; }
         public Double AmountFrom { get; set; }
         public Double AmountTo { get; set; }
-        public int? CostCentreId { get; set; }
+        public int? CostCenterId { get; set; }
         public int? ApprovalStatusId { get; set; }
 
 

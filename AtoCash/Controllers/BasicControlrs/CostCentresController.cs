@@ -15,104 +15,104 @@ namespace AtoCash.Controllers
     [Route("api/[controller]/[Action]")]
     [ApiController]
     [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr, User")]
-    public class CostCentresController : ControllerBase
+    public class CostCentersController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
 
-        public CostCentresController(AtoCashDbContext context)
+        public CostCentersController(AtoCashDbContext context)
         {
             _context = context;
         }
 
         [HttpGet]
-        [ActionName("CostCentresForDropdown")]
-        public async Task<ActionResult<IEnumerable<CostCentreVM>>> GetCostCentresForDropDown()
+        [ActionName("CostCentersForDropdown")]
+        public async Task<ActionResult<IEnumerable<CostCenterVM>>> GetCostCentersForDropDown()
         {
-            List<CostCentreVM> ListCostCentreVM = new List<CostCentreVM>();
+            List<CostCenterVM> ListCostCenterVM = new List<CostCenterVM>();
 
-            var costCentres = await _context.CostCentres.Where(c => c.StatusTypeId == (int)EStatusType.Active).ToListAsync();
-            foreach (CostCentre costCentre in costCentres)
+            var costCenters = await _context.CostCenters.Where(c => c.StatusTypeId == (int)EStatusType.Active).ToListAsync();
+            foreach (CostCenter costCenter in costCenters)
             {
-                CostCentreVM costCentreVM = new CostCentreVM
+                CostCenterVM costCenterVM = new CostCenterVM
                 {
-                    Id = costCentre.Id,
-                    CostCentreCode = costCentre.CostCentreCode + " " + costCentre.CostCentreDesc,
+                    Id = costCenter.Id,
+                    CostCenterCode = costCenter.CostCenterCode + " " + costCenter.CostCenterDesc,
                 };
 
-                ListCostCentreVM.Add(costCentreVM);
+                ListCostCenterVM.Add(costCenterVM);
             }
 
-            return ListCostCentreVM;
+            return ListCostCenterVM;
 
         }
 
-        // GET: api/CostCentres
+        // GET: api/CostCenters
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CostCentreDTO>>> GetCostCentres()
+        public async Task<ActionResult<IEnumerable<CostCenterDTO>>> GetCostCenters()
         {
 
-            List<CostCentreDTO> ListCostCentreDTO = new List<CostCentreDTO>();
+            List<CostCenterDTO> ListCostCenterDTO = new List<CostCenterDTO>();
 
-            var costCentres = await _context.CostCentres.ToListAsync();
+            var costCenters = await _context.CostCenters.ToListAsync();
 
-            foreach (CostCentre costCentre in costCentres)
+            foreach (CostCenter costCenter in costCenters)
             {
-                CostCentreDTO costCentreDTO = new CostCentreDTO
+                CostCenterDTO costCenterDTO = new CostCenterDTO
                 {
-                    Id = costCentre.Id,
-                    CostCentreCode = costCentre.CostCentreCode,
-                    CostCentreDesc = costCentre.CostCentreDesc,
-                    StatusTypeId = costCentre.StatusTypeId,
-                    StatusType = _context.StatusTypes.Find(costCentre.StatusTypeId).Status
+                    Id = costCenter.Id,
+                    CostCenterCode = costCenter.CostCenterCode,
+                    CostCenterDesc = costCenter.CostCenterDesc,
+                    StatusTypeId = costCenter.StatusTypeId,
+                    StatusType = _context.StatusTypes.Find(costCenter.StatusTypeId).Status
                 };
 
-                ListCostCentreDTO.Add(costCentreDTO);
+                ListCostCenterDTO.Add(costCenterDTO);
 
             }
-            return Ok(ListCostCentreDTO);
+            return Ok(ListCostCenterDTO);
         }
 
-        // GET: api/CostCentres/5
+        // GET: api/CostCenters/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<CostCentreDTO>> GetCostCentre(int id)
+        public async Task<ActionResult<CostCenterDTO>> GetCostCenter(int id)
         {
-            var costCentre = await _context.CostCentres.FindAsync(id);
+            var costCenter = await _context.CostCenters.FindAsync(id);
 
-            if (costCentre == null)
+            if (costCenter == null)
             {
                 return NoContent();
             }
 
-            CostCentreDTO costCentreDTO = new CostCentreDTO
+            CostCenterDTO costCenterDTO = new CostCenterDTO
             {
-                Id = costCentre.Id,
-                CostCentreCode = costCentre.CostCentreCode,
-                CostCentreDesc = costCentre.CostCentreDesc,
-                StatusTypeId = costCentre.StatusTypeId,
-                StatusType = _context.StatusTypes.Find(costCentre.StatusTypeId).Status
+                Id = costCenter.Id,
+                CostCenterCode = costCenter.CostCenterCode,
+                CostCenterDesc = costCenter.CostCenterDesc,
+                StatusTypeId = costCenter.StatusTypeId,
+                StatusType = _context.StatusTypes.Find(costCenter.StatusTypeId).Status
 
             };
 
-            return costCentreDTO;
+            return costCenterDTO;
         }
 
-        // PUT: api/CostCentres/5
+        // PUT: api/CostCenters/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
-        public async Task<IActionResult> PutCostCentre(int id, CostCentreDTO costCentreDTO)
+        public async Task<IActionResult> PutCostCenter(int id, CostCenterDTO costCenterDTO)
         {
-            if (id != costCentreDTO.Id)
+            if (id != costCenterDTO.Id)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
-            var ccentre = await _context.CostCentres.FindAsync(id);
-            ccentre.CostCentreDesc = costCentreDTO.CostCentreDesc;
-            ccentre.StatusTypeId = costCentreDTO.StatusTypeId;
-            _context.CostCentres.Update(ccentre);
+            var ccentre = await _context.CostCenters.FindAsync(id);
+            ccentre.CostCenterDesc = costCenterDTO.CostCenterDesc;
+            ccentre.StatusTypeId = costCenterDTO.StatusTypeId;
+            _context.CostCenters.Update(ccentre);
 
-            //_context.Entry(costCentre).State = EntityState.Modified;
+            //_context.Entry(costCenter).State = EntityState.Modified;
 
             try
             {
@@ -120,9 +120,9 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!CostCentreExists(id))
+                if (!CostCenterExists(id))
                 {
-                    return Conflict(new RespStatus { Status = "Failure", Message = "Costcentre is invalid" });
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Costcenter is invalid" });
                 }
                 else
                 {
@@ -130,38 +130,38 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return Ok(new RespStatus { Status = "Success", Message = "CostCentre Details Updated!" });
+            return Ok(new RespStatus { Status = "Success", Message = "CostCenter Details Updated!" });
         }
 
-        // POST: api/CostCentres
+        // POST: api/CostCenters
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
-        public async Task<ActionResult<CostCentre>> PostCostCentre(CostCentreDTO costCentreDTO)
+        public async Task<ActionResult<CostCenter>> PostCostCenter(CostCenterDTO costCenterDTO)
         {
-            var ccentre = _context.CostCentres.Where(c => c.CostCentreCode == costCentreDTO.CostCentreCode).FirstOrDefault();
+            var ccentre = _context.CostCenters.Where(c => c.CostCenterCode == costCenterDTO.CostCenterCode).FirstOrDefault();
             if (ccentre != null)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "CostCentre Already Exists" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "CostCenter Already Exists" });
             }
-            CostCentre costCentre = new();
-            costCentre.CostCentreCode = costCentreDTO.CostCentreCode;
-            costCentre.CostCentreDesc = costCentreDTO.CostCentreDesc;
-            costCentre.StatusTypeId = costCentreDTO.StatusTypeId;
+            CostCenter costCenter = new();
+            costCenter.CostCenterCode = costCenterDTO.CostCenterCode;
+            costCenter.CostCenterDesc = costCenterDTO.CostCenterDesc;
+            costCenter.StatusTypeId = costCenterDTO.StatusTypeId;
 
-            _context.CostCentres.Add(costCentre);
+            _context.CostCenters.Add(costCenter);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCostCentre", new { id = costCentre.Id }, costCentre);
+            return CreatedAtAction("GetCostCenter", new { id = costCenter.Id }, costCenter);
         }
 
-        // DELETE: api/CostCentres/5
+        // DELETE: api/CostCenters/5
         [HttpDelete("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
-        public async Task<IActionResult> DeleteCostCentre(int id)
+        public async Task<IActionResult> DeleteCostCenter(int id)
         {
-            var dept = _context.Departments.Where(d => d.CostCentreId == id).FirstOrDefault();
-            var proj = _context.Projects.Where(p => p.CostCentreId == id).FirstOrDefault();
+            var dept = _context.Departments.Where(d => d.CostCenterId == id).FirstOrDefault();
+            var proj = _context.Projects.Where(p => p.CostCenterId == id).FirstOrDefault();
 
             if (dept != null)
             {
@@ -172,21 +172,21 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Cost-Centre in use for Project" });
             }
 
-            var costCentre = await _context.CostCentres.FindAsync(id);
-            if (costCentre == null)
+            var costCenter = await _context.CostCenters.FindAsync(id);
+            if (costCenter == null)
             {
                 return NoContent();
             }
 
-            _context.CostCentres.Remove(costCentre);
+            _context.CostCenters.Remove(costCenter);
             await _context.SaveChangesAsync();
 
             return Ok(new RespStatus { Status = "Success", Message = "Cost-Centre Deleted!" });
         }
 
-        private bool CostCentreExists(int id)
+        private bool CostCenterExists(int id)
         {
-            return _context.CostCentres.Any(e => e.Id == id);
+            return _context.CostCenters.Any(e => e.Id == id);
         }
 
 

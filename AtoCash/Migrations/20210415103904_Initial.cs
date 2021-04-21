@@ -299,20 +299,20 @@ namespace AtoCash.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CostCentres",
+                name: "CostCenters",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CostCentreCode = table.Column<string>(type: "nvarchar(20)", nullable: false),
-                    CostCentreDesc = table.Column<string>(type: "nvarchar(150)", nullable: false),
+                    CostCenterCode = table.Column<string>(type: "nvarchar(20)", nullable: false),
+                    CostCenterDesc = table.Column<string>(type: "nvarchar(150)", nullable: false),
                     StatusTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CostCentres", x => x.Id);
+                    table.PrimaryKey("PK_CostCenters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CostCentres_StatusTypes_StatusTypeId",
+                        name: "FK_CostCenters_StatusTypes_StatusTypeId",
                         column: x => x.StatusTypeId,
                         principalTable: "StatusTypes",
                         principalColumn: "Id",
@@ -370,16 +370,16 @@ namespace AtoCash.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DeptCode = table.Column<string>(type: "nvarchar(20)", nullable: false),
                     DeptName = table.Column<string>(type: "nvarchar(30)", nullable: false),
-                    CostCentreId = table.Column<int>(type: "int", nullable: false),
+                    CostCenterId = table.Column<int>(type: "int", nullable: false),
                     StatusTypeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Departments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Departments_CostCentres_CostCentreId",
-                        column: x => x.CostCentreId,
-                        principalTable: "CostCentres",
+                        name: "FK_Departments_CostCenters_CostCenterId",
+                        column: x => x.CostCenterId,
+                        principalTable: "CostCenters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
@@ -487,7 +487,7 @@ namespace AtoCash.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ProjectName = table.Column<string>(type: "nvarchar(25)", nullable: false),
-                    CostCentreId = table.Column<int>(type: "int", nullable: false),
+                    CostCenterId = table.Column<int>(type: "int", nullable: false),
                     ProjectManagerId = table.Column<int>(type: "int", nullable: false),
                     ProjectDesc = table.Column<string>(type: "nvarchar(200)", nullable: false),
                     StatusTypeId = table.Column<int>(type: "int", nullable: false)
@@ -496,9 +496,9 @@ namespace AtoCash.Migrations
                 {
                     table.PrimaryKey("PK_Projects", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Projects_CostCentres_CostCentreId",
-                        column: x => x.CostCentreId,
-                        principalTable: "CostCentres",
+                        name: "FK_Projects_CostCenters_CostCenterId",
+                        column: x => x.CostCenterId,
+                        principalTable: "CostCenters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
@@ -990,7 +990,7 @@ namespace AtoCash.Migrations
                     ClaimAmount = table.Column<double>(type: "float", nullable: false),
                     AmountToWallet = table.Column<double>(type: "float", nullable: true),
                     AmountToCredit = table.Column<double>(type: "float", nullable: true),
-                    CostCentreId = table.Column<int>(type: "int", nullable: false),
+                    CostCenterId = table.Column<int>(type: "int", nullable: false),
                     ApprovalStatusId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -1003,9 +1003,9 @@ namespace AtoCash.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
-                        name: "FK_DisbursementsAndClaimsMasters_CostCentres_CostCentreId",
-                        column: x => x.CostCentreId,
-                        principalTable: "CostCentres",
+                        name: "FK_DisbursementsAndClaimsMasters_CostCenters_CostCenterId",
+                        column: x => x.CostCenterId,
+                        principalTable: "CostCenters",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
@@ -1230,8 +1230,8 @@ namespace AtoCash.Migrations
                 column: "WorkTaskId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CostCentres_StatusTypeId",
-                table: "CostCentres",
+                name: "IX_CostCenters_StatusTypeId",
+                table: "CostCenters",
                 column: "StatusTypeId");
 
             migrationBuilder.CreateIndex(
@@ -1240,9 +1240,9 @@ namespace AtoCash.Migrations
                 column: "StatusTypeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Departments_CostCentreId",
+                name: "IX_Departments_CostCenterId",
                 table: "Departments",
-                column: "CostCentreId");
+                column: "CostCenterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Departments_StatusTypeId",
@@ -1255,9 +1255,9 @@ namespace AtoCash.Migrations
                 column: "ApprovalStatusId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DisbursementsAndClaimsMasters_CostCentreId",
+                name: "IX_DisbursementsAndClaimsMasters_CostCenterId",
                 table: "DisbursementsAndClaimsMasters",
-                column: "CostCentreId");
+                column: "CostCenterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DisbursementsAndClaimsMasters_CurrencyTypeId",
@@ -1485,9 +1485,9 @@ namespace AtoCash.Migrations
                 column: "ProjectId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Projects_CostCentreId",
+                name: "IX_Projects_CostCenterId",
                 table: "Projects",
-                column: "CostCentreId");
+                column: "CostCenterId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_ProjectManagerId",
@@ -1674,7 +1674,7 @@ namespace AtoCash.Migrations
                 name: "JobRoles");
 
             migrationBuilder.DropTable(
-                name: "CostCentres");
+                name: "CostCenters");
 
             migrationBuilder.DropTable(
                 name: "StatusTypes");

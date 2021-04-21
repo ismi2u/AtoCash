@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AtoCash.Models
 {
-    public class CostCentre
+    public class CostCenter
     {
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
@@ -15,11 +15,11 @@ namespace AtoCash.Models
 
         [Required]
         [Column(TypeName = "nvarchar(20)")]
-        public string CostCentreCode { get; set; }
+        public string CostCenterCode { get; set; }
 
         [Required]
         [Column(TypeName = "nvarchar(150)")]
-        public string CostCentreDesc{ get; set; }
+        public string CostCenterDesc{ get; set; }
 
         [Required]
         [ForeignKey("StatusTypeId")]
@@ -28,22 +28,22 @@ namespace AtoCash.Models
 
     }
 
-    public class CostCentreDTO
+    public class CostCenterDTO
     {
 
         public int Id { get; set; }
-        public string CostCentreCode { get; set; }
-        public string CostCentreDesc { get; set; }
+        public string CostCenterCode { get; set; }
+        public string CostCenterDesc { get; set; }
 
         public int StatusTypeId { get; set; }
         public string StatusType { get; set; }
 
     }
 
-    public class CostCentreVM
+    public class CostCenterVM
     {
         public int Id { get; set; }
-        public string CostCentreCode { get; set; }
+        public string CostCenterCode { get; set; }
 
 
     }

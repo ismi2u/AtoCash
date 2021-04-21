@@ -133,26 +133,43 @@ namespace AtoCash.Controllers
         [ActionName("GetEmpCashBalanceVsAdvanced")]
         public ActionResult<CashbalVsAdvancedVM> GetEmpCashBalanceVsAdvanced(int id)
         {
-            if (id ==0) // atominos admin doesnt have a wallet balance
-            {
-                return Ok(new CashbalVsAdvancedVM()
-                {
-                    CurCashBal = 0,
-                    MaxCashAllowed = 0
-
-                });
-            }
 
             CashbalVsAdvancedVM cashbalVsAdvancedVM = new();
+            if (id == 0) // atominos admin doesnt have a wallet balance
+            {
+                cashbalVsAdvancedVM.CurCashBal = 0;
+                cashbalVsAdvancedVM.MaxCashAllowed = 0;
+                return Ok(cashbalVsAdvancedVM);
+            }
 
-            cashbalVsAdvancedVM.CurCashBal = _context.EmpCurrentPettyCashBalances.Where(b => b.EmployeeId == id).FirstOrDefault().CurBalance;
-            cashbalVsAdvancedVM.MaxCashAllowed = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed;
+            //Check if employee cash balance is availabel in the EmpCurrentPettyCashBalance table, if NOT then ADD
+            if (!_context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == id).Any())
+            {
+                var emp = _context.Employees.Find(id);
 
+                if (emp != null)
+                {
+                    Double empPettyCashAmountEligible = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed;
+                    _context.EmpCurrentPettyCashBalances.Add(new EmpCurrentPettyCashBalance()
+                    {
+                        EmployeeId = id,
+                        CurBalance = empPettyCashAmountEligible,
+                        UpdatedOn = DateTime.Now
+                    });
+
+                    _context.SaveChanges();
+                }
+
+                var empCurPettyBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == id).FirstOrDefault();
+                cashbalVsAdvancedVM.CurCashBal = empCurPettyBal.CurBalance;
+                cashbalVsAdvancedVM.MaxCashAllowed = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed;
+
+            }
 
             return Ok(cashbalVsAdvancedVM);
         }
 
-        
+
 
         // DELETE: api/EmpCurrentPettyCashBalances/5
         [HttpDelete("{id}")]
@@ -175,5 +192,9 @@ namespace AtoCash.Controllers
         {
             return _context.EmpCurrentPettyCashBalances.Any(e => e.Id == id);
         }
+
+
+
+        //
     }
 }

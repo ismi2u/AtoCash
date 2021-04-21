@@ -365,7 +365,7 @@ namespace AtoCash.Controllers
 
 
             #region
-            int costCentreId = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCentreId;
+            int costCenterId = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCenterId;
             int projManagerid = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).ProjectManagerId;
             var approver = _context.Employees.Find(projManagerid);
             int reqEmpid = travelApprovalRequestDTO.EmployeeId;
@@ -399,7 +399,7 @@ namespace AtoCash.Controllers
             #endregion
 
             //##### 3. Add an entry to ClaimApproval Status tracker
-            //get costcentreID based on project
+            //get costcenterID based on project
             #region
 
             ///////////////////////////// Check if self Approved Request /////////////////////////////

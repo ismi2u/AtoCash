@@ -61,7 +61,7 @@ namespace AtoCash.Controllers
                 {
                     Id = proj.Id,
                     ProjectName = proj.ProjectName,
-                    CostCentreId = proj.CostCentreId,
+                    CostCenterId = proj.CostCenterId,
                     ProjectDesc = proj.ProjectDesc,
                     StatusTypeId = proj.StatusTypeId,
                     StatusType = _context.StatusTypes.Find(proj.StatusTypeId).Status
@@ -93,7 +93,7 @@ namespace AtoCash.Controllers
             {
                 Id = proj.Id,
                 ProjectName = proj.ProjectName,
-                CostCentreId = proj.CostCentreId,
+                CostCenterId = proj.CostCenterId,
                 ProjectManagerId = proj.ProjectManagerId,
                 ProjectDesc = proj.ProjectDesc,
                 StatusTypeId = proj.StatusTypeId,
@@ -144,7 +144,7 @@ namespace AtoCash.Controllers
                 
             proj.Id = projectDto.Id;
             proj.ProjectName = projectDto.ProjectName;
-            proj.CostCentreId = projectDto.CostCentreId  ;
+            proj.CostCenterId = projectDto.CostCenterId  ;
             proj.ProjectManagerId = projectDto.ProjectManagerId;
             proj.ProjectDesc = projectDto.ProjectDesc;
             proj.StatusTypeId = projectDto.StatusTypeId;
@@ -185,7 +185,7 @@ namespace AtoCash.Controllers
             Project proj = new Project
             {
                 ProjectName = projectDto.ProjectName,
-                CostCentreId = projectDto.CostCentreId,
+                CostCenterId = projectDto.CostCenterId,
                 ProjectManagerId = projectDto.ProjectManagerId,
                 ProjectDesc = projectDto.ProjectDesc,
                 StatusTypeId = projectDto.StatusTypeId

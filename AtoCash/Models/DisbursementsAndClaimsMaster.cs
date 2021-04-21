@@ -73,9 +73,9 @@ namespace AtoCash.Models
 
 
         [Required]
-        [ForeignKey("CostCentreId")]
-        public virtual CostCentre CostCentre { get; set; }
-        public int CostCentreId { get; set; }
+        [ForeignKey("CostCenterId")]
+        public virtual CostCenter CostCenter { get; set; }
+        public int CostCenterId { get; set; }
 
         [Required]
         [ForeignKey("ApprovalStatusId")]
@@ -103,7 +103,7 @@ namespace AtoCash.Models
         public Double ClaimAmount { get; set; }
         public Double? AmountToWallet { get; set; }
         public Double? AmountToCredit { get; set; }
-        public int CostCentreId { get; set; }
+        public int CostCenterId { get; set; }
         public int ApprovalStatusId { get; set; }
 
 

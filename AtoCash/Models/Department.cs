@@ -21,9 +21,9 @@ namespace AtoCash.Models
         public string DeptName { get; set; }
 
         [Required]
-        [ForeignKey("CostCentreId")]
-        public virtual CostCentre CostCentre { get; set; }
-        public int CostCentreId { get; set; }
+        [ForeignKey("CostCenterId")]
+        public virtual CostCenter CostCenter { get; set; }
+        public int CostCenterId { get; set; }
 
 
         [Required]
@@ -41,9 +41,9 @@ namespace AtoCash.Models
 
         public string DeptName { get; set; }
 
-        public int CostCentreId { get; set; }
+        public int CostCenterId { get; set; }
 
-        public string CostCentre { get; set; }
+        public string CostCenter { get; set; }
 
         public string StatusType { get; set; }
 

@@ -137,14 +137,14 @@ namespace AtoCash.Controllers
                 {
                     bRejectMessage = true;
                 }
-                claimApprovalStatusTracker.Id = claimApprovalStatusTrackerDto.Id;
-                claimApprovalStatusTracker.EmployeeId = claimApprovalStatusTrackerDto.EmployeeId;
-                claimApprovalStatusTracker.PettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId;
-                claimApprovalStatusTracker.DepartmentId = claimApprovalStatusTrackerDto.DepartmentId;
-                claimApprovalStatusTracker.ProjectId = claimApprovalStatusTrackerDto.ProjectId;
-                claimApprovalStatusTracker.RoleId = claimApprovalStatusTrackerDto.RoleId;
-                claimApprovalStatusTracker.ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId;
-                claimApprovalStatusTracker.ReqDate = claimApprovalStatusTrackerDto.ReqDate;
+                //claimApprovalStatusTracker.Id = claimApprovalStatusTrackerDto.Id;
+                //claimApprovalStatusTracker.EmployeeId = claimApprovalStatusTrackerDto.EmployeeId;
+                //claimApprovalStatusTracker.PettyCashRequestId = claimApprovalStatusTrackerDto.PettyCashRequestId;
+                //claimApprovalStatusTracker.DepartmentId = claimApprovalStatusTrackerDto.DepartmentId;
+                //claimApprovalStatusTracker.ProjectId = claimApprovalStatusTrackerDto.ProjectId;
+                //claimApprovalStatusTracker.RoleId = claimApprovalStatusTrackerDto.RoleId;
+                //claimApprovalStatusTracker.ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId;
+                //claimApprovalStatusTracker.ReqDate = claimApprovalStatusTrackerDto.ReqDate;
                 claimApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
                 claimApprovalStatusTracker.Comments = claimApprovalStatusTrackerDto.Comments;
 
@@ -259,6 +259,17 @@ namespace AtoCash.Controllers
                     //if nothing else then just update the approval status
                     claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
 
+
+                    //update the pettycash request table to reflect the rejection
+                    if (bRejectMessage)
+                    {
+                        var pettyCashReq = _context.PettyCashRequests.Where(p => p.Id == claimApprovalStatusTrackerDto.PettyCashRequestId).FirstOrDefault();
+                        pettyCashReq.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
+                        pettyCashReq.ApprovedDate = DateTime.Now;
+                        _context.PettyCashRequests.Update(pettyCashReq);
+                        await _context.SaveChangesAsync();
+                    }
+
                 }
                 else
                 {
@@ -283,7 +294,7 @@ namespace AtoCash.Controllers
 
                 }
 
-                _context.ClaimApprovalStatusTrackers.Update(claimApprovalStatusTracker);
+                 _context.ClaimApprovalStatusTrackers.Update(claimApprovalStatusTracker);
             }
 
             try

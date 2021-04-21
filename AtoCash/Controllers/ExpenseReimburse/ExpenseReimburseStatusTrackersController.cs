@@ -341,6 +341,16 @@ namespace AtoCash.Controllers.ExpenseReimburse
                     //if nothing else then just update the approval status
                     expenseReimburseStatusTracker.ApprovalStatusTypeId = expenseReimburseStatusTrackerDto.ApprovalStatusTypeId;
 
+                    //update the Expense Reimburse request table to reflect the rejection
+                    if (bRejectMessage)
+                    {
+                        var expReimbReq = _context.ExpenseReimburseRequests.Where(p => p.Id == expenseReimburseStatusTrackerDto.ExpenseReimburseRequestId).FirstOrDefault();
+                        expReimbReq.ApprovalStatusTypeId = expenseReimburseStatusTrackerDto.ApprovalStatusTypeId;
+                        expReimbReq.ApprovedDate = DateTime.Now;
+                        _context.ExpenseReimburseRequests.Update(expReimbReq);
+                        await _context.SaveChangesAsync();
+                    }
+
                 }
                 else
                 {

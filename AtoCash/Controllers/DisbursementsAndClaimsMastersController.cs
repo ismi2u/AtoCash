@@ -46,7 +46,7 @@ namespace AtoCash.Controllers
                     WorkTaskId = disbursementsAndClaimsMaster.WorkTaskId,
                     RecordDate = disbursementsAndClaimsMaster.RecordDate,
                     ClaimAmount = disbursementsAndClaimsMaster.ClaimAmount,
-                    CostCentreId = disbursementsAndClaimsMaster.CostCentreId,
+                    CostCenterId = disbursementsAndClaimsMaster.CostCenterId,
                     ApprovalStatusId = disbursementsAndClaimsMaster.ApprovalStatusId
                 };
 
@@ -81,7 +81,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMasterDTO.WorkTaskId = disbursementsAndClaimsMaster.WorkTaskId;
             disbursementsAndClaimsMasterDTO.RecordDate = disbursementsAndClaimsMaster.RecordDate;
             disbursementsAndClaimsMasterDTO.ClaimAmount = disbursementsAndClaimsMaster.ClaimAmount;
-            disbursementsAndClaimsMasterDTO.CostCentreId = disbursementsAndClaimsMaster.CostCentreId;
+            disbursementsAndClaimsMasterDTO.CostCenterId = disbursementsAndClaimsMaster.CostCenterId;
             disbursementsAndClaimsMasterDTO.ApprovalStatusId = disbursementsAndClaimsMaster.ApprovalStatusId;
 
             return disbursementsAndClaimsMasterDTO;
@@ -110,7 +110,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.WorkTaskId = disbursementsAndClaimsMasterDto.WorkTaskId;
             disbursementsAndClaimsMaster.RecordDate = disbursementsAndClaimsMasterDto.RecordDate;
             disbursementsAndClaimsMaster.ClaimAmount = disbursementsAndClaimsMasterDto.ClaimAmount;
-            disbursementsAndClaimsMaster.CostCentreId = disbursementsAndClaimsMasterDto.CostCentreId;
+            disbursementsAndClaimsMaster.CostCenterId = disbursementsAndClaimsMasterDto.CostCenterId;
             disbursementsAndClaimsMaster.ApprovalStatusId = disbursementsAndClaimsMasterDto.ApprovalStatusId;
 
 
@@ -152,7 +152,7 @@ namespace AtoCash.Controllers
                 WorkTaskId = disbursementsAndClaimsMasterDto.WorkTaskId,
                 RecordDate = disbursementsAndClaimsMasterDto.RecordDate,
                 ClaimAmount = disbursementsAndClaimsMasterDto.ClaimAmount,
-                CostCentreId = disbursementsAndClaimsMasterDto.CostCentreId,
+                CostCenterId = disbursementsAndClaimsMasterDto.CostCenterId,
                 ApprovalStatusId = disbursementsAndClaimsMasterDto.ApprovalStatusId
             };
 

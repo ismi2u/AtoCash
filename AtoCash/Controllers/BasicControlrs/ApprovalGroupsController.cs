@@ -37,7 +37,7 @@ namespace AtoCash.Controllers
                 ApprovalGroupVM approvalGroupVM = new()
                 {
                     Id = approvalGroup.Id,
-                    ApprovalGroupCode = approvalGroup.ApprovalGroupCode
+                    ApprovalGroupCode = approvalGroup.ApprovalGroupCode + "-" + approvalGroup.ApprovalGroupDesc
                 };
 
                 ListApprovalGroupVM.Add(approvalGroupVM);
@@ -70,19 +70,19 @@ namespace AtoCash.Controllers
         // PUT: api/ApprovalGroups/5
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
-        public async Task<IActionResult> PutApprovalGroup(int id, ApprovalGroup approvalGroup)
+        public async Task<IActionResult> PutApprovalGroup(int id, ApprovalGroupDTO approvalGroupDto)
         {
-            if (id != approvalGroup.Id)
+            if (id != approvalGroupDto.Id)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is Invalid" });
             }
 
-            var agroup = await _context.ApprovalGroups.FindAsync(id);
-            agroup.ApprovalGroupDesc = approvalGroup.ApprovalGroupDesc;
+            var agroup = await _context.ApprovalGroups.FindAsync(approvalGroupDto.Id);
+            agroup.ApprovalGroupDesc = approvalGroupDto.ApprovalGroupDesc;
 
             _context.ApprovalGroups.Update(agroup);
 
-            _context.Entry(approvalGroup).State = EntityState.Modified;
+            //_context.Entry(approvalGroup).State = EntityState.Modified;
 
             try
             {
@@ -90,14 +90,7 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ApprovalGroupExists(id))
-                {
-                    return Conflict(new RespStatus { Status = "Failure", Message = "ApprovalGroup is invalid" });
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return Ok(new RespStatus { Status = "Success", Message = "ApprovalGroup Details Updated!" });

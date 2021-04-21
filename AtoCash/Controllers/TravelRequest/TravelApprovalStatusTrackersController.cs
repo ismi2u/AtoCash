@@ -259,6 +259,16 @@ namespace AtoCash.Controllers
                     travelApprovalStatusTracker.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
 
 
+                    //update the Travel request table to reflect the rejection
+                    if (bRejectMessage)
+                    {
+                        var trvlApprReq = _context.TravelApprovalRequests.Where(p => p.Id == travelApprovalStatusTrackerDTO.TravelApprovalRequestId).FirstOrDefault();
+                        trvlApprReq.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
+                        trvlApprReq.ApprovedDate = DateTime.Now;
+                        _context.TravelApprovalRequests.Update(trvlApprReq);
+                        await _context.SaveChangesAsync();
+                    }
+
                 }
                 else //if the approver is the final approver
                 {

@@ -61,8 +61,8 @@ namespace AtoCash.Controllers
                     Id = department.Id,
                     DeptCode = department.DeptCode,
                     DeptName = department.DeptName,
-                    CostCentreId = department.CostCentreId,
-                    CostCentre = _context.CostCentres.Find(department.CostCentreId).CostCentreCode,
+                    CostCenterId = department.CostCenterId,
+                    CostCenter = _context.CostCenters.Find(department.CostCenterId).CostCenterCode,
                     StatusTypeId = department.StatusTypeId,
                     StatusType = _context.StatusTypes.Find(department.StatusTypeId).Status
 
@@ -91,8 +91,8 @@ namespace AtoCash.Controllers
             departmentDTO.Id = department.Id;
             departmentDTO.DeptCode = department.DeptCode;
             departmentDTO.DeptName = department.DeptName;
-            departmentDTO.CostCentreId = department.CostCentreId;
-            departmentDTO.CostCentre = _context.CostCentres.Find(department.CostCentreId).CostCentreCode;
+            departmentDTO.CostCenterId = department.CostCenterId;
+            departmentDTO.CostCenter = _context.CostCenters.Find(department.CostCenterId).CostCenterCode;
             departmentDTO.StatusTypeId = department.StatusTypeId;
             departmentDTO.StatusType = _context.StatusTypes.Find(department.StatusTypeId).Status;
 
@@ -113,7 +113,7 @@ namespace AtoCash.Controllers
             var department = await _context.Departments.FindAsync(id);
 
             department.DeptName = departmentDto.DeptName;
-            department.CostCentreId = departmentDto.CostCentreId;
+            department.CostCenterId = departmentDto.CostCenterId;
             department.StatusTypeId = departmentDto.StatusTypeId;
 
             _context.Departments.Update(department);
@@ -153,7 +153,7 @@ namespace AtoCash.Controllers
             {
                 DeptCode = departmentDto.DeptCode,
                 DeptName = departmentDto.DeptName,
-                CostCentreId = departmentDto.CostCentreId,
+                CostCenterId = departmentDto.CostCenterId,
                 StatusTypeId = departmentDto.StatusTypeId
             };
 

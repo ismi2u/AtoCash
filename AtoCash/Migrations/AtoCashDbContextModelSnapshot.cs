@@ -238,18 +238,18 @@ namespace AtoCash.Migrations
                     b.ToTable("ClaimApprovalStatusTrackers");
                 });
 
-            modelBuilder.Entity("AtoCash.Models.CostCentre", b =>
+            modelBuilder.Entity("AtoCash.Models.CostCenter", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("CostCentreCode")
+                    b.Property<string>("CostCenterCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("CostCentreDesc")
+                    b.Property<string>("CostCenterDesc")
                         .IsRequired()
                         .HasColumnType("nvarchar(150)");
 
@@ -260,7 +260,7 @@ namespace AtoCash.Migrations
 
                     b.HasIndex("StatusTypeId");
 
-                    b.ToTable("CostCentres");
+                    b.ToTable("CostCenters");
                 });
 
             modelBuilder.Entity("AtoCash.Models.CurrencyType", b =>
@@ -299,7 +299,7 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CostCentreId")
+                    b.Property<int>("CostCenterId")
                         .HasColumnType("int");
 
                     b.Property<string>("DeptCode")
@@ -315,7 +315,7 @@ namespace AtoCash.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CostCentreId");
+                    b.HasIndex("CostCenterId");
 
                     b.HasIndex("StatusTypeId");
 
@@ -341,7 +341,7 @@ namespace AtoCash.Migrations
                     b.Property<double>("ClaimAmount")
                         .HasColumnType("float");
 
-                    b.Property<int>("CostCentreId")
+                    b.Property<int>("CostCenterId")
                         .HasColumnType("int");
 
                     b.Property<int>("CurrencyTypeId")
@@ -378,7 +378,7 @@ namespace AtoCash.Migrations
 
                     b.HasIndex("ApprovalStatusId");
 
-                    b.HasIndex("CostCentreId");
+                    b.HasIndex("CostCenterId");
 
                     b.HasIndex("CurrencyTypeId");
 
@@ -860,7 +860,7 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("CostCentreId")
+                    b.Property<int>("CostCenterId")
                         .HasColumnType("int");
 
                     b.Property<string>("ProjectDesc")
@@ -879,7 +879,7 @@ namespace AtoCash.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CostCentreId");
+                    b.HasIndex("CostCenterId");
 
                     b.HasIndex("ProjectManagerId");
 
@@ -1339,7 +1339,7 @@ namespace AtoCash.Migrations
                     b.Navigation("WorkTask");
                 });
 
-            modelBuilder.Entity("AtoCash.Models.CostCentre", b =>
+            modelBuilder.Entity("AtoCash.Models.CostCenter", b =>
                 {
                     b.HasOne("AtoCash.Models.StatusType", "StatusType")
                         .WithMany()
@@ -1363,9 +1363,9 @@ namespace AtoCash.Migrations
 
             modelBuilder.Entity("AtoCash.Models.Department", b =>
                 {
-                    b.HasOne("AtoCash.Models.CostCentre", "CostCentre")
+                    b.HasOne("AtoCash.Models.CostCenter", "CostCenter")
                         .WithMany()
-                        .HasForeignKey("CostCentreId")
+                        .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1375,7 +1375,7 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CostCentre");
+                    b.Navigation("CostCenter");
 
                     b.Navigation("StatusType");
                 });
@@ -1388,9 +1388,9 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AtoCash.Models.CostCentre", "CostCentre")
+                    b.HasOne("AtoCash.Models.CostCenter", "CostCenter")
                         .WithMany()
-                        .HasForeignKey("CostCentreId")
+                        .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1438,7 +1438,7 @@ namespace AtoCash.Migrations
 
                     b.Navigation("ApprovalStatusType");
 
-                    b.Navigation("CostCentre");
+                    b.Navigation("CostCenter");
 
                     b.Navigation("CurrencyType");
 
@@ -1730,9 +1730,9 @@ namespace AtoCash.Migrations
 
             modelBuilder.Entity("AtoCash.Models.Project", b =>
                 {
-                    b.HasOne("AtoCash.Models.CostCentre", "CostCentre")
+                    b.HasOne("AtoCash.Models.CostCenter", "CostCenter")
                         .WithMany()
-                        .HasForeignKey("CostCentreId")
+                        .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1748,7 +1748,7 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("CostCentre");
+                    b.Navigation("CostCenter");
 
                     b.Navigation("ProjectManager");
 

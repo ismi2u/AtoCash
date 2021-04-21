@@ -20,7 +20,7 @@ namespace AtoCash.Data
        
         public DbSet<Employee> Employees { get; set; }
 
-        public DbSet<CostCentre> CostCentres { get; set; }
+        public DbSet<CostCenter> CostCenters { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<ApprovalGroup> ApprovalGroups { get; set; }
         public DbSet<ApprovalRoleMap> ApprovalRoleMaps { get; set; }

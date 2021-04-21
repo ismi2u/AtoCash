@@ -30,4 +30,12 @@ namespace AtoCash.Models
         public int Id { get; set; }
         public string ApprovalGroupCode { get; set; }
     }
+
+    public class ApprovalGroupDTO
+    {
+        public int Id { get; set; }
+
+        public string ApprovalGroupCode { get; set; }
+        public string ApprovalGroupDesc { get; set; }
+    }
 }

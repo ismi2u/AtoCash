@@ -119,10 +119,10 @@ CREATE TABLE [dbo].[ClaimApprovalStatusTrackers](
 	[ApprovalStatusTypeId] [int] NOT NULL,
 	[Comments] [nvarchar](250) NOT NULL)
 GO
-CREATE TABLE [dbo].[CostCentres](
+CREATE TABLE [dbo].[CostCenters](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
-	[CostCentreCode] [nvarchar](20) NOT NULL,
-	[CostCentreDesc] [nvarchar](150) NOT NULL,
+	[CostCenterCode] [nvarchar](20) NOT NULL,
+	[CostCenterDesc] [nvarchar](150) NOT NULL,
 	[StatusTypeId] [int] NOT NULL)
 GO
 
@@ -141,7 +141,7 @@ CREATE TABLE [dbo].[Departments](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[DeptCode] [nvarchar](20) NOT NULL,
 	[DeptName] [nvarchar](30) NOT NULL,
-	[CostCentreId] [int] NOT NULL,
+	[CostCenterId] [int] NOT NULL,
 	[StatusTypeId] [int] NOT NULL)
 GO
 CREATE TABLE [dbo].[DisbursementsAndClaimsMasters](
@@ -157,7 +157,7 @@ CREATE TABLE [dbo].[DisbursementsAndClaimsMasters](
 	[RecordDate] [datetime2](7) NOT NULL,
 	[CurrencyTypeId] [int] NOT NULL,
 	[Amount] [float] NOT NULL,
-	[CostCentreId] [int] NOT NULL,
+	[CostCenterId] [int] NOT NULL,
 	[ApprovalStatusId] [int] NOT NULL)
 GO
 CREATE TABLE [dbo].[EmpCurrentPettyCashBalances](
@@ -288,7 +288,7 @@ GO
 CREATE TABLE [dbo].[Projects](
 	[Id] [int] IDENTITY(1,1) NOT NULL PRIMARY KEY,
 	[ProjectName] [nvarchar](25) NOT NULL,
-	[CostCentreId] [int] NOT NULL,
+	[CostCenterId] [int] NOT NULL,
 	[ProjectManagerId] [int] NOT NULL,
 	[ProjectDesc] [nvarchar](200) NOT NULL,
 	[StatusTypeId] [int] NOT NULL)
@@ -437,10 +437,10 @@ GO
 ALTER TABLE [dbo].[ClaimApprovalStatusTrackers] CHECK CONSTRAINT [FK_ClaimApprovalStatusTrackers_Projects_ProjectId]
 GO
 
-ALTER TABLE [dbo].[CostCentres]  WITH CHECK ADD  CONSTRAINT [FK_CostCentres_StatusTypes_StatusTypeId] FOREIGN KEY([StatusTypeId])
+ALTER TABLE [dbo].[CostCenters]  WITH CHECK ADD  CONSTRAINT [FK_CostCenters_StatusTypes_StatusTypeId] FOREIGN KEY([StatusTypeId])
 REFERENCES [dbo].[StatusTypes] ([Id])
 GO
-ALTER TABLE [dbo].[CostCentres] CHECK CONSTRAINT [FK_CostCentres_StatusTypes_StatusTypeId]
+ALTER TABLE [dbo].[CostCenters] CHECK CONSTRAINT [FK_CostCenters_StatusTypes_StatusTypeId]
 GO
 ALTER TABLE [dbo].[CurrencyTypes]  WITH CHECK ADD  CONSTRAINT [FK_CurrencyTypes_StatusTypes_StatusTypeId] FOREIGN KEY([StatusTypeId])
 REFERENCES [dbo].[StatusTypes] ([Id])
@@ -450,10 +450,10 @@ GO
 
 
 
-ALTER TABLE [dbo].[Departments]  WITH CHECK ADD  CONSTRAINT [FK_Departments_CostCentres_CostCentreId] FOREIGN KEY([CostCentreId])
-REFERENCES [dbo].[CostCentres] ([Id])
+ALTER TABLE [dbo].[Departments]  WITH CHECK ADD  CONSTRAINT [FK_Departments_CostCenters_CostCenterId] FOREIGN KEY([CostCenterId])
+REFERENCES [dbo].[CostCenters] ([Id])
 GO
-ALTER TABLE [dbo].[Departments] CHECK CONSTRAINT [FK_Departments_CostCentres_CostCentreId]
+ALTER TABLE [dbo].[Departments] CHECK CONSTRAINT [FK_Departments_CostCenters_CostCenterId]
 GO
 
 
@@ -469,10 +469,10 @@ REFERENCES [dbo].[ApprovalStatusTypes] ([Id])
 GO
 ALTER TABLE [dbo].[DisbursementsAndClaimsMasters] CHECK CONSTRAINT [FK_DisbursementsAndClaimsMasters_ApprovalStatusTypes_ApprovalStatusId]
 GO
-ALTER TABLE [dbo].[DisbursementsAndClaimsMasters]  WITH CHECK ADD  CONSTRAINT [FK_DisbursementsAndClaimsMasters_CostCentres_CostCentreId] FOREIGN KEY([CostCentreId])
-REFERENCES [dbo].[CostCentres] ([Id])
+ALTER TABLE [dbo].[DisbursementsAndClaimsMasters]  WITH CHECK ADD  CONSTRAINT [FK_DisbursementsAndClaimsMasters_CostCenters_CostCenterId] FOREIGN KEY([CostCenterId])
+REFERENCES [dbo].[CostCenters] ([Id])
 GO
-ALTER TABLE [dbo].[DisbursementsAndClaimsMasters] CHECK CONSTRAINT [FK_DisbursementsAndClaimsMasters_CostCentres_CostCentreId]
+ALTER TABLE [dbo].[DisbursementsAndClaimsMasters] CHECK CONSTRAINT [FK_DisbursementsAndClaimsMasters_CostCenters_CostCenterId]
 GO
 
 ALTER TABLE [dbo].[DisbursementsAndClaimsMasters]  WITH CHECK ADD  CONSTRAINT [FK_DisbursementsAndClaimsMasters_CurrencyTypes_CurrencyTypeId] FOREIGN KEY([CurrencyTypeId])
@@ -718,10 +718,10 @@ REFERENCES [dbo].[Projects] ([Id])
 GO
 ALTER TABLE [dbo].[ProjectManagements] CHECK CONSTRAINT [FK_ProjectManagements_Projects_ProjectId]
 GO
-ALTER TABLE [dbo].[Projects]  WITH CHECK ADD  CONSTRAINT [FK_Projects_CostCentres_CostCentreId] FOREIGN KEY([CostCentreId])
-REFERENCES [dbo].[CostCentres] ([Id])
+ALTER TABLE [dbo].[Projects]  WITH CHECK ADD  CONSTRAINT [FK_Projects_CostCenters_CostCenterId] FOREIGN KEY([CostCenterId])
+REFERENCES [dbo].[CostCenters] ([Id])
 GO
-ALTER TABLE [dbo].[Projects] CHECK CONSTRAINT [FK_Projects_CostCentres_CostCentreId]
+ALTER TABLE [dbo].[Projects] CHECK CONSTRAINT [FK_Projects_CostCenters_CostCenterId]
 GO
 ALTER TABLE [dbo].[Projects]  WITH CHECK ADD  CONSTRAINT [FK_Projects_Employees_ProjectManagerId] FOREIGN KEY([ProjectManagerId])
 REFERENCES [dbo].[Employees] ([Id])
@@ -852,19 +852,19 @@ INSERT [dbo].[ApprovalGroups] ([Id], [ApprovalGroupCode], [ApprovalGroupDesc]) V
 INSERT [dbo].[ApprovalGroups] ([Id], [ApprovalGroupCode], [ApprovalGroupDesc]) VALUES (3, N'APPGRP-03', N'APPROVER GROUP 3')
 SET IDENTITY_INSERT [dbo].[ApprovalGroups] OFF
 GO
-SET IDENTITY_INSERT [dbo].[CostCentres] ON 
+SET IDENTITY_INSERT [dbo].[CostCenters] ON 
 
-INSERT [dbo].[CostCentres] ([Id], [CostCentreCode], [CostCentreDesc], [StatusTypeId]) VALUES (1, N'CC1001', N'COST CENTRE FOR EXP', 1)
-INSERT [dbo].[CostCentres] ([Id], [CostCentreCode], [CostCentreDesc], [StatusTypeId]) VALUES (2, N'CC1002', N'COST EXPENSE TRACKING', 1)
-INSERT [dbo].[CostCentres] ([Id], [CostCentreCode], [CostCentreDesc], [StatusTypeId]) VALUES (3, N'NW1002', N'OVERSEAS COST TRACKING', 1)
-SET IDENTITY_INSERT [dbo].[CostCentres] OFF
+INSERT [dbo].[CostCenters] ([Id], [CostCenterCode], [CostCenterDesc], [StatusTypeId]) VALUES (1, N'CC1001', N'COST CENTRE FOR EXP', 1)
+INSERT [dbo].[CostCenters] ([Id], [CostCenterCode], [CostCenterDesc], [StatusTypeId]) VALUES (2, N'CC1002', N'COST EXPENSE TRACKING', 1)
+INSERT [dbo].[CostCenters] ([Id], [CostCenterCode], [CostCenterDesc], [StatusTypeId]) VALUES (3, N'NW1002', N'OVERSEAS COST TRACKING', 1)
+SET IDENTITY_INSERT [dbo].[CostCenters] OFF
 GO
 SET IDENTITY_INSERT [dbo].[Departments] ON 
 
-INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId], [StatusTypeId]) VALUES (1, N'MFGDEPT-01', N'MANUFACTURING', 1, 1)
-INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId], [StatusTypeId]) VALUES (2, N'MFGDEPT-02', N'MANUFACT UNIT 2', 2, 1)
-INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId], [StatusTypeId]) VALUES (3, N'FINDEPT-01', N'CHENNAI FINANCE DEPT', 3, 1)
-INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCentreId], [StatusTypeId]) VALUES (4, N'FINDEPT-02', N'DUBAI FINANCE DEPT', 3, 1)
+INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCenterId], [StatusTypeId]) VALUES (1, N'MFGDEPT-01', N'MANUFACTURING', 1, 1)
+INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCenterId], [StatusTypeId]) VALUES (2, N'MFGDEPT-02', N'MANUFACT UNIT 2', 2, 1)
+INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCenterId], [StatusTypeId]) VALUES (3, N'FINDEPT-01', N'CHENNAI FINANCE DEPT', 3, 1)
+INSERT [dbo].[Departments] ([Id], [DeptCode], [DeptName], [CostCenterId], [StatusTypeId]) VALUES (4, N'FINDEPT-02', N'DUBAI FINANCE DEPT', 3, 1)
 SET IDENTITY_INSERT [dbo].[Departments] OFF
 GO
 SET IDENTITY_INSERT [dbo].[EmploymentTypes] ON 
@@ -968,8 +968,8 @@ SET IDENTITY_INSERT [dbo].[EmpCurrentPettyCashBalances] OFF
 GO
 
 SET IDENTITY_INSERT [dbo].[Projects] ON 
-INSERT [dbo].[Projects] ([Id], [ProjectName], [CostCentreId], [ProjectManagerId], [ProjectDesc], [StatusTypeId]) VALUES (1, N'PROJ-01', 1, 4, 'PROJ Description', 1)
-INSERT [dbo].[Projects] ([Id], [ProjectName], [CostCentreId], [ProjectManagerId], [ProjectDesc], [StatusTypeId]) VALUES (2, N'PROJ-02', 1, 3, 'Second PROJ Description', 1)
+INSERT [dbo].[Projects] ([Id], [ProjectName], [CostCenterId], [ProjectManagerId], [ProjectDesc], [StatusTypeId]) VALUES (1, N'PROJ-01', 1, 4, 'PROJ Description', 1)
+INSERT [dbo].[Projects] ([Id], [ProjectName], [CostCenterId], [ProjectManagerId], [ProjectDesc], [StatusTypeId]) VALUES (2, N'PROJ-02', 1, 3, 'Second PROJ Description', 1)
 SET IDENTITY_INSERT [dbo].[Projects] OFF
 GO
 

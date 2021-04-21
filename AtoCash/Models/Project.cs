@@ -19,9 +19,9 @@ namespace AtoCash.Models
         public string ProjectName { get; set; }
 
         [Required]
-        [ForeignKey("CostCentreId")]
-        public virtual CostCentre CostCentre { get; set; }
-        public int CostCentreId { get; set; }
+        [ForeignKey("CostCenterId")]
+        public virtual CostCenter CostCenter { get; set; }
+        public int CostCenterId { get; set; }
 
         [Required]
         [ForeignKey("ProjectManagerId")]
@@ -43,8 +43,8 @@ namespace AtoCash.Models
     {
         public int Id { get; set; }
         public string ProjectName { get; set; }
-        public int CostCentreId { get; set; }
-        public string CostCentre { get; set; }
+        public int CostCenterId { get; set; }
+        public string CostCenter { get; set; }
         public int ProjectManagerId { get; set; }
         public string ProjectManager { get; set; }
         public string ProjectDesc { get; set; }
