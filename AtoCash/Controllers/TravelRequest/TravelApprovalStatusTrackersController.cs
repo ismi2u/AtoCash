@@ -258,6 +258,20 @@ namespace AtoCash.Controllers
                     //if nothing else then just update the approval status
                     travelApprovalStatusTracker.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
 
+                    //If no travelApprovalStatusTrackers are in pending for the travel request then update the TravelRequest table
+
+                  int pendingApprovals =   _context.TravelApprovalStatusTrackers
+                            .Where(t => t.TravelApprovalRequestId == travelApprovalStatusTrackerDTO.TravelApprovalRequestId &&
+                            t.ApprovalStatusTypeId == (int)EApprovalStatus.Pending).Count();
+
+                    if (pendingApprovals == 0)
+                    {
+                        var trvlApprReq = _context.TravelApprovalRequests.Where(p => p.Id == travelApprovalStatusTrackerDTO.TravelApprovalRequestId).FirstOrDefault();
+                        trvlApprReq.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
+                        trvlApprReq.ApprovedDate = DateTime.Now;
+                        _context.TravelApprovalRequests.Update(trvlApprReq);
+                        await _context.SaveChangesAsync();
+                    }
 
                     //update the Travel request table to reflect the rejection
                     if (bRejectMessage)
@@ -282,9 +296,11 @@ namespace AtoCash.Controllers
                     int travelApprovalrequestId = _context.TravelApprovalRequests.Where(d => d.Id == travelItem.TravelApprovalRequestId).FirstOrDefault().Id;
                     var travelApprovalrequest = await _context.TravelApprovalRequests.FindAsync(travelApprovalrequestId);
 
-                    travelApprovalrequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                    travelApprovalrequest.ApprovalStatusTypeId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     travelApprovalrequest.ApprovedDate = DateTime.Now;
                     _context.Update(travelApprovalrequest);
+
+
 
                 }
 
@@ -335,13 +351,13 @@ namespace AtoCash.Controllers
             var travelApprovalStatusTracker = await _context.TravelApprovalStatusTrackers.FindAsync(id);
             if (travelApprovalStatusTracker == null)
             {
-                return NotFound();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Travel Approval Request Id invalid!" });
             }
 
             _context.TravelApprovalStatusTrackers.Remove(travelApprovalStatusTracker);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Travel Approval Request deleted!" });
         }
 
         //private bool TravelApprovalStatusTrackerExists(int id)
@@ -380,7 +396,7 @@ namespace AtoCash.Controllers
                                     r.ProjectId != null &&
                                     r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending)
 
-                                    );
+                                    ).ToList();
 
 
             List<TravelApprovalStatusTrackerDTO> ListTravelApprovalStatusTrackerDTO = new();

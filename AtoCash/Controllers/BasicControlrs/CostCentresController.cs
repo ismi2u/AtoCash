@@ -80,7 +80,7 @@ namespace AtoCash.Controllers
 
             if (costCenter == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cost Centre Id invalid!" });
             }
 
             CostCenterDTO costCenterDTO = new CostCenterDTO
@@ -175,7 +175,7 @@ namespace AtoCash.Controllers
             var costCenter = await _context.CostCenters.FindAsync(id);
             if (costCenter == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cost Centre Id invalid!" });
             }
 
             _context.CostCenters.Remove(costCenter);

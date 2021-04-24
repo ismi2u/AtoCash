@@ -68,7 +68,7 @@ namespace AtoCash.Controllers
 
             if (disbursementsAndClaimsMaster == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Disburese Id invalid!" });
             }
 
             disbursementsAndClaimsMasterDTO.Id = disbursementsAndClaimsMaster.Id;
@@ -125,7 +125,7 @@ namespace AtoCash.Controllers
             {
                 if (!DisbursementsAndClaimsMasterExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Disburse Id invalid!" });
                 }
                 else
                 {
@@ -133,7 +133,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Disburse Details Updated!" });
         }
 
         // POST: api/DisbursementsAndClaimsMasters
@@ -172,13 +172,13 @@ namespace AtoCash.Controllers
             var disbursementsAndClaimsMaster = await _context.DisbursementsAndClaimsMasters.FindAsync(id);
             if (disbursementsAndClaimsMaster == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Disburse Id invalid!" });
             }
 
             _context.DisbursementsAndClaimsMasters.Remove(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Disburse Details Updated!" });
         }
 
         private bool DisbursementsAndClaimsMasterExists(int id)

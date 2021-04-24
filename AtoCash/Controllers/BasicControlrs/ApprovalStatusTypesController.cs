@@ -39,7 +39,7 @@ namespace AtoCash.Controllers
 
             if (approvalStatusType == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Status-Type Id invalid!" });
             }
 
             return approvalStatusType;
@@ -70,7 +70,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalStatusTypeExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Approval Status Type Id invalid!" });
                 }
                 else
                 {
@@ -78,7 +78,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Approval Status Type Details Updated!" });
         }
 
         // POST: api/ApprovalStatusTypes
@@ -107,7 +107,7 @@ namespace AtoCash.Controllers
             var approvalStatusType = await _context.ApprovalStatusTypes.FindAsync(id);
             if (approvalStatusType == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Status Type Id invalid!" });
             }
 
             _context.ApprovalStatusTypes.Remove(approvalStatusType);

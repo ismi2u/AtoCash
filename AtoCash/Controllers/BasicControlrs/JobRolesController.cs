@@ -118,7 +118,7 @@ namespace AtoCash.Controllers
             _context.JobRoles.Add(role);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRole", new { id = role.Id }, role);
+            return Ok(new RespStatus { Status = "Success", Message = "JobRole Created!" });
         }
 
         // DELETE: api/Roles/5

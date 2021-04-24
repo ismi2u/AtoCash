@@ -39,7 +39,7 @@ namespace AtoCash.Controllers
 
             if (employmentType == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employment Type Id invalid!" });
             }
 
             return employmentType;
@@ -72,7 +72,7 @@ namespace AtoCash.Controllers
             {
                 if (!EmploymentTypeExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Employment Type Id invalid!" });
                 }
                 else
                 {
@@ -80,7 +80,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Employment Type Details Updated!" });
         }
 
         // POST: api/EmploymentTypes
@@ -99,7 +99,7 @@ namespace AtoCash.Controllers
             _context.EmploymentTypes.Add(employmentType);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEmploymentType", new { id = employmentType.Id }, employmentType);
+            return Ok(new RespStatus { Status = "Success", Message = "New EmploymentType Created!" });
         }
 
         // DELETE: api/EmploymentTypes/5
@@ -110,7 +110,7 @@ namespace AtoCash.Controllers
             var employmentType = await _context.EmploymentTypes.FindAsync(id);
             if (employmentType == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employment Type Id invalid!" });
             }
 
             _context.EmploymentTypes.Remove(employmentType);

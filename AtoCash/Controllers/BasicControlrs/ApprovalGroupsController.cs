@@ -61,7 +61,7 @@ namespace AtoCash.Controllers
 
             if (approvalGroup == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Group Id invalid!" });
             }
 
             return approvalGroup;
@@ -122,7 +122,7 @@ namespace AtoCash.Controllers
             var approvalGroup = await _context.ApprovalGroups.FindAsync(id);
             if (approvalGroup == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Group Id invalid!" });
             }
 
             _context.ApprovalGroups.Remove(approvalGroup);

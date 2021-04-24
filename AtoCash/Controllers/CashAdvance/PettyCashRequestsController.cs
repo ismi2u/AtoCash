@@ -100,6 +100,7 @@ namespace AtoCash.Controllers
             pettyCashRequestDTO.WorkTaskId = pettyCashRequest.WorkTaskId;
             pettyCashRequestDTO.WorkTask = pettyCashRequest.WorkTaskId != null ? _context.WorkTasks.Find(pettyCashRequest.WorkTaskId).TaskName : null;
             pettyCashRequestDTO.ApprovalStatusTypeId = pettyCashRequest.ApprovalStatusTypeId;
+            pettyCashRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(pettyCashRequest.ApprovalStatusTypeId).Status;
             pettyCashRequestDTO.ApprovedDate = pettyCashRequest.ApprovedDate;
 
             return pettyCashRequestDTO;
@@ -236,13 +237,31 @@ namespace AtoCash.Controllers
 
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
 
+            ///update the Wallet of the employe to reflect the changes
+            int ApprovedCount = _context.ExpenseReimburseStatusTrackers.Where(e => e.ExpenseReimburseRequestId == pettyCashRequest.Id && e.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
+            if (ApprovedCount != 0)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "PettyCash Requests cant be Edited after Approval!" });
+            }
+
+
             //if Pettycash request is modified then trigger changes to other tables
-            if (pettyCashRequest.PettyClaimAmount != pettyCashRequestDto.PettyClaimAmount
-                || pettyCashRequest.PettyClaimRequestDesc != pettyCashRequestDto.PettyClaimRequestDesc)
+            if (pettyCashRequest.PettyClaimAmount != pettyCashRequestDto.PettyClaimAmount)
             {
                 pettyCashRequest.PettyClaimAmount = pettyCashRequestDto.PettyClaimAmount;
                 pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
+                //update the EmpPettyCashBalance to credit back the deducted amount
+                EmpCurrentPettyCashBalance empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).FirstOrDefault();
+                double oldBal = empPettyCashBal.CurBalance;
+                double DiffAmt = pettyCashRequestDto.PettyClaimAmount - pettyCashRequest.PettyClaimAmount;
+
+                empPettyCashBal.CurBalance = oldBal + DiffAmt;
+                empPettyCashBal.UpdatedOn = DateTime.Now;
+                _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
             }
+            ////
+            ///
+
             pettyCashRequest.PettyClaimAmount = pettyCashRequestDto.PettyClaimAmount;
             pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
             pettyCashRequest.CashReqDate = DateTime.Now;
@@ -261,6 +280,7 @@ namespace AtoCash.Controllers
             }
 
 
+            
 
             _context.PettyCashRequests.Update(pettyCashRequest);
 
@@ -353,8 +373,22 @@ namespace AtoCash.Controllers
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
             if (pettyCashRequest == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cash Advance Request Id Invalid!" });
             }
+
+            int ApprovedCount = _context.ClaimApprovalStatusTrackers.Where( c=> c.PettyCashRequestId== pettyCashRequest.Id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
+
+            if (ApprovedCount != 0)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cash Advance Request cant be Deleted after Approval!" });
+            }
+
+
+            //update the EmpPettyCashBalance to credit back the deducted amount
+            EmpCurrentPettyCashBalance empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).FirstOrDefault();
+            empPettyCashBal.CurBalance = empPettyCashBal.CurBalance + pettyCashRequest.PettyClaimAmount;
+            empPettyCashBal.UpdatedOn = DateTime.Now;
+            _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
 
             _context.PettyCashRequests.Remove(pettyCashRequest);
             await _context.SaveChangesAsync();
@@ -435,6 +469,7 @@ namespace AtoCash.Controllers
             curPettyCashBal.Id = curPettyCashBal.Id;
             curPettyCashBal.CurBalance = empCurAvailBal - empReqAmount <= maxCashAllowedForRole ? empCurAvailBal - empReqAmount : maxCashAllowedForRole;
             curPettyCashBal.EmployeeId = empid;
+            curPettyCashBal.UpdatedOn = DateTime.Now;
             _context.Update(curPettyCashBal);
             await _context.SaveChangesAsync();
             #endregion
@@ -452,7 +487,7 @@ namespace AtoCash.Controllers
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
                 PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc,
                 CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
-                ApprovalStatusTypeId = (int)EApprovalStatus.Initiating
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending
 
             };
             _context.PettyCashRequests.Add(pcrq);
@@ -543,23 +578,34 @@ namespace AtoCash.Controllers
 
             //##### 5. Adding a entry in DisbursementsAndClaimsMaster table for records
             #region
-            _context.DisbursementsAndClaimsMasters.Add(new DisbursementsAndClaimsMaster()
+
+            DisbursementsAndClaimsMaster disbursementsAndClaimsMaster = new();
+
+            disbursementsAndClaimsMaster.EmployeeId = pettyCashRequestDto.EmployeeId;
+            disbursementsAndClaimsMaster.PettyCashRequestId = pettyCashRequestDto.Id;
+            disbursementsAndClaimsMaster.ExpenseReimburseReqId = null;
+            disbursementsAndClaimsMaster.RequestTypeId = (int)ERequestType.CashAdvance;
+            disbursementsAndClaimsMaster.DepartmentId = null;
+            disbursementsAndClaimsMaster.ProjectId = pettyCashRequestDto.ProjectId;
+            disbursementsAndClaimsMaster.SubProjectId = pettyCashRequestDto.SubProjectId;
+            disbursementsAndClaimsMaster.WorkTaskId = pettyCashRequestDto.WorkTaskId;
+            disbursementsAndClaimsMaster.RecordDate = DateTime.Now;
+            disbursementsAndClaimsMaster.CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId;
+            disbursementsAndClaimsMaster.ClaimAmount = pettyCashRequestDto.PettyClaimAmount;
+            disbursementsAndClaimsMaster.AmountToWallet = 0;
+            disbursementsAndClaimsMaster.AmountToCredit = 0;
+            disbursementsAndClaimsMaster.CostCenterId = _context.Projects.Find(pettyCashRequestDto.ProjectId).CostCenterId;
+            disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
+
+            _context.DisbursementsAndClaimsMasters.Add(disbursementsAndClaimsMaster);
+            try
             {
-                EmployeeId = pettyCashRequestDto.EmployeeId,
-                PettyCashRequestId = pettyCashRequestDto.Id,
-                ExpenseReimburseReqId = null,
-                RequestTypeId = (int)ERequestType.CashAdvance,
-                DepartmentId = null,
-                ProjectId = pettyCashRequestDto.ProjectId,
-                SubProjectId = pettyCashRequestDto.SubProjectId,
-                WorkTaskId = pettyCashRequestDto.WorkTaskId,
-                RecordDate = DateTime.Now,
-                CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
-                ClaimAmount = pettyCashRequestDto.PettyClaimAmount,
-                CostCenterId = _context.Departments.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId).CostCenterId,
-                ApprovalStatusId = (int)EApprovalStatus.Pending //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
-            });
-            await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                string error = ex.Message;
+            }
             #endregion
 
             return Ok(new RespStatus { Status = "Success", Message = "Advance Request Created!" });
@@ -614,7 +660,7 @@ namespace AtoCash.Controllers
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
                 DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId,
                 CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
-                ApprovalStatusTypeId = (int)EApprovalStatus.Initiating
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending
 
             };
             _context.PettyCashRequests.Add(pcrq);

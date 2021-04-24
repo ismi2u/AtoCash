@@ -90,7 +90,7 @@ namespace AtoCash.Controllers
 
             if (expenseReimbRequest == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense Reimburse Id invalid!" });
             }
 
             ExpenseReimburseRequestDTO expenseReimburseRequestDTO = new()
@@ -132,7 +132,7 @@ namespace AtoCash.Controllers
 
             if (employee == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Id invalid!" });
             }
 
             //get the employee's approval level for comparison with approver level  to decide "ShowEditDelete" bool
@@ -143,7 +143,7 @@ namespace AtoCash.Controllers
 
             if (expenseReimbRequests == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense Reimburse Id invalid!" });
             }
 
             List<ExpenseReimburseRequestDTO> ListExpenseReimburseRequestDTO = new();
@@ -268,7 +268,7 @@ namespace AtoCash.Controllers
                 throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Expense Reimburse Data Updated!" });
         }
 
         // POST: api/ExpenseReimburseRequests
@@ -422,7 +422,7 @@ namespace AtoCash.Controllers
 
             if (expenseReimburseRequestDto == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "expenseReimburseRequest Id invalid!" });
             }
 
             if (expenseReimburseRequestDto.ProjectId != null)
@@ -448,8 +448,16 @@ namespace AtoCash.Controllers
             var expenseReimburseRequest = await _context.ExpenseReimburseRequests.FindAsync(id);
             if (expenseReimburseRequest == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "expense Reimburse Request Id Invalid!" });
             }
+
+            int ApprovedCount =   _context.ExpenseReimburseStatusTrackers.Where(e => e.ExpenseReimburseRequestId == expenseReimburseRequest.Id && e.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
+
+            if(ApprovedCount !=0 )
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Reimburse Request cant be Deleted after Approval!" });
+            }
+            
 
             _context.ExpenseReimburseRequests.Remove(expenseReimburseRequest);
             await _context.SaveChangesAsync();

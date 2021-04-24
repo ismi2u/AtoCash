@@ -73,27 +73,7 @@ namespace AtoCash.Controllers
 
         }
 
-        [HttpGet]
-        [ActionName("GetSubProjectsForDropdown")]
-        public async Task<ActionResult<IEnumerable<SubProjectVM>>> GetSubProjectsForDropdown()
-        {
-            List<SubProjectVM> ListSubProjectVM = new List<SubProjectVM>();
-
-            var subProjects = await _context.SubProjects.ToListAsync();
-            foreach (SubProject subProject in subProjects)
-            {
-                SubProjectVM subProjectVM = new SubProjectVM
-                {
-                    Id = subProject.Id,
-                    SubProjectName = subProject.SubProjectName
-                };
-
-                ListSubProjectVM.Add(subProjectVM);
-            }
-
-            return ListSubProjectVM;
-
-        }
+      
 
 
         // GET: api/SubProjects

@@ -85,7 +85,7 @@ namespace AtoCash.Controllers
 
             if (department == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Department Id invalid!" });
             }
 
             departmentDTO.Id = department.Id;
@@ -180,7 +180,7 @@ namespace AtoCash.Controllers
             var department = await _context.Departments.FindAsync(id);
             if (department == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Department Id invalid!" });
             }
 
             _context.Departments.Remove(department);

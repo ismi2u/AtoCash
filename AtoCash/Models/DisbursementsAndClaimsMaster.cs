@@ -91,20 +91,36 @@ namespace AtoCash.Models
 
         public int Id { get; set; }
         public int EmployeeId { get; set; }
+
+        public string EmployeeName { get; set; }
         public int? PettyCashRequestId { get; set; }
         public int? ExpenseReimburseReqId { get; set; }
         public int RequestTypeId { get; set; }
+        public string RequestType { get; set; }
+
+        public int? DepartmentId { get; set; }
+        public string Department { get; set; }
         public int? ProjectId { get; set; }
+        public string Project { get; set; }
+
+        public string SubProject { get; set; }
         public int? SubProjectId { get; set; }
+
+        public string WorkTask { get; set; }
         public int? WorkTaskId { get; set; }
         public DateTime RecordDate { get; set; }
 
         public int CurrencyTypeId { get; set; }
+
+        public string CurrencyType { get; set; }
         public Double ClaimAmount { get; set; }
         public Double? AmountToWallet { get; set; }
         public Double? AmountToCredit { get; set; }
         public int CostCenterId { get; set; }
+        public string CostCenter { get; set; }
         public int ApprovalStatusId { get; set; }
+
+        public string ApprovalStatusType { get; set; }
 
 
 

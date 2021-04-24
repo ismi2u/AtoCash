@@ -133,7 +133,7 @@ namespace AtoCash.Controllers
 
             if (worktask == null)
             {
-                return NoContent();
+                return Ok(new RespStatus { Status = "Failure", Message = "Work Task Id is invalid!" });
             }
             WorkTaskDTO workTaskDto = new WorkTaskDTO
             {
@@ -173,17 +173,10 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!WorkTaskExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Work Task Details Updated!" });
         }
 
         // POST: api/WorkTasks
@@ -221,7 +214,7 @@ namespace AtoCash.Controllers
             var workTask = await _context.WorkTasks.FindAsync(id);
             if (workTask == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Work Task Id Invalid!" });
             }
 
             _context.WorkTasks.Remove(workTask);

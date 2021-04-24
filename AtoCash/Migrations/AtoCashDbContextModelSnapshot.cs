@@ -178,6 +178,9 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("ApprovalGroupId")
+                        .HasColumnType("int");
+
                     b.Property<int>("ApprovalLevelId")
                         .HasColumnType("int");
 
@@ -304,11 +307,11 @@ namespace AtoCash.Migrations
 
                     b.Property<string>("DeptCode")
                         .IsRequired()
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("DeptName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<int>("StatusTypeId")
                         .HasColumnType("int");
@@ -603,6 +606,9 @@ namespace AtoCash.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ApprovalGroupId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ApprovalLevelId")
                         .HasColumnType("int");
@@ -984,6 +990,9 @@ namespace AtoCash.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("CostCenterId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("DepartmentId")
                         .HasColumnType("int");
 
@@ -1016,6 +1025,8 @@ namespace AtoCash.Migrations
 
                     b.HasIndex("ApprovalStatusTypeId");
 
+                    b.HasIndex("CostCenterId");
+
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("EmployeeId");
@@ -1035,6 +1046,9 @@ namespace AtoCash.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("ApprovalGroupId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ApprovalLevelId")
                         .HasColumnType("int");
@@ -1063,6 +1077,9 @@ namespace AtoCash.Migrations
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("SubProjectId")
+                        .HasColumnType("int");
+
                     b.Property<int>("TravelApprovalRequestId")
                         .HasColumnType("int");
 
@@ -1071,6 +1088,9 @@ namespace AtoCash.Migrations
 
                     b.Property<DateTime>("TravelStartDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int?>("WorkTaskId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -1086,7 +1106,11 @@ namespace AtoCash.Migrations
 
                     b.HasIndex("RoleId");
 
+                    b.HasIndex("SubProjectId");
+
                     b.HasIndex("TravelApprovalRequestId");
+
+                    b.HasIndex("WorkTaskId");
 
                     b.ToTable("TravelApprovalStatusTrackers");
                 });
@@ -1793,6 +1817,12 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AtoCash.Models.CostCenter", "CostCenter")
+                        .WithMany()
+                        .HasForeignKey("CostCenterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("AtoCash.Models.Department", "Department")
                         .WithMany()
                         .HasForeignKey("DepartmentId");
@@ -1816,6 +1846,8 @@ namespace AtoCash.Migrations
                         .HasForeignKey("WorkTaskId");
 
                     b.Navigation("ApprovalStatusType");
+
+                    b.Navigation("CostCenter");
 
                     b.Navigation("Department");
 
@@ -1862,11 +1894,19 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AtoCash.Models.SubProject", "SubProject")
+                        .WithMany()
+                        .HasForeignKey("SubProjectId");
+
                     b.HasOne("AtoCash.Models.TravelApprovalRequest", "TravelApprovalRequest")
                         .WithMany()
                         .HasForeignKey("TravelApprovalRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("AtoCash.Models.WorkTask", "WorkTask")
+                        .WithMany()
+                        .HasForeignKey("WorkTaskId");
 
                     b.Navigation("ApprovalLevel");
 
@@ -1880,7 +1920,11 @@ namespace AtoCash.Migrations
 
                     b.Navigation("Role");
 
+                    b.Navigation("SubProject");
+
                     b.Navigation("TravelApprovalRequest");
+
+                    b.Navigation("WorkTask");
                 });
 
             modelBuilder.Entity("AtoCash.Models.WorkTask", b =>

@@ -99,7 +99,7 @@ namespace AtoCash.Controllers
 
             if (employee == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Id invalid!" });
             }
 
             employeeDTO.Id = employee.Id;
@@ -187,10 +187,24 @@ namespace AtoCash.Controllers
             employee.MobileNumber = employeeDto.MobileNumber;
             employee.EmploymentTypeId = employeeDto.EmploymentTypeId;
             employee.DepartmentId = employeeDto.DepartmentId;
-            employee.RoleId = employeeDto.RoleId;
             employee.CurrencyTypeId = employeeDto.CurrencyTypeId;
             employee.ApprovalGroupId = employeeDto.ApprovalGroupId;
             employee.StatusTypeId = employeeDto.StatusTypeId;
+
+            if(employee.RoleId != employeeDto.RoleId)
+            {
+            employee.RoleId = employeeDto.RoleId;
+                double oldAmt = _context.JobRoles.Find(employee.RoleId).MaxPettyCashAllowed;
+                double newAmt = _context.JobRoles.Find(employeeDto.RoleId).MaxPettyCashAllowed;
+                EmpCurrentPettyCashBalance empCurrentPettyCashBalance = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == employee.Id).FirstOrDefault();
+                double empCurBal = empCurrentPettyCashBalance.CurBalance;
+
+
+                double diffAmt = newAmt - oldAmt;
+
+                empCurrentPettyCashBalance.CurBalance = empCurBal+ diffAmt;
+                _context.EmpCurrentPettyCashBalances.Update(empCurrentPettyCashBalance);
+            }
 
             _context.Employees.Update(employee);
             //_context.Entry(employeeDto).State = EntityState.Modified;
@@ -292,7 +306,7 @@ namespace AtoCash.Controllers
             var employee = await _context.Employees.FindAsync(id);
             if (employee == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Id invalid!" });
             }
 
             _context.Employees.Remove(employee);

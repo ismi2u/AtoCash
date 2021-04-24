@@ -160,7 +160,7 @@ namespace AtoCash.Controllers.BasicControlrs
             _context.CurrencyTypes.Add(currencyTyp);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCurrencyType", new { id = currencyTypeDto.Id }, currencyTyp);
+            return Ok(new RespStatus { Status = "Success", Message = "New Currency Created!" });
         }
 
         // DELETE: api/CurrencyTypes/5

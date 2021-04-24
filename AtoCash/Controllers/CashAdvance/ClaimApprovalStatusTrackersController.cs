@@ -74,7 +74,7 @@ namespace AtoCash.Controllers
 
             if (claimApprovalStatusTracker == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Claim Approval Id is Invalid!" });
             }
 
             ClaimApprovalStatusTrackerDTO claimApprovalStatusTrackerDTO = new()
@@ -260,6 +260,21 @@ namespace AtoCash.Controllers
                     claimApprovalStatusTracker.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
 
 
+                    int pendingApprovals = _context.ClaimApprovalStatusTrackers
+                              .Where(t => t.PettyCashRequestId == claimApprovalStatusTrackerDto.PettyCashRequestId &&
+                              t.ApprovalStatusTypeId == (int)EApprovalStatus.Pending).Count();
+
+                    if ( pendingApprovals == 0)
+                    {
+                        var pettyCashReq = _context.PettyCashRequests.Where(p => p.Id == claimApprovalStatusTrackerDto.PettyCashRequestId).FirstOrDefault();
+                        pettyCashReq.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
+                        pettyCashReq.ApprovedDate = DateTime.Now;
+                        _context.PettyCashRequests.Update(pettyCashReq);
+                        await _context.SaveChangesAsync();
+                    }
+
+
+
                     //update the pettycash request table to reflect the rejection
                     if (bRejectMessage)
                     {
@@ -267,6 +282,19 @@ namespace AtoCash.Controllers
                         pettyCashReq.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
                         pettyCashReq.ApprovedDate = DateTime.Now;
                         _context.PettyCashRequests.Update(pettyCashReq);
+
+                        //update the EmpPettyCashBalance to credit back the deducted amount
+                        var empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashReq.EmployeeId).FirstOrDefault();
+                        empPettyCashBal.CurBalance = empPettyCashBal.CurBalance + pettyCashReq.PettyClaimAmount;
+                        _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
+
+
+                        var disbursementsAndClaimsMaster = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == pettyCashReq.Id).FirstOrDefault();
+                        disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Rejected;
+                        disbursementsAndClaimsMaster.ClaimAmount = 0;
+                        disbursementsAndClaimsMaster.AmountToWallet = 0;
+                        disbursementsAndClaimsMaster.AmountToCredit = 0;
+                        _context.DisbursementsAndClaimsMasters.Update(disbursementsAndClaimsMaster);
                         await _context.SaveChangesAsync();
                     }
 
@@ -288,7 +316,7 @@ namespace AtoCash.Controllers
                     int pettyCashReqId = _context.PettyCashRequests.Where(d => d.Id == claimitem.PettyCashRequestId).FirstOrDefault().Id;
                     var pettyCashReq = await _context.PettyCashRequests.FindAsync(pettyCashReqId);
 
-                    pettyCashReq.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                    pettyCashReq.ApprovalStatusTypeId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     pettyCashReq.ApprovedDate = DateTime.Now;
                     _context.Update(pettyCashReq);
 
@@ -359,7 +387,7 @@ namespace AtoCash.Controllers
             var claimApprovalStatusTracker = await _context.ClaimApprovalStatusTrackers.FindAsync(id);
             if (claimApprovalStatusTracker == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "PettyCash Approval Request Id invalid!" });
             }
 
             _context.ClaimApprovalStatusTrackers.Remove(claimApprovalStatusTracker);

@@ -36,9 +36,19 @@ namespace AtoCash.Models
 
         //Approver Project (either Department or Project => Can't be both)
 
+
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }
         public int? ProjectId { get; set; }
+
+        [ForeignKey("SubProjectId")]
+        public virtual SubProject SubProject { get; set; }
+        public int? SubProjectId { get; set; }
+
+        [ForeignKey("WorkTaskId")]
+        public virtual WorkTask WorkTask { get; set; }
+        public int? WorkTaskId { get; set; }
+
 
         //Approver ApprovalLevel
         [Required]

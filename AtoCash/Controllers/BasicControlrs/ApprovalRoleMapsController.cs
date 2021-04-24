@@ -102,7 +102,7 @@ namespace AtoCash.Controllers
 
             if (approvalRoleMap == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Rolemap Id invalid!" });
             }
 
             approvalRoleMapDTO.Id = approvalRoleMap.Id;
@@ -166,6 +166,13 @@ namespace AtoCash.Controllers
             }
 
 
+            int maxApprLevel = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId).Select(a => a.ApprovalLevelId).Max();
+
+            if(approvalRoleMapDto.ApprovalLevelId != maxApprLevel +1)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Assign only in Linear Increasing Order" });
+            }
+
             //Check for Duplicate Levels in the same group
             AprvRolMap = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId && a.ApprovalLevelId == approvalRoleMapDto.ApprovalLevelId).FirstOrDefault();
             if (AprvRolMap != null)
@@ -195,7 +202,7 @@ namespace AtoCash.Controllers
             var approvalRoleMap = await _context.ApprovalRoleMaps.FindAsync(id);
             if (approvalRoleMap == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Role Map Id invalid!" });
             }
 
             _context.ApprovalRoleMaps.Remove(approvalRoleMap);

@@ -213,7 +213,7 @@ namespace AtoCash.Authentication
                     return Ok(new { model.email, token, Request.Scheme });
                 }
 
-                return NoContent();
+                return Ok(new RespStatus { Status = "Success", Message = "Forgot Password Actioned!" });
             }
             return Conflict(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
         }

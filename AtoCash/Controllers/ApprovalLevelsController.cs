@@ -60,7 +60,7 @@ namespace AtoCash.Controllers
 
             if (approvalLevel == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level Id invalid!" });
             }
 
             approvalLevelDTO.Id = approvalLevel.Id;
@@ -97,7 +97,7 @@ namespace AtoCash.Controllers
             {
                 if (!ApprovalLevelExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Approval Id invalid!" });
                 }
                 else
                 {
@@ -105,7 +105,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Approval Level Details Updated!" });
         }
 
         // POST: api/ApprovalLevels
@@ -142,7 +142,7 @@ namespace AtoCash.Controllers
             await _context.SaveChangesAsync();
 
 
-            return CreatedAtAction("GetApprovalLevel", new { id = approvalLevel.Id }, approvalLevel);
+            return Ok(new RespStatus { Status = "Failure", Message = "New Approval Level Created!" });
         }
 
         // DELETE: api/ApprovalLevels/5
@@ -153,7 +153,7 @@ namespace AtoCash.Controllers
             var approvalLevel = await _context.ApprovalLevels.FindAsync(id);
             if (approvalLevel == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level Id invalid!" });
             }
 
             _context.ApprovalLevels.Remove(approvalLevel);

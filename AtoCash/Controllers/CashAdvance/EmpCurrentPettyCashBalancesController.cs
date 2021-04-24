@@ -58,7 +58,7 @@ namespace AtoCash.Controllers
 
             if (empCurrentPettyCashBalance == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Current PettyCash balance Id invalid!" });
             }
 
             empCurrentPettyCashBalanceDTO.Id = empCurrentPettyCashBalance.Id;
@@ -98,7 +98,7 @@ namespace AtoCash.Controllers
             {
                 if (!EmpCurrentPettyCashBalanceExists(id))
                 {
-                    return NoContent();
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Currnet Balance Id invalid!" });
                 }
                 else
                 {
@@ -106,7 +106,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Petty Cash Balance Details Updated!" });
         }
 
         // POST: api/EmpCurrentPettyCashBalances
@@ -179,13 +179,13 @@ namespace AtoCash.Controllers
             var empCurrentPettyCashBalance = await _context.EmpCurrentPettyCashBalances.FindAsync(id);
             if (empCurrentPettyCashBalance == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "EmpCurrentPettyCashBalances Id invalid!" });
             }
 
             _context.EmpCurrentPettyCashBalances.Remove(empCurrentPettyCashBalance);
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Cash Balance Deleted!" });
         }
 
         private bool EmpCurrentPettyCashBalanceExists(int id)

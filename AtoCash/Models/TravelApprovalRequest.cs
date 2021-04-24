@@ -55,6 +55,10 @@ namespace AtoCash.Models
         public virtual WorkTask WorkTask { get; set; }
         public int? WorkTaskId { get; set; }
 
+        [Required]
+        [ForeignKey("CostCenterId")]
+        public virtual CostCenter CostCenter { get; set; }
+        public int CostCenterId { get; set; }
 
         [Required]
         [ForeignKey("ApprovalStatusTypeId")]
@@ -84,6 +88,10 @@ namespace AtoCash.Models
         public string SubProject { get; set; }
         public int? WorkTaskId { get; set; }
         public string WorkTask { get; set; }
+
+        public int CostCenterId { get; set; }
+
+        public string CostCenter { get; set; }
         public int ApprovalStatusTypeId { get; set; }
         public string ApprovalStatusType { get; set; }
         public DateTime? ApprovedDate { get; set; }

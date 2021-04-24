@@ -48,7 +48,7 @@ namespace AtoCash
             //StagingServer : "server=143.110.188.154,1433; 
 
 
-            services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("StagingServer")));
+            services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("AtoCashDBServer")));
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AtoCashDbContext>();
             //services.AddHttpsRedirection(options => options.HttpsPort = 443);
