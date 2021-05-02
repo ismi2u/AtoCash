@@ -160,7 +160,7 @@ namespace AtoCash.Controllers
             _context.Departments.Add(department);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetDepartment", new { id = department.Id }, department);
+            return Ok(new RespStatus { Status = "Success", Message = "Department Created!" });
         }
 
         // DELETE: api/Departments/5

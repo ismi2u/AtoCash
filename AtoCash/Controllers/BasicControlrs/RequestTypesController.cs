@@ -62,7 +62,7 @@ namespace AtoCash.Controllers
 
             if (requestType == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Request Type Id is Invalid!" });
             }
 
             return requestType;
@@ -91,17 +91,10 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RequestTypeExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Request Type Updated!" });
         }
 
         // POST: api/Requests
@@ -130,7 +123,7 @@ namespace AtoCash.Controllers
             var requestType = await _context.RequestTypes.FindAsync(id);
             if (requestType == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id Is Invalid!" });
             }
 
             _context.RequestTypes.Remove(requestType);

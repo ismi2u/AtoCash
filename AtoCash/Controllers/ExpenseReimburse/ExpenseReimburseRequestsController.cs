@@ -223,18 +223,15 @@ namespace AtoCash.Controllers
         // PUT: api/ExpenseReimburseRequests/5
         [HttpPut]
         //[Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
-        public async Task<IActionResult> PutExpenseReimburseRequest(List<ExpenseReimburseRequestDTO> ListExpenseReimbRequestDTO)
+        public async Task<IActionResult> PutExpenseReimburseRequest(int id, ExpenseReimburseRequestDTO expenseReimbRequestDTO)
         {
-            if (ListExpenseReimbRequestDTO.Count == 0)
+            if (id != expenseReimbRequestDTO.Id)
             {
-                return Ok(new RespStatus { Status = "Failure", Message = "No" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
 
 
-
-            foreach (ExpenseReimburseRequestDTO expenseReimbRequestDTO in ListExpenseReimbRequestDTO)
-            {
                 var expenseReimbRequest = await _context.ExpenseReimburseRequests.FindAsync(expenseReimbRequestDTO.Id);
 
                 expenseReimbRequest.Id = expenseReimbRequestDTO.Id;
@@ -256,8 +253,6 @@ namespace AtoCash.Controllers
 
                 await Task.Run(() => _context.ExpenseReimburseRequests.Update(expenseReimbRequest));
 
-            }
-            //_context.Entry(expenseReimburseRequestDTO).State = EntityState.Modified;
 
             try
             {
@@ -481,8 +476,12 @@ namespace AtoCash.Controllers
             Employee reqEmp = _context.Employees.Find(reqEmpid);
             int reqApprGroupId = reqEmp.ApprovalGroupId;
             int reqRoleId = reqEmp.RoleId;
-            int maxApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId).ToList().Select(x => x.ApprovalLevel).Max(a => a.Level);
-            int reqApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId && a.RoleId == reqRoleId).Select(x => x.ApprovalLevel).FirstOrDefault().Level;
+
+            var approRolMapsList = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId).ToList();
+                int maxApprLevel = approRolMapsList.Select(x => x.ApprovalLevel).Max(a => a.Level);
+                int reqApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId && a.RoleId == reqRoleId).Select(x => x.ApprovalLevel).FirstOrDefault().Level;
+
+           
             bool isSelfApprovedRequest = false;
             ////
 
@@ -560,7 +559,7 @@ namespace AtoCash.Controllers
                     EmployeeId = expenseReimburseRequestDto.EmployeeId,
                     ExpenseReimburseRequestId = expenseReimburseRequest.Id,
                     CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId,
-                    TotalClaimAmount = expenseReimburseRequestDto.TotalClaimAmount,
+                    TotalClaimAmount = dblTotalClaimAmount,
                     ExpReimReqDate = DateTime.Now,
                     DepartmentId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId,
                     ProjectId = null, //Approver Project Id
@@ -598,7 +597,7 @@ namespace AtoCash.Controllers
                         EmployeeId = expenseReimburseRequestDto.EmployeeId,
                         ExpenseReimburseRequestId = expenseReimburseRequest.Id,
                         CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId,
-                        TotalClaimAmount = expenseReimburseRequestDto.TotalClaimAmount,
+                        TotalClaimAmount = dblTotalClaimAmount,
                         ExpReimReqDate = DateTime.Now,
                         DepartmentId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId,
                         ProjectId = null, //Approver Project Id
@@ -743,7 +742,7 @@ namespace AtoCash.Controllers
                     EmployeeId = expenseReimburseRequestDto.EmployeeId,
                     ExpenseReimburseRequestId = expenseReimburseRequest.Id,
                     CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId,
-                    TotalClaimAmount = expenseReimburseRequestDto.TotalClaimAmount,
+                    TotalClaimAmount = dblTotalClaimAmount,
                     ExpReimReqDate = DateTime.Now,
                     DepartmentId = null,
                     ProjectId = expenseReimburseRequestDto.ProjectId, //Approver Project Id

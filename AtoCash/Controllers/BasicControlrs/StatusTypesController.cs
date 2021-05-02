@@ -76,7 +76,7 @@ namespace AtoCash.Controllers.BasicControlrs
         {
             if (id != statusType.Id)
             {
-                return BadRequest();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Status Type Id is Invalid" });
             }
 
             var statustyp = await _context.StatusTypes.FindAsync(id);
@@ -91,17 +91,10 @@ namespace AtoCash.Controllers.BasicControlrs
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!StatusTypeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Conflict(new RespStatus { Status = "Failure", Message = "Status Type is Updated!" });
         }
 
         // POST: api/StatusTypes

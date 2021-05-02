@@ -381,7 +381,6 @@ namespace AtoCash.Controllers
         // DELETE: api/TravelApprovalRequests/5
         [HttpDelete("{id}")]
         [ActionName("DeleteTravelApprovalRequest")]
-        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> DeleteTravelApprovalRequest(int id)
         {
             var travelApprovalRequest = await _context.TravelApprovalRequests.FindAsync(id);
@@ -390,7 +389,21 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Travel Approval Request Id invalid!" });
             }
 
+         var trvlappStatusTrackers = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == travelApprovalRequest.Id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).ToList();
+
+            int ApprovedCount = trvlappStatusTrackers.Count();
+
+            if (ApprovedCount > 0)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Travel Request cant be Deleted after Approval!" });
+            }
+
             _context.TravelApprovalRequests.Remove(travelApprovalRequest);
+
+            foreach( var item in trvlappStatusTrackers)
+            {
+                _context.TravelApprovalStatusTrackers.Remove(item);
+            }
             await _context.SaveChangesAsync();
 
             return Ok(new RespStatus { Status = "Success", Message = "Travel Approval Request Deleted!" });

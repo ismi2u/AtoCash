@@ -142,7 +142,7 @@ namespace AtoCash.Controllers
             await _context.SaveChangesAsync();
 
 
-            return Ok(new RespStatus { Status = "Failure", Message = "New Approval Level Created!" });
+            return Ok(new RespStatus { Status = "Success", Message = "New Approval Level Created!" });
         }
 
         // DELETE: api/ApprovalLevels/5

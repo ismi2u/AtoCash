@@ -125,7 +125,10 @@ namespace AtoCash.Controllers.ExpenseReimburse
                                 .Where(r =>
                                     r.JobRoleId == jobRoleid &&
                                     r.ApprovalGroupId == apprGroupId &&
-                                    r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending);
+                                    r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending
+                                    || r.JobRoleId == jobRoleid &&
+                                    r.ProjectId !=null &&
+                                    r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending ).ToList();
 
             List<ExpenseReimburseStatusTrackerDTO> ListExpenseReimburseStatusTrackerDTO = new();
 
@@ -224,7 +227,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                 expenseReimburseStatusTracker.ExpReimReqDate = expenseReimburseStatusTrackerDto.ExpReimReqDate;
                 expenseReimburseStatusTracker.ApprovedDate = expenseReimburseStatusTrackerDto.ApprovedDate;
                 expenseReimburseStatusTracker.ApprovalStatusTypeId = expenseReimburseStatusTrackerDto.ApprovalStatusTypeId;
-                expenseReimburseStatusTracker.Comments = expenseReimburseStatusTrackerDto.Comments;
+                expenseReimburseStatusTracker.Comments = expenseReimburseStatusTrackerDto.Comments ?? "Approved";
 
 
 
@@ -325,7 +328,8 @@ namespace AtoCash.Controllers.ExpenseReimburse
 
                             //Final Approveer hence update the EmpCurrentPettyCashBalance table for the employee to reflect the credit
                             empCurrentPettyCashBalance.CurBalance = empCurPettyBal + disbAndClaimItem.AmountToWallet??0;
-                            _context.EmpCurrentPettyCashBalances.Update(empCurrentPettyCashBalance);
+                            empCurrentPettyCashBalance.UpdatedOn = DateTime.Now;
+                           _context.EmpCurrentPettyCashBalances.Update(empCurrentPettyCashBalance);
 
                             ///
                         }
@@ -429,7 +433,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                         disbAndClaimItem.AmountToCredit = 0;
                     }
 
-                    disbAndClaimItem.ApprovalStatusId = (int)EApprovalStatus.Approved;
+                    disbAndClaimItem.ApprovalStatusId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     _context.Update(disbAndClaimItem);
 
 

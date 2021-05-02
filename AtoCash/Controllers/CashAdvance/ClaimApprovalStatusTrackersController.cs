@@ -286,6 +286,7 @@ namespace AtoCash.Controllers
                         //update the EmpPettyCashBalance to credit back the deducted amount
                         var empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashReq.EmployeeId).FirstOrDefault();
                         empPettyCashBal.CurBalance = empPettyCashBal.CurBalance + pettyCashReq.PettyClaimAmount;
+                        empPettyCashBal.UpdatedOn = DateTime.Now;
                         _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
 
 
@@ -309,12 +310,25 @@ namespace AtoCash.Controllers
                     int disbAndClaimItemId = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == claimitem.PettyCashRequestId).FirstOrDefault().Id;
                     var disbAndClaimItem = await _context.DisbursementsAndClaimsMasters.FindAsync(disbAndClaimItemId);
 
-                    disbAndClaimItem.ApprovalStatusId = (int)EApprovalStatus.Approved;
+                    disbAndClaimItem.ApprovalStatusId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
+                    disbAndClaimItem.ClaimAmount = 0;
+                    disbAndClaimItem.AmountToWallet = 0;
+                    disbAndClaimItem.AmountToCredit = 0;
+                    _context.DisbursementsAndClaimsMasters.Update(disbAndClaimItem);
                     _context.Update(disbAndClaimItem);
 
                     //Update Pettycashrequest table to update the record to Approved as the final approver has approved it.
                     int pettyCashReqId = _context.PettyCashRequests.Where(d => d.Id == claimitem.PettyCashRequestId).FirstOrDefault().Id;
                     var pettyCashReq = await _context.PettyCashRequests.FindAsync(pettyCashReqId);
+
+                    //update the EmpPettyCashBalance to credit back the deducted amount
+                    if (bRejectMessage)
+                    {
+                        var empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashReq.EmployeeId).FirstOrDefault();
+                        empPettyCashBal.CurBalance = empPettyCashBal.CurBalance + pettyCashReq.PettyClaimAmount;
+                        empPettyCashBal.UpdatedOn = DateTime.Now;
+                        _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
+                    }
 
                     pettyCashReq.ApprovalStatusTypeId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     pettyCashReq.ApprovedDate = DateTime.Now;
@@ -421,6 +435,7 @@ namespace AtoCash.Controllers
 
             //get the RoleID of the Employee (Approver)
             int roleid = _context.Employees.Find(id).RoleId;
+            int apprGroupId = _context.Employees.Find(id).ApprovalGroupId;
 
             if (roleid == 0)
             {
@@ -429,7 +444,14 @@ namespace AtoCash.Controllers
 
             var test = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending ).ToList();
 
-            var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => r.RoleId == roleid && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending || r.RoleId == roleid && r.ApprovalStatusTypeId == 2);
+            var claimApprovalStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(r => 
+                r.RoleId == roleid 
+                && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending 
+                && r.ApprovalGroupId == apprGroupId
+                || r.RoleId == roleid 
+                && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending
+                && r.ProjectId != null).ToList();
+
             List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new();
 
             foreach (ClaimApprovalStatusTracker claimApprovalStatusTracker in claimApprovalStatusTrackers)

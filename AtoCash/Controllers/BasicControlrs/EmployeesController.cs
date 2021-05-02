@@ -295,7 +295,7 @@ namespace AtoCash.Controllers
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetEmployee", new { id = employee.Id }, employee);
+            return Ok(new RespStatus { Status = "Success", Message = "New Employee Created!" });
         }
 
         // DELETE: api/Employees/5

@@ -116,22 +116,22 @@ namespace AtoCash.Controllers
                         disbursementsAndClaimsMasterDTO.RequestTypeId = disb.RequestTypeId;
                         disbursementsAndClaimsMasterDTO.RequestType = _context.RequestTypes.Find(disb.RequestTypeId).RequestName;
                         disbursementsAndClaimsMasterDTO.DepartmentId = disb.DepartmentId;
-                        disbursementsAndClaimsMasterDTO.Department = _context.Departments.Find(disb.DepartmentId).DeptName;
+                        disbursementsAndClaimsMasterDTO.Department = disb.DepartmentId != null ? _context.Departments.Find(disb.DepartmentId).DeptCode : null;
                         disbursementsAndClaimsMasterDTO.ProjectId = disb.ProjectId;
-                        disbursementsAndClaimsMasterDTO.Project = _context.Projects.Find(disb.ProjectId).ProjectName;
+                        disbursementsAndClaimsMasterDTO.Project = disb.ProjectId != null ? _context.Projects.Find(disb.ProjectId).ProjectName : null;
                         disbursementsAndClaimsMasterDTO.SubProjectId = disb.SubProjectId;
-                        disbursementsAndClaimsMasterDTO.SubProject = _context.SubProjects.Find(disb.SubProjectId).SubProjectName;
+                        disbursementsAndClaimsMasterDTO.SubProject = disb.SubProjectId != null ? _context.SubProjects.Find(disb.SubProjectId).SubProjectName : null;
                         disbursementsAndClaimsMasterDTO.WorkTaskId = disb.WorkTaskId;
-                        disbursementsAndClaimsMasterDTO.WorkTask = _context.WorkTasks.Find(disb.WorkTaskId).TaskName;
+                        disbursementsAndClaimsMasterDTO.WorkTask = disb.WorkTaskId != null ? _context.WorkTasks.Find(disb.WorkTaskId).TaskName : null;
                         disbursementsAndClaimsMasterDTO.CurrencyTypeId = disb.CurrencyTypeId;
-                        disbursementsAndClaimsMasterDTO.CurrencyType = _context.CurrencyTypes.Find(disb.CurrencyTypeId).CurrencyCode;
+                        disbursementsAndClaimsMasterDTO.CurrencyType = disb.CurrencyTypeId != null ? _context.CurrencyTypes.Find(disb.CurrencyTypeId).CurrencyCode : null;
                         disbursementsAndClaimsMasterDTO.ClaimAmount = disb.ClaimAmount;
-                        disbursementsAndClaimsMasterDTO.AmountToWallet = disb.AmountToWallet;
-                        disbursementsAndClaimsMasterDTO.AmountToCredit = disb.AmountToCredit;
+                        disbursementsAndClaimsMasterDTO.AmountToWallet = disb.AmountToWallet?? 0;
+                        disbursementsAndClaimsMasterDTO.AmountToCredit = disb.AmountToCredit?? 0;
                         disbursementsAndClaimsMasterDTO.CostCenterId = disb.CostCenterId;
-                        disbursementsAndClaimsMasterDTO.CostCenter = _context.CostCenters.Find(disb.CostCenterId).CostCenterCode;
+                        disbursementsAndClaimsMasterDTO.CostCenter = disb.CostCenterId != null ? _context.CostCenters.Find(disb.CostCenterId).CostCenterCode : null;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusId = disb.ApprovalStatusId;
-                        disbursementsAndClaimsMasterDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status;
+                        disbursementsAndClaimsMasterDTO.ApprovalStatusType = disb.ApprovalStatusId != null ? _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status : null;
 
                         ListDisbItemsDTO.Add(disbursementsAndClaimsMasterDTO);
                     }
@@ -203,25 +203,27 @@ namespace AtoCash.Controllers
                         disbursementsAndClaimsMasterDTO.RequestTypeId = disb.RequestTypeId;
                         disbursementsAndClaimsMasterDTO.RequestType = _context.RequestTypes.Find(disb.RequestTypeId).RequestName;
                         disbursementsAndClaimsMasterDTO.DepartmentId = disb.DepartmentId;
-                        disbursementsAndClaimsMasterDTO.Department = _context.Departments.Find(disb.DepartmentId).DeptName;
+                        disbursementsAndClaimsMasterDTO.Department = disb.DepartmentId != null ? _context.Departments.Find(disb.DepartmentId).DeptCode : null;
                         disbursementsAndClaimsMasterDTO.ProjectId = disb.ProjectId;
-                        disbursementsAndClaimsMasterDTO.Project = _context.Projects.Find(disb.ProjectId).ProjectName;
+                        disbursementsAndClaimsMasterDTO.Project = disb.ProjectId != null ? _context.Projects.Find(disb.ProjectId).ProjectName : null;
                         disbursementsAndClaimsMasterDTO.SubProjectId = disb.SubProjectId;
-                        disbursementsAndClaimsMasterDTO.SubProject = _context.SubProjects.Find(disb.SubProjectId).SubProjectName;
+                        disbursementsAndClaimsMasterDTO.SubProject = disb.SubProjectId != null ? _context.SubProjects.Find(disb.SubProjectId).SubProjectName : null;
                         disbursementsAndClaimsMasterDTO.WorkTaskId = disb.WorkTaskId;
-                        disbursementsAndClaimsMasterDTO.WorkTask = _context.WorkTasks.Find(disb.WorkTaskId).TaskName;
+                        disbursementsAndClaimsMasterDTO.WorkTask = disb.WorkTaskId != null ? _context.WorkTasks.Find(disb.WorkTaskId).TaskName : null;
                         disbursementsAndClaimsMasterDTO.CurrencyTypeId = disb.CurrencyTypeId;
-                        disbursementsAndClaimsMasterDTO.CurrencyType = _context.CurrencyTypes.Find(disb.CurrencyTypeId).CurrencyCode;
+                        disbursementsAndClaimsMasterDTO.CurrencyType = disb.CurrencyTypeId != null ? _context.CurrencyTypes.Find(disb.CurrencyTypeId).CurrencyCode : null;
                         disbursementsAndClaimsMasterDTO.ClaimAmount = disb.ClaimAmount;
-                        disbursementsAndClaimsMasterDTO.AmountToWallet = disb.AmountToWallet;
-                        disbursementsAndClaimsMasterDTO.AmountToCredit = disb.AmountToCredit;
+                        disbursementsAndClaimsMasterDTO.AmountToWallet = disb.AmountToWallet ?? 0;
+                        disbursementsAndClaimsMasterDTO.AmountToCredit = disb.AmountToCredit ?? 0;
                         disbursementsAndClaimsMasterDTO.CostCenterId = disb.CostCenterId;
-                        disbursementsAndClaimsMasterDTO.CostCenter = _context.CostCenters.Find(disb.CostCenterId).CostCenterCode;
+                        disbursementsAndClaimsMasterDTO.CostCenter = disb.CostCenterId != null ? _context.CostCenters.Find(disb.CostCenterId).CostCenterCode : null;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusId = disb.ApprovalStatusId;
-                        disbursementsAndClaimsMasterDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status;
+                        disbursementsAndClaimsMasterDTO.ApprovalStatusType = disb.ApprovalStatusId != null ? _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status : null;
 
                         ListDisbItemsDTO.Add(disbursementsAndClaimsMasterDTO);
                     }
+
+                    return Ok(ListDisbItemsDTO);
 
 
                     DataTable dt = new DataTable();
@@ -327,17 +329,17 @@ namespace AtoCash.Controllers
                     travelItemDTO.EmployeeName = _context.Employees.Find(travel.EmployeeId).GetFullName();
 
                     travelItemDTO.DepartmentId = travel.DepartmentId;
-                    travelItemDTO.Department = _context.Departments.Find(travel.DepartmentId).DeptName;
+                    travelItemDTO.Department = travel.DepartmentId !=null ? _context.Departments.Find(travel.DepartmentId).DeptName :null;
                     travelItemDTO.ProjectId = travel.ProjectId;
-                    travelItemDTO.Project = _context.Projects.Find(travel.ProjectId).ProjectName;
+                    travelItemDTO.Project = travel.ProjectId != null ? _context.Projects.Find(travel.ProjectId).ProjectName: null;
                     travelItemDTO.SubProjectId = travel.SubProjectId;
-                    travelItemDTO.SubProject = _context.SubProjects.Find(travel.SubProjectId).SubProjectName;
+                    travelItemDTO.SubProject = travel.SubProjectId != null ? _context.SubProjects.Find(travel.SubProjectId).SubProjectName : null;
                     travelItemDTO.WorkTaskId = travel.WorkTaskId;
-                    travelItemDTO.WorkTask = _context.WorkTasks.Find(travel.WorkTaskId).TaskName;
+                    travelItemDTO.WorkTask = travel.WorkTaskId != null ? _context.WorkTasks.Find(travel.WorkTaskId).TaskName: null;
                     travelItemDTO.CostCenterId = travel.CostCenterId;
-                    travelItemDTO.CostCenter = _context.CostCenters.Find(travel.CostCenterId).CostCenterCode;
+                    travelItemDTO.CostCenter = travel.CostCenterId != null ? _context.CostCenters.Find(travel.CostCenterId).CostCenterCode : null;
                     travelItemDTO.ApprovalStatusTypeId = travel.ApprovalStatusTypeId;
-                    travelItemDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status;
+                    travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != null ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status: null;
 
                     ListTravelItemsDTO.Add(travelItemDTO);
                 }
@@ -404,17 +406,17 @@ namespace AtoCash.Controllers
                     travelItemDTO.EmployeeName = _context.Employees.Find(travel.EmployeeId).GetFullName();
 
                     travelItemDTO.DepartmentId = travel.DepartmentId;
-                    travelItemDTO.Department = _context.Departments.Find(travel.DepartmentId).DeptName;
+                    travelItemDTO.Department = travel.DepartmentId != null ? _context.Departments.Find(travel.DepartmentId).DeptName : null;
                     travelItemDTO.ProjectId = travel.ProjectId;
-                    travelItemDTO.Project = _context.Projects.Find(travel.ProjectId).ProjectName;
+                    travelItemDTO.Project = travel.ProjectId != null ? _context.Projects.Find(travel.ProjectId).ProjectName : null;
                     travelItemDTO.SubProjectId = travel.SubProjectId;
-                    travelItemDTO.SubProject = _context.SubProjects.Find(travel.SubProjectId).SubProjectName;
+                    travelItemDTO.SubProject = travel.SubProjectId != null ? _context.SubProjects.Find(travel.SubProjectId).SubProjectName : null;
                     travelItemDTO.WorkTaskId = travel.WorkTaskId;
-                    travelItemDTO.WorkTask = _context.WorkTasks.Find(travel.WorkTaskId).TaskName;
+                    travelItemDTO.WorkTask = travel.WorkTaskId != null ? _context.WorkTasks.Find(travel.WorkTaskId).TaskName : null;
                     travelItemDTO.CostCenterId = travel.CostCenterId;
-                    travelItemDTO.CostCenter = _context.CostCenters.Find(travel.CostCenterId).CostCenterCode;
+                    travelItemDTO.CostCenter = travel.CostCenterId != null ? _context.CostCenters.Find(travel.CostCenterId).CostCenterCode : null;
                     travelItemDTO.ApprovalStatusTypeId = travel.ApprovalStatusTypeId;
-                    travelItemDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status;
+                    travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != null ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status : null;
 
                     ListTravelItemsDTO.Add(travelItemDTO);
                 }

@@ -229,7 +229,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                 }
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Expense Approval Updated!" });
         }
 
         // POST: api/ExpenseSubClaims

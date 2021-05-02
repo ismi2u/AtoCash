@@ -201,7 +201,7 @@ namespace AtoCash.Controllers
             _context.WorkTasks.Add(workTask);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetWorkTask", new { id = workTask.Id }, workTask);
+            return Ok(new RespStatus { Status = "Success", Message = "Work-Task Created!" });
 
 
         }

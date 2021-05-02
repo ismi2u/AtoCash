@@ -87,7 +87,7 @@ namespace AtoCash.Controllers
 
             if (proj == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Project Id is Invalid!" });
             }
             ProjectDTO projectDTO = new ProjectDTO
             {
@@ -194,7 +194,7 @@ namespace AtoCash.Controllers
             _context.Projects.Add(proj);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProject", new { id = proj.Id }, proj);
+            return Ok(new RespStatus { Status = "Success", Message = "Project Created!" });
         }
 
         // DELETE: api/Projects/5
@@ -211,7 +211,7 @@ namespace AtoCash.Controllers
             var project = await _context.Projects.FindAsync(id);
             if (project == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Project Id is Invalid!" });
             }
 
             _context.Projects.Remove(project);

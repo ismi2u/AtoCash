@@ -112,7 +112,7 @@ namespace AtoCash.Controllers
 
             if (SubProj == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Sub Project Id is Invalid!" });
             }
 
             subProjectDTO.Id = SubProj.Id;
@@ -148,17 +148,10 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SubProjectExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Sub Project Updated!" });
         }
 
         // POST: api/SubProjects
@@ -182,7 +175,7 @@ namespace AtoCash.Controllers
             _context.SubProjects.Add(SubProj);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSubProject", new { id = SubProj.Id }, SubProj);
+            return Ok(new RespStatus { Status = "Success", Message = "Sub-Project Created!" });
         }
 
         // DELETE: api/SubProjects/5
@@ -199,7 +192,7 @@ namespace AtoCash.Controllers
             var subProject = await _context.SubProjects.FindAsync(id);
             if (subProject == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Sub Project Id is Invalid!" });
             }
 
             _context.SubProjects.Remove(subProject);

@@ -60,7 +60,7 @@ namespace AtoCash.Controllers
 
             if (projManagement == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "PROJ Management Id is Invalid!" });
             }
 
             projManagementDTO.Id = projManagement.Id;
@@ -187,17 +187,10 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ProjectManagementExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "Project Management data Updated!" });
         }
 
         // POST: api/ProjectManagement
@@ -235,7 +228,7 @@ namespace AtoCash.Controllers
             var projectManagement = await _context.ProjectManagements.FindAsync(id);
             if (projectManagement == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Id is Invalid!" });
             }
 
             _context.ProjectManagements.Remove(projectManagement);

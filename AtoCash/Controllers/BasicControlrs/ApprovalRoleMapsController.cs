@@ -59,7 +59,7 @@ namespace AtoCash.Controllers
                     }
                     else
                     {
-                        empName = "UnAssigned";
+                        empName = "Un-Assigned";
                     }
                 }
                 else
@@ -69,7 +69,7 @@ namespace AtoCash.Controllers
                     {
                         if (employeeAssigned != null)
                         {
-                            empName = "Total Employees Assigned =" + empCount;
+                            empName = "Assigned to =" + empCount;
                         }
                        
                     }
@@ -79,7 +79,7 @@ namespace AtoCash.Controllers
                     }
                      else
                     {
-                        empName = "UnAssigned";
+                        empName = "Un-Assigned";
                     }
                 }
                 approvalRoleMapDTO.EmployeeName = empName;
@@ -165,10 +165,15 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Approval Role Map Already Exists" });
             }
 
+            var approvalgroup = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId).ToList();
+            int maxApprLevel = 0;
 
-            int maxApprLevel = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId).Select(a => a.ApprovalLevelId).Max();
-
-            if(approvalRoleMapDto.ApprovalLevelId != maxApprLevel +1)
+            if (approvalgroup.Count >0)
+            {
+                 maxApprLevel = _context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == approvalRoleMapDto.ApprovalGroupId).OrderByDescending(a => a.ApprovalLevelId).First().ApprovalLevelId;
+            }
+            
+            if (approvalRoleMapDto.ApprovalLevelId != maxApprLevel + 1)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Assign only in Linear Increasing Order" });
             }
@@ -191,7 +196,7 @@ namespace AtoCash.Controllers
             _context.ApprovalRoleMaps.Add(approvalRoleMap);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetApprovalRoleMap", new { id = approvalRoleMap.Id }, approvalRoleMap);
+            return Ok(new RespStatus { Status = "Success", Message = "Approval To Role... Mapped!" });
         }
 
         // DELETE: api/ApprovalRoleMaps/5

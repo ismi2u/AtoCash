@@ -152,7 +152,7 @@ namespace AtoCash.Controllers
             _context.CostCenters.Add(costCenter);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCostCenter", new { id = costCenter.Id }, costCenter);
+            return Ok(new RespStatus { Status = "Success", Message = "CostCenter Created!" });
         }
 
         // DELETE: api/CostCenters/5

@@ -111,7 +111,7 @@ namespace AtoCash.Controllers
             _context.ApprovalGroups.Add(approvalGroup);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetApprovalGroup", new { id = approvalGroup.Id }, approvalGroup);
+            return Ok(new RespStatus { Status = "Success", Message = "Approval Group Created!" });
         }
 
         // DELETE: api/ApprovalGroups/5

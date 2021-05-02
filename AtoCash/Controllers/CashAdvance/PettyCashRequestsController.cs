@@ -81,7 +81,7 @@ namespace AtoCash.Controllers
 
             if (pettyCashRequest == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "GetPettyCashRequest Id is Invalid!" });
             }
             PettyCashRequestDTO pettyCashRequestDTO = new();
 
@@ -118,7 +118,7 @@ namespace AtoCash.Controllers
 
             if (employee == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee Id is Invalid!" });
             }
 
             //get the employee's approval level for comparison with approver level  to decide "ShowEditDelete" bool
@@ -129,7 +129,7 @@ namespace AtoCash.Controllers
 
             if (pettyCashRequests == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Cash Advance Id is Invalid!" });
             }
 
             List<PettyCashRequestDTO> PettyCashRequestDTOs = new();
@@ -216,7 +216,7 @@ namespace AtoCash.Controllers
 
             if (pettyCashRequests == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "pettyCashRequests is Empty!" });
             }
 
             return Ok(pettyCashRequests.Count);
@@ -227,7 +227,6 @@ namespace AtoCash.Controllers
         // PUT: api/PettyCashRequests/5
         [HttpPut("{id}")]
         [ActionName("PutPettyCashRequest")]
-        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
         public async Task<IActionResult> PutPettyCashRequest(int id, PettyCashRequestDTO pettyCashRequestDto)
         {
             if (id != pettyCashRequestDto.Id)
@@ -248,14 +247,16 @@ namespace AtoCash.Controllers
             //if Pettycash request is modified then trigger changes to other tables
             if (pettyCashRequest.PettyClaimAmount != pettyCashRequestDto.PettyClaimAmount)
             {
-                pettyCashRequest.PettyClaimAmount = pettyCashRequestDto.PettyClaimAmount;
-                pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
+
                 //update the EmpPettyCashBalance to credit back the deducted amount
                 EmpCurrentPettyCashBalance empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).FirstOrDefault();
                 double oldBal = empPettyCashBal.CurBalance;
                 double DiffAmt = pettyCashRequestDto.PettyClaimAmount - pettyCashRequest.PettyClaimAmount;
 
-                empPettyCashBal.CurBalance = oldBal + DiffAmt;
+                pettyCashRequest.PettyClaimAmount = pettyCashRequestDto.PettyClaimAmount;
+                pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
+
+                empPettyCashBal.CurBalance = oldBal - DiffAmt;
                 empPettyCashBal.UpdatedOn = DateTime.Now;
                 _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
             }
@@ -266,18 +267,22 @@ namespace AtoCash.Controllers
             pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
             pettyCashRequest.CashReqDate = DateTime.Now;
 
-            if (pettyCashRequestDto.ProjectId != null)
-            {
-                pettyCashRequest.ProjectId = pettyCashRequestDto.ProjectId;
-                pettyCashRequest.SubProjectId = pettyCashRequestDto.SubProjectId;
-                pettyCashRequest.WorkTaskId = pettyCashRequestDto.WorkTaskId;
-                pettyCashRequest.DepartmentId = null;
+            //if (pettyCashRequestDto.ProjectId != null)
+            //{
+            //    pettyCashRequest.ProjectId = pettyCashRequestDto.ProjectId;
+            //    pettyCashRequest.SubProjectId = pettyCashRequestDto.SubProjectId;
+            //    pettyCashRequest.WorkTaskId = pettyCashRequestDto.WorkTaskId;
+            //    pettyCashRequest.DepartmentId = null;
 
-            }
-            else
-            {
-                pettyCashRequest.DepartmentId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).DepartmentId;
-            }
+            //}
+            //else
+            //{
+            //    pettyCashRequest.DepartmentId = _context.Employees.Find(pettyCashRequest.EmployeeId).DepartmentId;
+
+            //    pettyCashRequest.ProjectId = null;
+            //    pettyCashRequest.SubProjectId = null;
+            //    pettyCashRequest.WorkTaskId = null;
+            //}
 
 
             
@@ -324,17 +329,10 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!PettyCashRequestExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Conflict(new RespStatus { Status = "Success", Message = "Request Updated!" });
         }
 
         // POST: api/PettyCashRequests
@@ -376,9 +374,11 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Cash Advance Request Id Invalid!" });
             }
 
-            int ApprovedCount = _context.ClaimApprovalStatusTrackers.Where( c=> c.PettyCashRequestId== pettyCashRequest.Id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
+            var ClmApprvStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == pettyCashRequest.Id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved);
 
-            if (ApprovedCount != 0)
+            int ApprovedCount = ClmApprvStatusTrackers.Count();
+
+            if (ApprovedCount > 0)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Cash Advance Request cant be Deleted after Approval!" });
             }
@@ -391,6 +391,11 @@ namespace AtoCash.Controllers
             _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
 
             _context.PettyCashRequests.Remove(pettyCashRequest);
+
+            foreach(var item in ClmApprvStatusTrackers)
+            {
+                _context.ClaimApprovalStatusTrackers.Remove(item);
+            }
             await _context.SaveChangesAsync();
 
             return Ok(new RespStatus { Status = "Success", Message = "Cash Advance Request Deleted!" });

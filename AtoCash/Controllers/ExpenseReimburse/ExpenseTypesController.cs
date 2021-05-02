@@ -79,7 +79,7 @@ namespace AtoCash.Controllers
 
             if (expenseType == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense Type id is Invalid!" });
             }
 
             ExpenseTypeDTO expenseTypeDTO = new()
@@ -119,14 +119,7 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ExpenseTypeExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return Ok(new RespStatus { Status = "Success", Message = "Expsense Type Details Updated!" });
@@ -151,7 +144,7 @@ namespace AtoCash.Controllers
             _context.ExpenseTypes.Add(expenseType);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetExpenseType", new { id = expenseType.Id }, expenseType);
+            return Ok(new RespStatus { Status = "Success", Message = "Expense Type Created!" });
         }
 
         //// DELETE: api/ExpenseTypes/5

@@ -61,7 +61,7 @@ namespace AtoCash.Controllers
 
             if (role == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Role Id is invalid!" });
             }
 
             return role;
@@ -91,17 +91,10 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RoleExists(id))
-                {
-                    return NoContent();
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
-            return NoContent();
+            return Ok(new RespStatus { Status = "Success", Message = "JobRole Updated!" });
         }
 
         // POST: api/Roles
@@ -129,7 +122,7 @@ namespace AtoCash.Controllers
             var role = await _context.JobRoles.FindAsync(id);
             if (role == null)
             {
-                return NoContent();
+                return Conflict(new RespStatus { Status = "Failure", Message = "Role Id is Invalid!" });
             }
 
             _context.JobRoles.Remove(role);
