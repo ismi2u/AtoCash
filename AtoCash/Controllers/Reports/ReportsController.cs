@@ -15,6 +15,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Hosting;
 
 namespace AtoCash.Controllers
 {
@@ -25,13 +26,14 @@ namespace AtoCash.Controllers
     {
         private readonly AtoCashDbContext _context;
 
+        private readonly IWebHostEnvironment hostingEnvironment;
 
-
-        public ReportsController(AtoCashDbContext context)
+        public ReportsController(AtoCashDbContext context, IWebHostEnvironment hostEnv)
         {
             //var user = System.Threading.Thread.CurrentPrincipal;
             //var TheUser = User.Identity.IsAuthenticated ? UserRepository.GetUser(user.Identity.Name) : null;
             _context = context;
+            hostingEnvironment = hostEnv;
             //Get Logged in User's EmpId.
             //var   LoggedInEmpid = User.Identities.First().Claims.ToList().Where(x => x.Type == "EmployeeId").Select(c => c.Value);
         }
@@ -95,9 +97,9 @@ namespace AtoCash.Controllers
                     if (searchModel.RecordDateTo.HasValue)
                         result = result.Where(x => x.RecordDate <= searchModel.RecordDateTo);
                     if (searchModel.AmountFrom > 0)
-                        result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
+                        result = result.Where(x => x.ClaimAmount >= searchModel.AmountFrom);
                     if (searchModel.AmountTo > 0)
-                        result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
+                        result = result.Where(x => x.ClaimAmount <= searchModel.AmountTo);
                     if (searchModel.CostCenterId.HasValue)
                         result = result.Where(x => x.CostCenterId == searchModel.CostCenterId);
                     if (searchModel.ApprovalStatusId.HasValue)
@@ -181,9 +183,9 @@ namespace AtoCash.Controllers
                     if (searchModel.RecordDateTo.HasValue)
                         result = result.Where(x => x.RecordDate <= searchModel.RecordDateTo);
                     if (searchModel.AmountFrom > 0)
-                        result = result.Where(x => x.ClaimAmount == searchModel.AmountFrom);
+                        result = result.Where(x => x.ClaimAmount >= searchModel.AmountFrom);
                     if (searchModel.AmountTo > 0)
-                        result = result.Where(x => x.ClaimAmount == searchModel.AmountTo);
+                        result = result.Where(x => x.ClaimAmount <= searchModel.AmountTo);
                     if (searchModel.CostCenterId.HasValue)
                         result = result.Where(x => x.CostCenterId == searchModel.CostCenterId);
                     if (searchModel.ApprovalStatusId.HasValue)
@@ -270,7 +272,9 @@ namespace AtoCash.Controllers
                     // Creating the Excel workbook 
                     // Add the datatable to the Excel workbook
 
-                    return GetExcel("CashReimburseReportByEmployee", dt);
+                    return  GetExcel("CashReimburseReportByEmployee", dt);
+
+
                 }
             }
             return Conflict(new RespStatus() { Status = "Failure", Message = "User Id not valid" });
@@ -483,11 +487,30 @@ namespace AtoCash.Controllers
             using XLWorkbook wb = new XLWorkbook();
             wb.Worksheets.Add(dt, reporttype);
             string xlfileName = reporttype + "_" + DateTime.Now.ToShortDateString().Replace("/", string.Empty) + ".xlsx";
+           // string xlfileName = reporttype  + ".xlsx";
 
             using MemoryStream stream = new MemoryStream();
+
             wb.SaveAs(stream);
 
-            return File(stream.ToArray(), "Application/Ms-Excel", xlfileName);
+            //string uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "Images");
+            
+            //string filePath = Path.Combine(uploadsFolder, xlfileName);
+
+            //if (System.IO.File.Exists(filePath))
+            //    System.IO.File.Delete(filePath);
+
+
+            //using var outputtream = new FileStream(filePath, FileMode.Create);
+
+            //using (FileStream outputFileStream = new FileStream(filePath, FileMode.Create))
+            //{
+            //    stream.CopyTo(outputtream);
+            //}
+            //string docUrl = Directory.EnumerateFiles(uploadsFolder).Select(f => filePath).FirstOrDefault().ToString();
+
+            //return docUrl;
+         return File(stream.ToArray(), "Application/Ms-Excel", xlfileName);
         }
 
 
