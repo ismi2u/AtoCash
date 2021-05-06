@@ -132,7 +132,7 @@ namespace AtoCash.Controllers
                         disbursementsAndClaimsMasterDTO.CostCenter = disb.CostCenterId != null ? _context.CostCenters.Find(disb.CostCenterId).CostCenterCode : null;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusId = disb.ApprovalStatusId;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusType = disb.ApprovalStatusId != null ? _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status : null;
-
+                        disbursementsAndClaimsMasterDTO.RecordDate = disb.RecordDate;
                         ListDisbItemsDTO.Add(disbursementsAndClaimsMasterDTO);
                     }
 
@@ -219,17 +219,17 @@ namespace AtoCash.Controllers
                         disbursementsAndClaimsMasterDTO.CostCenter = disb.CostCenterId != null ? _context.CostCenters.Find(disb.CostCenterId).CostCenterCode : null;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusId = disb.ApprovalStatusId;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusType = disb.ApprovalStatusId != null ? _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status : null;
-
+                        disbursementsAndClaimsMasterDTO.RecordDate = disb.RecordDate;
                         ListDisbItemsDTO.Add(disbursementsAndClaimsMasterDTO);
                     }
 
-                    return Ok(ListDisbItemsDTO);
+                    //return Ok(ListDisbItemsDTO);
 
 
                     DataTable dt = new DataTable();
-                    dt.Columns.AddRange(new DataColumn[16]
+                    dt.Columns.AddRange(new DataColumn[15]
                         {
-                    new DataColumn("Id", typeof(int)),
+                    //new DataColumn("Id", typeof(int)),
                     new DataColumn("EmployeeName", typeof(string)),
                     new DataColumn("PettyCashRequestId", typeof(int)),
                     new DataColumn("ExpenseReimburseReqId", typeof(int)),
@@ -239,10 +239,10 @@ namespace AtoCash.Controllers
                     new DataColumn("SubProject", typeof(string)),
                     new DataColumn("WorkTask",typeof(string)),
                     new DataColumn("RecordDate",typeof(DateTime)),
-                      new DataColumn("CurrencyType",typeof(string)),
+                    new DataColumn("CurrencyType",typeof(string)),
                     new DataColumn("ClaimAmount", typeof(Double)),
                     new DataColumn("AmountToWallet", typeof(Double)),
-                       new DataColumn("AmountToCredit", typeof(Double)),
+                    new DataColumn("AmountToCredit", typeof(Double)),
                     new DataColumn("CostCenter", typeof(string)),
                     new DataColumn("ApprovalStatus", typeof(string))
                         });
@@ -252,13 +252,14 @@ namespace AtoCash.Controllers
                         dt.Rows.Add(
                             disbItem.EmployeeName,
                             disbItem.PettyCashRequestId,
+                            disbItem.ExpenseReimburseReqId,
                             disbItem.RequestType,
                             disbItem.Department,
-
                             disbItem.Project,
                             disbItem.SubProject,
                             disbItem.WorkTask,
                             disbItem.RecordDate,
+                            disbItem.CurrencyType,
                             disbItem.ClaimAmount,
                             disbItem.AmountToWallet,
                             disbItem.AmountToCredit,
@@ -340,12 +341,13 @@ namespace AtoCash.Controllers
                     travelItemDTO.CostCenter = travel.CostCenterId != null ? _context.CostCenters.Find(travel.CostCenterId).CostCenterCode : null;
                     travelItemDTO.ApprovalStatusTypeId = travel.ApprovalStatusTypeId;
                     travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != null ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status: null;
+                    travelItemDTO.ReqRaisedDate = travel.ReqRaisedDate;
 
                     ListTravelItemsDTO.Add(travelItemDTO);
                 }
 
 
-                return Ok(result);
+                return Ok(ListTravelItemsDTO);
             }
 
             return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
@@ -417,7 +419,7 @@ namespace AtoCash.Controllers
                     travelItemDTO.CostCenter = travel.CostCenterId != null ? _context.CostCenters.Find(travel.CostCenterId).CostCenterCode : null;
                     travelItemDTO.ApprovalStatusTypeId = travel.ApprovalStatusTypeId;
                     travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != null ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status : null;
-
+                    travelItemDTO.ReqRaisedDate = travel.ReqRaisedDate;
                     ListTravelItemsDTO.Add(travelItemDTO);
                 }
 

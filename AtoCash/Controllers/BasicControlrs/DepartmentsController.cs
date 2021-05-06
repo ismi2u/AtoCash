@@ -45,6 +45,26 @@ namespace AtoCash.Controllers
             return ListDepartmentVM;
 
         }
+        [HttpGet]
+        [ActionName("DepartmentsForDropdownByCostCentre")]
+        public async Task<ActionResult<IEnumerable<DepartmentVM>>> GetDepartmentsForDropdownByCostCentre(int CostCenterId)
+        {
+            List<DepartmentVM> ListDepartmentVM = new List<DepartmentVM>();
+
+            var departments = await _context.Departments.Where(d => d.StatusTypeId == (int)EStatusType.Active && d.CostCenterId== CostCenterId).ToListAsync();
+            foreach (Department department in departments)
+            {
+                DepartmentVM departmentVM = new DepartmentVM
+                {
+                    Id = department.Id,
+                    DeptDesc = department.DeptCode + "-" + department.DeptName
+                };
+
+                ListDepartmentVM.Add(departmentVM);
+            }
+            return ListDepartmentVM;
+
+        }
 
         // GET: api/Departments
         [HttpGet]
