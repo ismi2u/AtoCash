@@ -272,7 +272,7 @@ namespace AtoCash.Controllers
                     // Creating the Excel workbook 
                     // Add the datatable to the Excel workbook
 
-                    return  GetExcel("CashReimburseReportByEmployee", dt);
+                    return Ok(GetExcel("CashReimburseReportByEmployee", dt));
 
 
                 }
@@ -469,7 +469,7 @@ namespace AtoCash.Controllers
                 // Creating the Excel workbook 
                 // Add the datatable to the Excel workbook
 
-                return GetExcel("TravelRequestReportForEmployee", dt);
+                return Ok(GetExcel("TravelRequestReportForEmployee", dt));
             }
 
             return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
@@ -480,37 +480,37 @@ namespace AtoCash.Controllers
 
 
 
-        private FileContentResult GetExcel(string reporttype, DataTable dt)
+        private string GetExcel(string reporttype, DataTable dt)
         {
             // Creating the Excel workbook 
             // Add the datatable to the Excel workbook
             using XLWorkbook wb = new XLWorkbook();
             wb.Worksheets.Add(dt, reporttype);
-            string xlfileName = reporttype + "_" + DateTime.Now.ToShortDateString().Replace("/", string.Empty) + ".xlsx";
-           // string xlfileName = reporttype  + ".xlsx";
+           // string xlfileName = reporttype + "_" + DateTime.Now.ToShortDateString().Replace("/", string.Empty) + ".xlsx";
+          string xlfileName = reporttype  + ".xlsx";
 
             using MemoryStream stream = new MemoryStream();
 
             wb.SaveAs(stream);
 
-            //string uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "Images");
-            
-            //string filePath = Path.Combine(uploadsFolder, xlfileName);
+            string uploadsfolder = Path.Combine(hostingEnvironment.ContentRootPath, "images");
 
-            //if (System.IO.File.Exists(filePath))
-            //    System.IO.File.Delete(filePath);
+            string filepath = Path.Combine(uploadsfolder, xlfileName);
+
+            if (System.IO.File.Exists(filepath))
+                System.IO.File.Delete(filepath);
 
 
-            //using var outputtream = new FileStream(filePath, FileMode.Create);
+            using var outputtream = new FileStream(filepath, FileMode.Create);
 
-            //using (FileStream outputFileStream = new FileStream(filePath, FileMode.Create))
-            //{
-            //    stream.CopyTo(outputtream);
-            //}
-            //string docUrl = Directory.EnumerateFiles(uploadsFolder).Select(f => filePath).FirstOrDefault().ToString();
+            using (FileStream outputfilestream = new FileStream(filepath, FileMode.Create))
+            {
+                stream.CopyTo(outputtream);
+            }
+            string docurl = Directory.EnumerateFiles(uploadsfolder).Select(f => filepath).FirstOrDefault().ToString();
 
-            //return docUrl;
-         return File(stream.ToArray(), "Application/Ms-Excel", xlfileName);
+            return docurl;
+            // return File(stream.ToArray(), "Application/Ms-Excel", xlfileName);
         }
 
 
