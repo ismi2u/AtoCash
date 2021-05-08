@@ -128,8 +128,8 @@ namespace AtoCash.Controllers
                         disbursementsAndClaimsMasterDTO.CurrencyTypeId = disb.CurrencyTypeId;
                         disbursementsAndClaimsMasterDTO.CurrencyType = disb.CurrencyTypeId != null ? _context.CurrencyTypes.Find(disb.CurrencyTypeId).CurrencyCode : null;
                         disbursementsAndClaimsMasterDTO.ClaimAmount = disb.ClaimAmount;
-                        disbursementsAndClaimsMasterDTO.AmountToWallet = disb.AmountToWallet?? 0;
-                        disbursementsAndClaimsMasterDTO.AmountToCredit = disb.AmountToCredit?? 0;
+                        disbursementsAndClaimsMasterDTO.AmountToWallet = disb.AmountToWallet ?? 0;
+                        disbursementsAndClaimsMasterDTO.AmountToCredit = disb.AmountToCredit ?? 0;
                         disbursementsAndClaimsMasterDTO.CostCenterId = disb.CostCenterId;
                         disbursementsAndClaimsMasterDTO.CostCenter = disb.CostCenterId != null ? _context.CostCenters.Find(disb.CostCenterId).CostCenterCode : null;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusId = disb.ApprovalStatusId;
@@ -272,7 +272,12 @@ namespace AtoCash.Controllers
                     // Creating the Excel workbook 
                     // Add the datatable to the Excel workbook
 
-                    return Ok(GetExcel("CashReimburseReportByEmployee", dt));
+                    List<string> docUrls = new();
+                    var docUrl = GetExcel("CashReimburseReportByEmployee", dt);
+
+                    docUrls.Add(docUrl);
+
+                    return Ok(docUrls);
 
 
                 }
@@ -334,17 +339,17 @@ namespace AtoCash.Controllers
                     travelItemDTO.EmployeeName = _context.Employees.Find(travel.EmployeeId).GetFullName();
 
                     travelItemDTO.DepartmentId = travel.DepartmentId;
-                    travelItemDTO.Department = travel.DepartmentId !=null ? _context.Departments.Find(travel.DepartmentId).DeptName :null;
+                    travelItemDTO.Department = travel.DepartmentId != null ? _context.Departments.Find(travel.DepartmentId).DeptName : null;
                     travelItemDTO.ProjectId = travel.ProjectId;
-                    travelItemDTO.Project = travel.ProjectId != null ? _context.Projects.Find(travel.ProjectId).ProjectName: null;
+                    travelItemDTO.Project = travel.ProjectId != null ? _context.Projects.Find(travel.ProjectId).ProjectName : null;
                     travelItemDTO.SubProjectId = travel.SubProjectId;
                     travelItemDTO.SubProject = travel.SubProjectId != null ? _context.SubProjects.Find(travel.SubProjectId).SubProjectName : null;
                     travelItemDTO.WorkTaskId = travel.WorkTaskId;
-                    travelItemDTO.WorkTask = travel.WorkTaskId != null ? _context.WorkTasks.Find(travel.WorkTaskId).TaskName: null;
+                    travelItemDTO.WorkTask = travel.WorkTaskId != null ? _context.WorkTasks.Find(travel.WorkTaskId).TaskName : null;
                     travelItemDTO.CostCenterId = travel.CostCenterId;
                     travelItemDTO.CostCenter = travel.CostCenterId != null ? _context.CostCenters.Find(travel.CostCenterId).CostCenterCode : null;
                     travelItemDTO.ApprovalStatusTypeId = travel.ApprovalStatusTypeId;
-                    travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != null ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status: null;
+                    travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != null ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status : null;
                     travelItemDTO.ReqRaisedDate = travel.ReqRaisedDate;
 
                     ListTravelItemsDTO.Add(travelItemDTO);
@@ -469,7 +474,12 @@ namespace AtoCash.Controllers
                 // Creating the Excel workbook 
                 // Add the datatable to the Excel workbook
 
-                return Ok(GetExcel("TravelRequestReportForEmployee", dt));
+                List<string> docUrls = new();
+                var docUrl = GetExcel("TravelRequestReportForEmployee", dt);
+
+                docUrls.Add(docUrl);
+
+                return Ok(docUrl);
             }
 
             return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
@@ -486,8 +496,8 @@ namespace AtoCash.Controllers
             // Add the datatable to the Excel workbook
             using XLWorkbook wb = new XLWorkbook();
             wb.Worksheets.Add(dt, reporttype);
-           // string xlfileName = reporttype + "_" + DateTime.Now.ToShortDateString().Replace("/", string.Empty) + ".xlsx";
-          string xlfileName = reporttype  + ".xlsx";
+            // string xlfileName = reporttype + "_" + DateTime.Now.ToShortDateString().Replace("/", string.Empty) + ".xlsx";
+            string xlfileName = reporttype + ".xlsx";
 
             using MemoryStream stream = new MemoryStream();
 

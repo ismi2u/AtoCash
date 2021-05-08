@@ -45,13 +45,13 @@ namespace AtoCash.Controllers
             return ListDepartmentVM;
 
         }
-        [HttpGet]
+        [HttpGet("{id}")]
         [ActionName("DepartmentsForDropdownByCostCentre")]
-        public async Task<ActionResult<IEnumerable<DepartmentVM>>> GetDepartmentsForDropdownByCostCentre(int CostCenterId)
+        public async Task<ActionResult<IEnumerable<DepartmentVM>>> GetDepartmentsForDropdownByCostCentre(int id)
         {
             List<DepartmentVM> ListDepartmentVM = new List<DepartmentVM>();
 
-            var departments = await _context.Departments.Where(d => d.StatusTypeId == (int)EStatusType.Active && d.CostCenterId== CostCenterId).ToListAsync();
+            var departments = await _context.Departments.Where(d => d.StatusTypeId == (int)EStatusType.Active && d.CostCenterId == id).ToListAsync();
             foreach (Department department in departments)
             {
                 DepartmentVM departmentVM = new DepartmentVM
@@ -214,7 +214,7 @@ namespace AtoCash.Controllers
             return _context.Departments.Any(e => e.Id == id);
         }
 
-       
+
         //
     }
 }
