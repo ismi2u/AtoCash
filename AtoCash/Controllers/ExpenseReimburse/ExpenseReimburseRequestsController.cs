@@ -729,7 +729,7 @@ namespace AtoCash.Controllers
 
             ///////////////////////////// Check if self Approved Request /////////////////////////////
             //if highest approver is requesting Petty cash request himself
-            if (maxApprLevel == reqApprLevel)
+            if (maxApprLevel == reqApprLevel || projManagerid == reqEmpid)
             {
                 isSelfApprovedRequest = true;
             }
@@ -750,10 +750,10 @@ namespace AtoCash.Controllers
                     WorkTaskId = expenseReimburseRequestDto.WorkTaskId,
                     JobRoleId = _context.Employees.Find(expenseReimburseRequestDto.EmployeeId).RoleId,
                     ApprovalGroupId = reqApprGroupId,
-                    ApprovalLevelId = reqApprLevel,
+                    ApprovalLevelId = 2,  //(reqApprLevel) or 2  default approval level is 2 for Project based request
                     ApprovedDate = null,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved, //1-Pending, 2-Approved, 3-Rejected
-                    Comments = "Self Approved Request"
+                    Comments = "Self Approved Request!"
                 };
                 _context.ExpenseReimburseStatusTrackers.Add(expenseReimburseStatusTracker);
                 await _context.SaveChangesAsync();

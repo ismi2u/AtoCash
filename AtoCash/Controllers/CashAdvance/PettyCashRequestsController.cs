@@ -510,7 +510,7 @@ namespace AtoCash.Controllers
             int empApprLevel = _context.ApprovalRoleMaps.Where(a => a.RoleId == _context.Employees.Find(empid).RoleId).FirstOrDefault().Id;
             bool isSelfApprovedRequest = false;
             //if highest approver is requesting Petty cash request himself
-            if (maxApprLevel == empApprLevel)
+            if (maxApprLevel == empApprLevel || projManagerid == empid)
             {
                 isSelfApprovedRequest = true;
             }
@@ -528,11 +528,11 @@ namespace AtoCash.Controllers
                     RoleId = approver.RoleId,
                     // get the next ProjectManager approval.
                     ApprovalGroupId = _context.Employees.Find(pettyCashRequestDto.EmployeeId).ApprovalGroupId,
-                    ApprovalLevelId = empApprLevel, // default approval level is 2 for Project based request
+                    ApprovalLevelId = 2, //empApprLevel or 2 default approval level is 2 for Project based request
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved, //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
-                    Comments = "Self Approved Request"
+                    Comments = "Self Approved Request!"
                 };
 
 

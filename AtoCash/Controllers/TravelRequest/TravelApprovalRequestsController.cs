@@ -469,7 +469,7 @@ namespace AtoCash.Controllers
             ///////////////////////////// Check if self Approved Request /////////////////////////////
 
             //if highest approver is requesting Petty cash request himself
-            if (maxApprLevel == empApprLevel)
+            if (maxApprLevel == empApprLevel || projManagerid == reqEmpid)
             {
                 isSelfApprovedRequest = true;
             }
@@ -485,11 +485,11 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.ProjectId = travelApprovalRequestDTO.ProjectId;
                 travelApprovalStatusTracker.RoleId = approver.RoleId;
                 travelApprovalStatusTracker.ApprovalGroupId = _context.Employees.Find(travelApprovalRequestDTO.EmployeeId).ApprovalGroupId;
-                travelApprovalStatusTracker.ApprovalLevelId = empApprLevel; // default approval level is 2 for Project based request
+                travelApprovalStatusTracker.ApprovalLevelId = 2; // default approval level is 2 for Project based request
                 travelApprovalStatusTracker.ReqDate = DateTime.Now;
                 travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
                 travelApprovalStatusTracker.ApprovalStatusTypeId = (int)EApprovalStatus.Approved; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
-                travelApprovalStatusTracker.Comments = "Travel Request in Proceess";
+                travelApprovalStatusTracker.Comments = "Travel Request is Self Approved!";
             }
             else
             {
@@ -512,7 +512,15 @@ namespace AtoCash.Controllers
 
 
             _context.TravelApprovalStatusTrackers.Add(travelApprovalStatusTracker);
-            await _context.SaveChangesAsync();
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
             #endregion
 
 
