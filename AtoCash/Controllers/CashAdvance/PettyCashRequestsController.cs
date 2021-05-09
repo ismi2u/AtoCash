@@ -716,6 +716,8 @@ namespace AtoCash.Controllers
                     //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
                 _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
+                pcrq.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                _context.PettyCashRequests.Update(pcrq);
                 await _context.SaveChangesAsync();
             }
             else

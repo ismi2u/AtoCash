@@ -629,6 +629,10 @@ namespace AtoCash.Controllers
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved,
                     Comments = "Travel Request in Proceess"
                 };
+
+                _context.TravelApprovalStatusTrackers.Add(travelApprovalStatusTracker);
+                travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                _context.TravelApprovalRequests.Update(travelApprovalRequest);
             }
             else
             {

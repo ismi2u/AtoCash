@@ -571,7 +571,9 @@ namespace AtoCash.Controllers
                     Comments = "Self Approved Request"
                 };
                 _context.ExpenseReimburseStatusTrackers.Add(expenseReimburseStatusTracker);
-                await _context.SaveChangesAsync();
+                expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                _context.ExpenseReimburseRequests.Update(expenseReimburseRequest);
+               await _context.SaveChangesAsync();
             }
             else
             {
