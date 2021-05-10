@@ -516,7 +516,7 @@ namespace AtoCash.Controllers
 
             using (FileStream outputfilestream = new FileStream(filepath, FileMode.Create))
             {
-                stream.CopyTo(outputtream);
+                outputfilestream.CopyToAsync(outputtream);
             }
             string docurl = Directory.EnumerateFiles(uploadsfolder).Select(f => filepath).FirstOrDefault().ToString();
 
