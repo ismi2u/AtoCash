@@ -41,6 +41,11 @@ namespace AtoCash.Models
         public virtual Department Department { get; set; }
         public int? DepartmentId { get; set; }
 
+        /// 
+        [ForeignKey("ProjManagerId")]
+        public virtual Employee ProjManager { get; set; }
+        public int? ProjManagerId { get; set; }
+
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }
         public int? ProjectId { get; set; }

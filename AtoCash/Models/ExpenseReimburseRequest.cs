@@ -58,6 +58,10 @@ namespace AtoCash.Models
         public int ApprovalStatusTypeId { get; set; }
 
         public DateTime? ApprovedDate { get; set; }
+
+        [Required]
+        [Column(TypeName = "nvarchar(250)")]
+        public string Comments { get; set; }
     }
 
 

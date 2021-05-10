@@ -37,6 +37,11 @@ namespace AtoCash.Models
         //Approver Project (either Department or Project => Can't be both)
 
 
+        [ForeignKey("ProjManagerId")]
+        public virtual Employee ProjManager { get; set; }
+        public int? ProjManagerId { get; set; }
+
+
         [ForeignKey("ProjectId")]
         public virtual Project Project { get; set; }
         public int? ProjectId { get; set; }

@@ -59,6 +59,10 @@ namespace AtoCash.Models
 
         public DateTime? ApprovedDate { get; set; }
 
+        [Required]
+        [Column(TypeName = "nvarchar(250)")]
+        public string Comments { get; set; }
+
 
     }
 
@@ -97,5 +101,6 @@ namespace AtoCash.Models
 
         public bool ShowEditDelete { get; set; }
 
+        public string Comments { get; set; }
     }
 }

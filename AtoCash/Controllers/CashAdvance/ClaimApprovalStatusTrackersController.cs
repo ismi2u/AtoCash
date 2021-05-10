@@ -146,7 +146,7 @@ namespace AtoCash.Controllers
                 //claimApprovalStatusTracker.ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId;
                 //claimApprovalStatusTracker.ReqDate = claimApprovalStatusTrackerDto.ReqDate;
                 claimApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
-                claimApprovalStatusTracker.Comments = claimApprovalStatusTrackerDto.Comments;
+                claimApprovalStatusTracker.Comments = claimApprovalStatusTrackerDto.Comments ?? "Approved";
 
                 ClaimApprovalStatusTracker claimitem;
                 if (claimApprovalStatusTrackerDto.DepartmentId != null)
@@ -212,6 +212,7 @@ namespace AtoCash.Controllers
                             var pettyCashRequest = _context.PettyCashRequests.Find(qPettyCashRequestId);
                             pettyCashRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                             pettyCashRequest.ApprovedDate = DateTime.Now;
+                            pettyCashRequest.Comments = claimApprovalStatusTrackerDto.Comments;
                             _context.Update(pettyCashRequest);
 
 
@@ -281,6 +282,7 @@ namespace AtoCash.Controllers
                         var pettyCashReq = _context.PettyCashRequests.Where(p => p.Id == claimApprovalStatusTrackerDto.PettyCashRequestId).FirstOrDefault();
                         pettyCashReq.ApprovalStatusTypeId = claimApprovalStatusTrackerDto.ApprovalStatusTypeId;
                         pettyCashReq.ApprovedDate = DateTime.Now;
+                        pettyCashReq.Comments = claimApprovalStatusTrackerDto.Comments;
                         _context.PettyCashRequests.Update(pettyCashReq);
 
                         //update the EmpPettyCashBalance to credit back the deducted amount
@@ -332,6 +334,7 @@ namespace AtoCash.Controllers
 
                     pettyCashReq.ApprovalStatusTypeId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     pettyCashReq.ApprovedDate = DateTime.Now;
+                    pettyCashReq.Comments = claimApprovalStatusTrackerDto.Comments;
                     _context.Update(pettyCashReq);
 
                 }
@@ -448,9 +451,10 @@ namespace AtoCash.Controllers
                 r.RoleId == roleid 
                 && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending 
                 && r.ApprovalGroupId == apprGroupId
+
                 || r.RoleId == roleid 
                 && r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending
-                && r.ProjectId != null).ToList();
+                && r.ProjManagerId == id).ToList();
 
             List<ClaimApprovalStatusTrackerDTO> ListClaimApprovalStatusTrackerDTO = new();
 

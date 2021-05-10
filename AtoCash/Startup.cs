@@ -45,7 +45,7 @@ namespace AtoCash
             //    "WithinContainerSQLConnectionString": "server=sqldata; database=AtoCashDB; User=sa; Password=Pa55word2019!123;trusted_connection=false; MultipleActiveResultSets=true",
             //    "LocalSQLConnectionString": "server=host.docker.internal,1433; database=AtoCashDB; User=sa; Password=Pa55word2019!123;trusted_connection=false; MultipleActiveResultSets=true"
             // "AtoCashDBServer":
-            //StagingServer : "server=143.110.188.154,1433; 
+            //StagingServer : "server=167.71.228.129,1433; 
 
 
             services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WithinContainerSQLConnectionString")));

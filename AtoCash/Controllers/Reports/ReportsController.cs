@@ -16,6 +16,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.StaticFiles;
 
 namespace AtoCash.Controllers
 {

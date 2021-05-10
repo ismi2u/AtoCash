@@ -127,7 +127,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                                     r.ApprovalGroupId == apprGroupId &&
                                     r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending
                                     || r.JobRoleId == jobRoleid &&
-                                    r.ProjectId !=null &&
+                                    r.ProjManagerId ==id &&
                                     r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending ).ToList();
 
             List<ExpenseReimburseStatusTrackerDTO> ListExpenseReimburseStatusTrackerDTO = new();
@@ -293,6 +293,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                             var expenseReimburseRequest = _context.ExpenseReimburseRequests.Find(qExpReimRequestId);
                             expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                             expenseReimburseRequest.ApprovedDate = DateTime.Now;
+                            expenseReimburseRequest.Comments = expenseReimburseStatusTrackerDto.Comments;
                             _context.Update(expenseReimburseRequest);
 
 
@@ -384,6 +385,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                         var expReimbReq = _context.ExpenseReimburseRequests.Where(p => p.Id == expenseReimburseStatusTrackerDto.ExpenseReimburseRequestId).FirstOrDefault();
                         expReimbReq.ApprovalStatusTypeId = expenseReimburseStatusTrackerDto.ApprovalStatusTypeId;
                         expReimbReq.ApprovedDate = DateTime.Now;
+                        expReimbReq.Comments = expenseReimburseStatusTrackerDto.Comments;
                         _context.ExpenseReimburseRequests.Update(expReimbReq);
                         await _context.SaveChangesAsync();
                     }

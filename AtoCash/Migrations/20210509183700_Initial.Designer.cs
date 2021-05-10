@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtoCash.Migrations
 {
     [DbContext(typeof(AtoCashDbContext))]
-    [Migration("20210424204300_Initial")]
+    [Migration("20210509183700_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -205,6 +205,9 @@ namespace AtoCash.Migrations
                     b.Property<int?>("PettyCashRequestId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProjManagerId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
 
@@ -231,6 +234,8 @@ namespace AtoCash.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("PettyCashRequestId");
+
+                    b.HasIndex("ProjManagerId");
 
                     b.HasIndex("ProjectId");
 
@@ -555,6 +560,10 @@ namespace AtoCash.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<int>("CurrencyTypeId")
                         .HasColumnType("int");
 
@@ -643,6 +652,9 @@ namespace AtoCash.Migrations
                     b.Property<int>("JobRoleId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("ProjManagerId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
 
@@ -670,6 +682,8 @@ namespace AtoCash.Migrations
                     b.HasIndex("ExpenseReimburseRequestId");
 
                     b.HasIndex("JobRoleId");
+
+                    b.HasIndex("ProjManagerId");
 
                     b.HasIndex("ProjectId");
 
@@ -816,6 +830,10 @@ namespace AtoCash.Migrations
 
                     b.Property<DateTime>("CashReqDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
 
                     b.Property<int>("CurrencyTypeId")
                         .HasColumnType("int");
@@ -992,6 +1010,10 @@ namespace AtoCash.Migrations
                     b.Property<DateTime?>("ApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Comments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(250)");
+
                     b.Property<int>("CostCenterId")
                         .HasColumnType("int");
 
@@ -1070,6 +1092,9 @@ namespace AtoCash.Migrations
                     b.Property<DateTime?>("FinalApprovedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ProjManagerId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("ProjectId")
                         .HasColumnType("int");
 
@@ -1103,6 +1128,8 @@ namespace AtoCash.Migrations
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("EmployeeId");
+
+                    b.HasIndex("ProjManagerId");
 
                     b.HasIndex("ProjectId");
 
@@ -1328,6 +1355,10 @@ namespace AtoCash.Migrations
                         .WithMany()
                         .HasForeignKey("PettyCashRequestId");
 
+                    b.HasOne("AtoCash.Models.Employee", "ProjManager")
+                        .WithMany()
+                        .HasForeignKey("ProjManagerId");
+
                     b.HasOne("AtoCash.Models.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId");
@@ -1357,6 +1388,8 @@ namespace AtoCash.Migrations
                     b.Navigation("PettyCashRequest");
 
                     b.Navigation("Project");
+
+                    b.Navigation("ProjManager");
 
                     b.Navigation("Role");
 
@@ -1640,6 +1673,10 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AtoCash.Models.Employee", "ProjManager")
+                        .WithMany()
+                        .HasForeignKey("ProjManagerId");
+
                     b.HasOne("AtoCash.Models.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId");
@@ -1667,6 +1704,8 @@ namespace AtoCash.Migrations
                     b.Navigation("JobRole");
 
                     b.Navigation("Project");
+
+                    b.Navigation("ProjManager");
 
                     b.Navigation("SubProject");
 
@@ -1886,6 +1925,10 @@ namespace AtoCash.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("AtoCash.Models.Employee", "ProjManager")
+                        .WithMany()
+                        .HasForeignKey("ProjManagerId");
+
                     b.HasOne("AtoCash.Models.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId");
@@ -1919,6 +1962,8 @@ namespace AtoCash.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("Project");
+
+                    b.Navigation("ProjManager");
 
                     b.Navigation("Role");
 

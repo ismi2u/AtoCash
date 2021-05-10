@@ -492,7 +492,8 @@ namespace AtoCash.Controllers
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
                 PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc,
                 CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
-                ApprovalStatusTypeId = (int)EApprovalStatus.Pending
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending,
+                Comments = "Cash Advance Request in Process!"
 
             };
             _context.PettyCashRequests.Add(pcrq);
@@ -522,6 +523,7 @@ namespace AtoCash.Controllers
                     EmployeeId = pettyCashRequestDto.EmployeeId,
                     PettyCashRequestId = pettyCashRequestDto.Id,
                     DepartmentId = null,
+                    ProjManagerId = projManagerid,
                     ProjectId = pettyCashRequestDto.ProjectId,
                     SubProjectId = pettyCashRequestDto.SubProjectId,
                     WorkTaskId = pettyCashRequestDto.WorkTaskId,
@@ -537,6 +539,8 @@ namespace AtoCash.Controllers
 
 
                 _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
+                pcrq.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                _context.PettyCashRequests.Update(pcrq);
                 await _context.SaveChangesAsync();
             }
             else
@@ -546,6 +550,7 @@ namespace AtoCash.Controllers
                     EmployeeId = pettyCashRequestDto.EmployeeId,
                     PettyCashRequestId = pettyCashRequestDto.Id,
                     DepartmentId = null,
+                    ProjManagerId = projManagerid,
                     ProjectId = pettyCashRequestDto.ProjectId,
                     SubProjectId = pettyCashRequestDto.SubProjectId,
                     WorkTaskId = pettyCashRequestDto.WorkTaskId,
@@ -665,7 +670,8 @@ namespace AtoCash.Controllers
                 WorkTaskId = pettyCashRequestDto.WorkTaskId,
                 DepartmentId = _context.Employees.Find(reqEmpid).DepartmentId,
                 CurrencyTypeId = pettyCashRequestDto.CurrencyTypeId,
-                ApprovalStatusTypeId = (int)EApprovalStatus.Pending
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending,
+                Comments = "Cash Advance Request in Process!"
 
             };
             _context.PettyCashRequests.Add(pcrq);
@@ -712,13 +718,13 @@ namespace AtoCash.Controllers
                     ReqDate = DateTime.Now,
                     FinalApprovedDate = DateTime.Now,
                     ApprovalStatusTypeId = (int)EApprovalStatus.Approved,
-                    Comments = "Awaiting Approver Action"
+                    Comments = "Self Approved Request!"
                     //1-Initiating, 2-Pending, 3-InReview, 4-Approved, 5-Rejected
                 };
                 _context.ClaimApprovalStatusTrackers.Add(claimAppStatusTrack);
                 pcrq.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                 _context.PettyCashRequests.Update(pcrq);
-                await _context.SaveChangesAsync();
+               await  _context.SaveChangesAsync();
             }
             else
             {
@@ -804,7 +810,14 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.ApprovalStatusId = isSelfApprovedRequest ? (int)EApprovalStatus.Approved : (int)EApprovalStatus.Pending;
 
             _context.DisbursementsAndClaimsMasters.Add(disbursementsAndClaimsMaster);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
             #endregion
 
         }

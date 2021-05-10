@@ -453,6 +453,7 @@ namespace AtoCash.Controllers
             travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
             travelApprovalRequest.CostCenterId =  _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCenterId;
             travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
+            travelApprovalRequest.Comments = "Travel Request In Process!";
 
 
             _context.TravelApprovalRequests.Add(travelApprovalRequest);
@@ -482,6 +483,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
                 travelApprovalStatusTracker.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
                 travelApprovalStatusTracker.DepartmentId = null;
+                travelApprovalStatusTracker.ProjManagerId = projManagerid;
                 travelApprovalStatusTracker.ProjectId = travelApprovalRequestDTO.ProjectId;
                 travelApprovalStatusTracker.RoleId = approver.RoleId;
                 travelApprovalStatusTracker.ApprovalGroupId = _context.Employees.Find(travelApprovalRequestDTO.EmployeeId).ApprovalGroupId;
@@ -490,6 +492,11 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
                 travelApprovalStatusTracker.ApprovalStatusTypeId = (int)EApprovalStatus.Approved; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
                 travelApprovalStatusTracker.Comments = "Travel Request is Self Approved!";
+
+                _context.TravelApprovalStatusTrackers.Add(travelApprovalStatusTracker);
+                travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                _context.TravelApprovalRequests.Update(travelApprovalRequest);
+                await _context.SaveChangesAsync();
             }
             else
             {
@@ -498,6 +505,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
                 travelApprovalStatusTracker.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
                 travelApprovalStatusTracker.DepartmentId = null;
+                travelApprovalStatusTracker.ProjManagerId = projManagerid;
                 travelApprovalStatusTracker.ProjectId = travelApprovalRequestDTO.ProjectId;
                 travelApprovalStatusTracker.RoleId = approver.RoleId;
                 // get the next ProjectManager approval.
@@ -578,7 +586,8 @@ namespace AtoCash.Controllers
                 SubProjectId = travelApprovalRequestDto.SubProjectId,
                 WorkTaskId = travelApprovalRequestDto.WorkTaskId,
                 CostCenterId = _context.Departments.Find(_context.Employees.Find(reqEmpid).DepartmentId).CostCenterId,
-                ApprovalStatusTypeId = (int)EApprovalStatus.Pending
+                ApprovalStatusTypeId = (int)EApprovalStatus.Pending,
+                Comments = "Travel Request In Process!"
 
 
             };
@@ -633,6 +642,7 @@ namespace AtoCash.Controllers
                 _context.TravelApprovalStatusTrackers.Add(travelApprovalStatusTracker);
                 travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                 _context.TravelApprovalRequests.Update(travelApprovalRequest);
+                await _context.SaveChangesAsync();
             }
             else
             {

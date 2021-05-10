@@ -218,6 +218,7 @@ namespace AtoCash.Controllers
                             //final Approver hence updating TravelApprovalRequest
                             var travelApprovalRequest = _context.TravelApprovalRequests.Find(qTravelApprovalRequestId);
                             travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                            travelApprovalRequest.Comments = travelApprovalStatusTrackerDTO.Comments;
                             travelApprovalRequest.ApprovedDate = DateTime.Now;
                             _context.Update(travelApprovalRequest);
                         }
@@ -269,6 +270,7 @@ namespace AtoCash.Controllers
                         var trvlApprReq = _context.TravelApprovalRequests.Where(p => p.Id == travelApprovalStatusTrackerDTO.TravelApprovalRequestId).FirstOrDefault();
                         trvlApprReq.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
                         trvlApprReq.ApprovedDate = DateTime.Now;
+                        trvlApprReq.Comments = travelApprovalStatusTrackerDTO.Comments;
                         _context.TravelApprovalRequests.Update(trvlApprReq);
                         await _context.SaveChangesAsync();
                     }
@@ -279,6 +281,7 @@ namespace AtoCash.Controllers
                         var trvlApprReq = _context.TravelApprovalRequests.Where(p => p.Id == travelApprovalStatusTrackerDTO.TravelApprovalRequestId).FirstOrDefault();
                         trvlApprReq.ApprovalStatusTypeId = travelApprovalStatusTrackerDTO.ApprovalStatusTypeId;
                         trvlApprReq.ApprovedDate = DateTime.Now;
+                        trvlApprReq.Comments = travelApprovalStatusTrackerDTO.Comments;
                         _context.TravelApprovalRequests.Update(trvlApprReq);
                         await _context.SaveChangesAsync();
                     }
@@ -298,6 +301,7 @@ namespace AtoCash.Controllers
 
                     travelApprovalrequest.ApprovalStatusTypeId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     travelApprovalrequest.ApprovedDate = DateTime.Now;
+                    travelApprovalrequest.Comments = travelApprovalStatusTrackerDTO.Comments;
                     _context.Update(travelApprovalrequest);
 
 
@@ -393,7 +397,7 @@ namespace AtoCash.Controllers
                                     r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending) ||
                                    
                                     (r.RoleId == jobRoleid &&
-                                    r.ProjectId != null &&
+                                    r.ProjManagerId == id &&
                                     r.ApprovalStatusTypeId == (int)EApprovalStatus.Pending)
 
                                     ).ToList();

@@ -499,6 +499,7 @@ namespace AtoCash.Controllers
             expenseReimburseRequest.WorkTaskId = null;
             expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
             //expenseReimburseRequest.ApprovedDate = expenseReimburseRequestDto.ApprovedDate;
+            expenseReimburseRequest.Comments = "Expense Reimburse Request in Process!";
 
             _context.ExpenseReimburseRequests.Add(expenseReimburseRequest); //  <= this generated the Id
             await _context.SaveChangesAsync();
@@ -573,7 +574,7 @@ namespace AtoCash.Controllers
                 _context.ExpenseReimburseStatusTrackers.Add(expenseReimburseStatusTracker);
                 expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                 _context.ExpenseReimburseRequests.Update(expenseReimburseRequest);
-               await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             else
             {
@@ -692,6 +693,7 @@ namespace AtoCash.Controllers
             expenseReimburseRequest.WorkTaskId = expenseReimburseRequestDto.WorkTaskId;
             expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
             //expenseReimburseRequest.ApprovedDate = expenseReimburseRequestDto.ApprovedDate;
+            expenseReimburseRequest.Comments = "Expense Reimburse Request in Process!";
 
             _context.ExpenseReimburseRequests.Add(expenseReimburseRequest); //  <= this generated the Id
             await _context.SaveChangesAsync();
@@ -747,6 +749,7 @@ namespace AtoCash.Controllers
                     TotalClaimAmount = dblTotalClaimAmount,
                     ExpReimReqDate = DateTime.Now,
                     DepartmentId = null,
+                    ProjManagerId = projManagerid,
                     ProjectId = expenseReimburseRequestDto.ProjectId, //Approver Project Id
                     SubProjectId = expenseReimburseRequestDto.SubProjectId,
                     WorkTaskId = expenseReimburseRequestDto.WorkTaskId,
@@ -758,6 +761,8 @@ namespace AtoCash.Controllers
                     Comments = "Self Approved Request!"
                 };
                 _context.ExpenseReimburseStatusTrackers.Add(expenseReimburseStatusTracker);
+                expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
+                _context.ExpenseReimburseRequests.Update(expenseReimburseRequest);
                 await _context.SaveChangesAsync();
             }
             else
@@ -771,6 +776,7 @@ namespace AtoCash.Controllers
                     TotalClaimAmount = expenseReimburseRequestDto.TotalClaimAmount,
                     ExpReimReqDate = DateTime.Now,
                     DepartmentId = null,
+                    ProjManagerId = projManagerid,
                     ProjectId = expenseReimburseRequestDto.ProjectId, //Approver Project Id
                     SubProjectId = expenseReimburseRequestDto.SubProjectId,
                     WorkTaskId = expenseReimburseRequestDto.WorkTaskId,
