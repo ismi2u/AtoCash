@@ -54,14 +54,15 @@ namespace AtoCash.Controllers
         {
             EmpCurrentPettyCashBalanceDTO empCurrentPettyCashBalanceDTO = new EmpCurrentPettyCashBalanceDTO();
 
-            var empCurrentPettyCashBalance = await _context.EmpCurrentPettyCashBalances.FindAsync(id);
+            var empCurrentPettyCashBalance =  _context.EmpCurrentPettyCashBalances.Where( e=> e.EmployeeId == id).FirstOrDefault();
 
             if (empCurrentPettyCashBalance == null)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Current PettyCash balance Id invalid!" });
+                empCurrentPettyCashBalanceDTO.CurBalance = 0;
+                return empCurrentPettyCashBalanceDTO;
             }
 
-            empCurrentPettyCashBalanceDTO.Id = empCurrentPettyCashBalance.Id;
+            //empCurrentPettyCashBalanceDTO.Id = empCurrentPettyCashBalance.Id;
             empCurrentPettyCashBalanceDTO.EmployeeId = empCurrentPettyCashBalance.EmployeeId;
             empCurrentPettyCashBalanceDTO.CurBalance = empCurrentPettyCashBalance.CurBalance;
             empCurrentPettyCashBalanceDTO.UpdatedOn = empCurrentPettyCashBalance.UpdatedOn;
@@ -161,8 +162,21 @@ namespace AtoCash.Controllers
                 }
 
                 var empCurPettyBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == id).FirstOrDefault();
+                if (empCurPettyBal == null)
+                {
+                    cashbalVsAdvancedVM.CurCashBal = 0;
+                }
+                else { 
                 cashbalVsAdvancedVM.CurCashBal = empCurPettyBal.CurBalance;
+                }
+                if(_context.Employees.Find(id).RoleId != 0)
+                { 
                 cashbalVsAdvancedVM.MaxCashAllowed = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed;
+                }
+                else
+                {
+                    cashbalVsAdvancedVM.MaxCashAllowed = 0;
+                }
 
             }
 

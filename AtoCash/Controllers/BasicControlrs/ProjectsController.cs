@@ -81,7 +81,7 @@ namespace AtoCash.Controllers
         public async Task<ActionResult<ProjectDTO>> GetProject(int id)
         {
 
-            
+
 
             var proj = await _context.Projects.FindAsync(id);
 
@@ -109,7 +109,7 @@ namespace AtoCash.Controllers
         [ActionName("GetEmployeeAssignedProjects")]
         public ActionResult<ProjectVM> GetEmployeeAssignedProjects(int id)
         {
-            var listOfProjmgts = _context.ProjectManagements.Where(p => p.EmployeeId == id ).ToList();
+            var listOfProjmgts = _context.ProjectManagements.Where(p => p.EmployeeId == id).ToList();
 
             List<ProjectVM> ListprojectVM = new List<ProjectVM>();
 
@@ -117,13 +117,15 @@ namespace AtoCash.Controllers
             {
                 foreach (var item in listOfProjmgts)
                 {
-                    ProjectVM project = new ProjectVM()
+                    if (_context.Projects.Find(item.ProjectId).StatusTypeId == (int)EStatusType.Active)
                     {
-                        Id = item.ProjectId,
-                        ProjectName = _context.Projects.Find(item.ProjectId).ProjectName
-                    };
-                    ListprojectVM.Add(project);
-
+                        ProjectVM project = new ProjectVM()
+                        {
+                            Id = item.ProjectId,
+                            ProjectName = _context.Projects.Find(item.ProjectId).ProjectName
+                        };
+                        ListprojectVM.Add(project);
+                    }
                 }
                 return Ok(ListprojectVM);
             }
@@ -141,10 +143,10 @@ namespace AtoCash.Controllers
             }
 
             var proj = await _context.Projects.FindAsync(id);
-                
+
             proj.Id = projectDto.Id;
             proj.ProjectName = projectDto.ProjectName;
-            proj.CostCenterId = projectDto.CostCenterId  ;
+            proj.CostCenterId = projectDto.CostCenterId;
             proj.ProjectManagerId = projectDto.ProjectManagerId;
             proj.ProjectDesc = projectDto.ProjectDesc;
             proj.StatusTypeId = projectDto.StatusTypeId;
@@ -226,7 +228,7 @@ namespace AtoCash.Controllers
         }
 
 
-       
+
         //
     }
 }

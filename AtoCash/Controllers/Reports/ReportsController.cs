@@ -16,7 +16,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.StaticFiles;
 
 namespace AtoCash.Controllers
 {
@@ -26,39 +25,181 @@ namespace AtoCash.Controllers
     public class ReportsController : ControllerBase
     {
         private readonly AtoCashDbContext _context;
-
         private readonly IWebHostEnvironment hostingEnvironment;
+        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public ReportsController(AtoCashDbContext context, IWebHostEnvironment hostEnv)
+        public ReportsController(AtoCashDbContext context, IWebHostEnvironment hostEnv, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             //var user = System.Threading.Thread.CurrentPrincipal;
             //var TheUser = User.Identity.IsAuthenticated ? UserRepository.GetUser(user.Identity.Name) : null;
             _context = context;
             hostingEnvironment = hostEnv;
+            this.roleManager = roleManager;
+            this.userManager = userManager;
             //Get Logged in User's EmpId.
             //var   LoggedInEmpid = User.Identities.First().Claims.ToList().Where(x => x.Type == "EmployeeId").Select(c => c.Value);
         }
 
 
 
-        //       TravelReqReportsForEmployee based on EmpId
-        //   TravelReqReportsForAdmin No filters
-        //TravelReqReportsForManager  Based on department of the manager
-        //   TravelReqReportsForProjectManager Based on Projects
+        [HttpGet("{id}")]
+        [ActionName("GetUsersAndRoles")]
+        public async Task<IActionResult> GetUsersByRoleId(string id)
+        {
+            string rolName = roleManager.Roles.Where(r => r.Id == id).FirstOrDefault().Name;
 
-        /*get current logged -in user details.
+            //  List<string> UserIds =  context.UserRoles.Where(r => r.RoleId == id).Select(b => b.UserId).Distinct().ToList();
 
-            System.Security.Claims.ClaimsPrincipal currentUser = this.User;
-            var test = currentUser.Identities.First().Claims.ToList();
-            //var id = userManager.GetUserId(User);
-            var tets = User.Identities.First().Claims.ToList().Select(x => x.Type == "EmployeeId");
+            List<UserByRole> ListUserByRole = new();
 
-            var skj = User.Identities.First().Claims.ToList().Where(x => x.Type == "EmployeeId");
+            var usersOfRole = await userManager.GetUsersInRoleAsync(rolName);
 
-            var identity = (ClaimsIdentity)User.Identity;
-            IEnumerable<Claim> claims = identity.Claims; */
+            foreach (ApplicationUser user in usersOfRole)
+            {
+                UserByRole userByRole = new();
 
-        //int empid = (int) User.Identities.First().Claims.ToList().Where(x => x.Type == "EmployeeId").Select(c => c.Value);
+                var emp = await _context.Employees.FindAsync(user.EmployeeId);
+                userByRole.UserId = user.Id;
+                userByRole.Id = emp.Id;
+                userByRole.UserFullName = emp.GetFullName();
+                userByRole.Email = emp.Email;
+                userByRole.EmpCode = emp.EmpCode;
+                userByRole.DOB = emp.DOB;
+                userByRole.DOJ = emp.DOJ;
+                userByRole.Gender = emp.Gender;
+                userByRole.MobileNumber = emp.MobileNumber;
+                userByRole.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
+                userByRole.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
+                userByRole.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
+               
+                ListUserByRole.Add(userByRole);
+            }
+
+
+            DataTable dt = new DataTable();
+            dt.Columns.AddRange(new DataColumn[12]
+                {
+                    //new DataColumn("Id", typeof(int)),
+                    new DataColumn("UserId", typeof(int)),
+                    new DataColumn("EmployeeId", typeof(int)),
+                    new DataColumn("UserFullName", typeof(string)),
+                    new DataColumn("Email",typeof(string)),
+                    new DataColumn("EmpCode",typeof(string)),
+                    new DataColumn("DOB",typeof(DateTime)),
+                    new DataColumn("DOJ", typeof(DateTime)),
+                    new DataColumn("Gender",typeof(string)),
+                    new DataColumn("MobileNumber",typeof(DateTime)),
+                    new DataColumn("Department",typeof(string)),
+                    new DataColumn("JobRole", typeof(string)),
+                    new DataColumn("StatusType", typeof(string))
+                   
+                });
+
+            foreach (var usr in ListUserByRole)
+            {
+                dt.Rows.Add(
+                    usr.UserId,
+                    usr.Id,
+                    usr.UserFullName,
+                    usr.Email,
+                    usr.EmpCode,
+                    usr.DOB,
+                    usr.DOJ,
+                    usr.Gender,
+                    usr.MobileNumber,
+                    usr.Department,
+                    usr.JobRole,
+                    usr.StatusType
+                    );
+            }
+            // Creating the Excel workbook 
+            // Add the datatable to the Excel workbook
+
+            List<string> docUrls = new();
+            var docUrl = GetExcel("GetUsersByRoleId", dt);
+
+            docUrls.Add(docUrl);
+
+            return Ok(docUrls);
+        }
+
+
+        [HttpPost]
+        [ActionName("GetAllEmployees")]
+        public async Task<IActionResult> GetAllEmployees()
+        {
+           
+            List<EmployeeDTO> ListEmployeeDto = new();
+
+            var employees =  _context.Employees.ToList();
+
+            foreach (Employee emp in employees)
+            {
+                EmployeeDTO employeeDTO = new();
+
+                employeeDTO.Id = emp.Id;
+                employeeDTO.FullName = emp.GetFullName();
+                employeeDTO.Email = emp.Email;
+                employeeDTO.EmpCode = emp.EmpCode;
+                employeeDTO.DOB = emp.DOB;
+                employeeDTO.DOJ = emp.DOJ;
+                employeeDTO.Gender = emp.Gender;
+                employeeDTO.MobileNumber = emp.MobileNumber;
+                employeeDTO.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
+                employeeDTO.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
+                employeeDTO.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
+
+                ListEmployeeDto.Add(employeeDTO);
+            }
+
+
+            DataTable dt = new DataTable();
+            dt.Columns.AddRange(new DataColumn[11]
+                {
+                    //new DataColumn("Id", typeof(int)),
+                    new DataColumn("EmployeeId", typeof(int)),
+                    new DataColumn("EmployeeFullName", typeof(string)),
+                    new DataColumn("Email",typeof(string)),
+                    new DataColumn("EmpCode",typeof(string)),
+                    new DataColumn("DOB",typeof(DateTime)),
+                    new DataColumn("DOJ", typeof(DateTime)),
+                    new DataColumn("Gender",typeof(string)),
+                    new DataColumn("MobileNumber",typeof(DateTime)),
+                    new DataColumn("Department",typeof(string)),
+                    new DataColumn("JobRole", typeof(string)),
+                    new DataColumn("StatusType", typeof(string))
+                });
+
+            foreach (var emp in ListEmployeeDto)
+            {
+                dt.Rows.Add(
+                    emp.Id,
+                    emp.FullName,
+                    emp.Email,
+                    emp.EmpCode,
+                    emp.DOB,
+                    emp.DOJ,
+                    emp.Gender,
+                    emp.MobileNumber,
+                    emp.Department,
+                    emp.JobRole,
+                    emp.StatusType
+                    );
+            }
+            // Creating the Excel workbook 
+            // Add the datatable to the Excel workbook
+
+            List<string> docUrls = new();
+            var docUrl = GetExcel("GetAllEmployees", dt);
+
+            docUrls.Add(docUrl);
+
+            return Ok(docUrls);
+        }
+
+
+
 
         [HttpPost]
         [ActionName("GetAdvanceAndReimburseReportsEmployeeJson")]
@@ -276,6 +417,9 @@ namespace AtoCash.Controllers
                     List<string> docUrls = new();
                     var docUrl = GetExcel("CashReimburseReportByEmployee", dt);
 
+
+
+
                     docUrls.Add(docUrl);
 
                     return Ok(docUrls);
@@ -478,9 +622,11 @@ namespace AtoCash.Controllers
                 List<string> docUrls = new();
                 var docUrl = GetExcel("TravelRequestReportForEmployee", dt);
 
+
+
                 docUrls.Add(docUrl);
 
-                return Ok(docUrl);
+                return Ok(docUrls);
             }
 
             return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Filter criteria" });
@@ -504,7 +650,8 @@ namespace AtoCash.Controllers
 
             wb.SaveAs(stream);
 
-            string uploadsfolder = Path.Combine(hostingEnvironment.ContentRootPath, "images");
+
+            string uploadsfolder = Path.Combine(hostingEnvironment.ContentRootPath, "Images");
 
             string filepath = Path.Combine(uploadsfolder, xlfileName);
 
@@ -514,14 +661,17 @@ namespace AtoCash.Controllers
 
             using var outputtream = new FileStream(filepath, FileMode.Create);
 
-            using (FileStream outputfilestream = new FileStream(filepath, FileMode.Create))
-            {
-                outputfilestream.CopyToAsync(outputtream);
-            }
+
+            wb.SaveAs(outputtream);
+
             string docurl = Directory.EnumerateFiles(uploadsfolder).Select(f => filepath).FirstOrDefault().ToString();
 
-            return docurl;
             // return File(stream.ToArray(), "Application/Ms-Excel", xlfileName);
+
+            return docurl;
+
+
+
         }
 
 

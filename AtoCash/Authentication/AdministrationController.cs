@@ -18,17 +18,19 @@ namespace AtoCash.Authentication
     {
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly AtoCashDbContext context;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, AtoCashDbContext context)
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
+            this.context = context;
         }
 
 
         [HttpPost]
         [ActionName("CreateRole")]
-    [Authorize(Roles = "AtominosAdmin, Admin")]
+        [Authorize(Roles = "AtominosAdmin, Admin")]
         public async Task<IActionResult> CreateRole([FromBody] RoleModel model)
         {
             IdentityRole identityRole = new IdentityRole()
@@ -100,6 +102,35 @@ namespace AtoCash.Authentication
             return Ok(new { user, roleids });
         }
 
+
+        [HttpGet("{id}")]
+        [ActionName("GetUsersByRoleId")]
+        public async Task<IActionResult> GetUsersByRoleId(string id)
+        {
+                string rolName = roleManager.Roles.Where(r => r.Id == id).FirstOrDefault().Name;
+
+            //  List<string> UserIds =  context.UserRoles.Where(r => r.RoleId == id).Select(b => b.UserId).Distinct().ToList();
+
+            List<UserByRole> ListUserByRole = new();
+
+            var usersOfRole = await userManager.GetUsersInRoleAsync(rolName);
+
+            foreach( ApplicationUser user in usersOfRole)
+            {
+                UserByRole userByRole = new();
+
+                var emp = await context.Employees.FindAsync(user.EmployeeId);
+                userByRole.UserId = user.Id;
+                userByRole.Id = emp.Id;
+                userByRole.UserFullName = emp.GetFullName();
+                userByRole.Email = emp.Email;
+
+                ListUserByRole.Add(userByRole);
+            }
+
+            return Ok(ListUserByRole);
+        }
+
         [HttpGet("{id}")]
         [ActionName("GetRoleByRoleId")]
         public async Task<IActionResult> GetRoleByRoleId(string id)
@@ -150,7 +181,7 @@ namespace AtoCash.Authentication
         {
             var user = await userManager.FindByIdAsync(id);
 
-            if (user ==null)
+            if (user == null)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "User not Found" });
             }
@@ -260,14 +291,14 @@ namespace AtoCash.Authentication
                 {
                     respStatus = new RespStatus()
                     {
-                        Message = role.Name + " assigned to User", 
-                        Status = "Success" 
+                        Message = role.Name + " assigned to User",
+                        Status = "Success"
                     };
                     ListRespStatus.Add(respStatus);
                 }
                 else
                 {
-                     respStatus = new RespStatus();
+                    respStatus = new RespStatus();
                     foreach (IdentityError error in result.Errors)
                     {
                         respStatus.Message = respStatus.Message + error.Description + "\n";

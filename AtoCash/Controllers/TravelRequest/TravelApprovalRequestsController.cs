@@ -254,18 +254,23 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Travel Requests cant be Edited after Approval!" });
             }
 
-            
+
             travelApprovalRequest.Id = travelApprovalRequestDTO.Id;
             travelApprovalRequest.EmployeeId = travelApprovalRequestDTO.EmployeeId;
             travelApprovalRequest.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
             travelApprovalRequest.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
             travelApprovalRequest.TravelPurpose = travelApprovalRequestDTO.TravelPurpose;
-            travelApprovalRequest.ReqRaisedDate = travelApprovalRequestDTO.ReqRaisedDate;
-            travelApprovalRequest.DepartmentId = travelApprovalRequestDTO.DepartmentId;
-            travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
-            travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
-            travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
-            travelApprovalRequest.ApprovalStatusTypeId = travelApprovalRequestDTO.ApprovalStatusTypeId;
+            travelApprovalRequest.ReqRaisedDate = DateTime.Now;
+            if (travelApprovalRequestDTO.DepartmentId != null)
+            {
+                travelApprovalRequest.DepartmentId = travelApprovalRequestDTO.DepartmentId;
+            }
+            if (travelApprovalRequestDTO.ProjectId != null)
+            {
+                travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
+                travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
+                travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
+            }
 
             _context.TravelApprovalRequests.Update(travelApprovalRequest);
 
@@ -273,20 +278,27 @@ namespace AtoCash.Controllers
             //now update the TravelApprovalStatus Trackers
             var travelStatusTrackers = _context.TravelApprovalStatusTrackers.Where(e => e.TravelApprovalRequestId == travelApprovalRequest.Id).OrderBy(o => o.Id).ToList();
             bool IsFirstEmail = true;
-            foreach(var travel in travelStatusTrackers)
+            foreach (var travel in travelStatusTrackers)
             {
 
-                TravelApprovalStatusTracker travelStatusItem =  await _context.TravelApprovalStatusTrackers.FindAsync(travel.Id);
+                TravelApprovalStatusTracker travelStatusItem = await _context.TravelApprovalStatusTrackers.FindAsync(travel.Id);
 
 
-                travelStatusItem.TravelStartDate = travel.TravelStartDate;
-                travelStatusItem.TravelEndDate = travel.TravelEndDate;
-                travelStatusItem.DepartmentId = travel.DepartmentId;
-                travelStatusItem.ProjectId = travel.ProjectId;
-                travelStatusItem.SubProjectId = travel.SubProjectId;
-                travelStatusItem.WorkTaskId = travel.WorkTaskId;
+                travelStatusItem.TravelStartDate = travelApprovalRequestDTO.TravelStartDate;
+                travelStatusItem.TravelEndDate = travelApprovalRequestDTO.TravelEndDate;
+
+                if (travelApprovalRequestDTO.DepartmentId != null)
+                {
+                    travelStatusItem.DepartmentId = travelApprovalRequestDTO.DepartmentId;
+                }
+                if (travelApprovalRequestDTO.ProjectId != null)
+                {
+                    travelStatusItem.ProjectId = travelApprovalRequestDTO.ProjectId;
+                    travelStatusItem.SubProjectId = travelApprovalRequestDTO.SubProjectId;
+                    travelStatusItem.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
+                }
+
                 travelStatusItem.ReqDate = DateTime.Now;
-                travelStatusItem.ApprovalStatusTypeId = travel.ApprovalStatusTypeId;
 
                 _context.TravelApprovalStatusTrackers.Update(travelStatusItem);
 
@@ -305,7 +317,7 @@ namespace AtoCash.Controllers
                 }
             }
 
-           
+
 
             //_context.Entry(travelApprovalRequest).State = EntityState.Modified;
 
@@ -315,14 +327,7 @@ namespace AtoCash.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!TravelApprovalRequestExists(id))
-                {
-                    return Conflict(new RespStatus { Status = "Failure", Message = "Travel Approval Request Id invalid!" });
-                }
-                else
-                {
-                    throw;
-                }
+                throw;
             }
 
             return Ok(new RespStatus { Status = "Success", Message = "Travel Approval Request Updated!" });
@@ -389,7 +394,7 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Travel Approval Request Id invalid!" });
             }
 
-         var trvlappStatusTrackers = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == travelApprovalRequest.Id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).ToList();
+            var trvlappStatusTrackers = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == travelApprovalRequest.Id && c.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).ToList();
 
             int ApprovedCount = trvlappStatusTrackers.Count();
 
@@ -400,7 +405,9 @@ namespace AtoCash.Controllers
 
             _context.TravelApprovalRequests.Remove(travelApprovalRequest);
 
-            foreach( var item in trvlappStatusTrackers)
+            var travlapprStatusTrackers = _context.TravelApprovalStatusTrackers.Where(c => c.TravelApprovalRequestId == travelApprovalRequest.Id).ToList();
+
+            foreach (var item in travlapprStatusTrackers)
             {
                 _context.TravelApprovalStatusTrackers.Remove(item);
             }
@@ -451,7 +458,7 @@ namespace AtoCash.Controllers
             travelApprovalRequest.ProjectId = travelApprovalRequestDTO.ProjectId;
             travelApprovalRequest.SubProjectId = travelApprovalRequestDTO.SubProjectId;
             travelApprovalRequest.WorkTaskId = travelApprovalRequestDTO.WorkTaskId;
-            travelApprovalRequest.CostCenterId =  _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCenterId;
+            travelApprovalRequest.CostCenterId = _context.Projects.Find(travelApprovalRequestDTO.ProjectId).CostCenterId;
             travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Pending;
             travelApprovalRequest.Comments = "Travel Request In Process!";
 

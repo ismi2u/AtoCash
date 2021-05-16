@@ -236,7 +236,7 @@ namespace AtoCash.Controllers
 
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
 
-            ///update the Wallet of the employe to reflect the changes
+   
             int ApprovedCount = _context.ExpenseReimburseStatusTrackers.Where(e => e.ExpenseReimburseRequestId == pettyCashRequest.Id && e.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
             if (ApprovedCount != 0)
             {
@@ -251,14 +251,27 @@ namespace AtoCash.Controllers
                 //update the EmpPettyCashBalance to credit back the deducted amount
                 EmpCurrentPettyCashBalance empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == pettyCashRequest.EmployeeId).FirstOrDefault();
                 double oldBal = empPettyCashBal.CurBalance;
-                double DiffAmt = pettyCashRequestDto.PettyClaimAmount - pettyCashRequest.PettyClaimAmount;
+                double prevAmt = pettyCashRequest.PettyClaimAmount;
+                double NewAmt = pettyCashRequestDto.PettyClaimAmount;
 
                 pettyCashRequest.PettyClaimAmount = pettyCashRequestDto.PettyClaimAmount;
                 pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
 
-                empPettyCashBal.CurBalance = oldBal - DiffAmt;
-                empPettyCashBal.UpdatedOn = DateTime.Now;
-                _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
+               
+                //check employee allowed limit to Cash Advance, if limit exceeded return with an conflict message.
+                if (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed >= oldBal + prevAmt - NewAmt)
+                {
+                    empPettyCashBal.CurBalance = oldBal + prevAmt - NewAmt;
+                    empPettyCashBal.UpdatedOn = DateTime.Now;
+                    _context.EmpCurrentPettyCashBalances.Update(empPettyCashBal);
+                }
+                else
+                {
+                    return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
+                }
+
+
+               
             }
             ////
             ///
@@ -267,32 +280,14 @@ namespace AtoCash.Controllers
             pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
             pettyCashRequest.CashReqDate = DateTime.Now;
 
-            //if (pettyCashRequestDto.ProjectId != null)
-            //{
-            //    pettyCashRequest.ProjectId = pettyCashRequestDto.ProjectId;
-            //    pettyCashRequest.SubProjectId = pettyCashRequestDto.SubProjectId;
-            //    pettyCashRequest.WorkTaskId = pettyCashRequestDto.WorkTaskId;
-            //    pettyCashRequest.DepartmentId = null;
-
-            //}
-            //else
-            //{
-            //    pettyCashRequest.DepartmentId = _context.Employees.Find(pettyCashRequest.EmployeeId).DepartmentId;
-
-            //    pettyCashRequest.ProjectId = null;
-            //    pettyCashRequest.SubProjectId = null;
-            //    pettyCashRequest.WorkTaskId = null;
-            //}
-
-
-            
-
             _context.PettyCashRequests.Update(pettyCashRequest);
+
+
 
 
             //Step -2 change the claim approval status tracker records
             var claims = await _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == pettyCashRequestDto.Id).ToListAsync();
-
+            bool IsFirstEmail = true;
             int? newDeptId = pettyCashRequest.DepartmentId;
             int? newProjId = pettyCashRequestDto.ProjectId;
             int? newSubProjId = pettyCashRequestDto.SubProjectId;
@@ -303,12 +298,30 @@ namespace AtoCash.Controllers
             {
                 claim.DepartmentId = newDeptId;
                 claim.ProjectId = newProjId;
+                claim.SubProjectId = newSubProjId;
+                claim.WorkTaskId = newWorkTaskId;
                 claim.ReqDate = pettyCashRequest.CashReqDate;
                 claim.FinalApprovedDate = null;
-                claim.ApprovalStatusTypeId = claim.ApprovalLevelId == 1 ? (int)EApprovalStatus.Pending : (int)EApprovalStatus.Initiating;
+                //claim.ApprovalStatusTypeId = claim.ApprovalLevelId == 1 ? (int)EApprovalStatus.Pending : (int)EApprovalStatus.Initiating;
                 claim.Comments = "Modified Request";
 
                 _context.ClaimApprovalStatusTrackers.Update(claim);
+
+                if (IsFirstEmail)
+                {
+                    //####################################
+                    var approver = _context.Employees.Where(e => e.RoleId == claim.RoleId && e.ApprovalGroupId == claim.ApprovalGroupId).FirstOrDefault();
+                    var approverMailAddress = approver.Email;
+                    string subject = "(Modified) Pettycash Request Approval " + pettyCashRequestDto.Id.ToString();
+                    Employee emp = await _context.Employees.FindAsync(pettyCashRequest.EmployeeId);
+                    var pettycashreq = _context.PettyCashRequests.Find(pettyCashRequestDto.Id);
+                    string content = "(Modified) Petty Cash Approval sought by " + emp.FirstName + "@<br/>Cash Request for the amount of " + pettycashreq.PettyClaimAmount + "@<br/>towards " + pettycashreq.PettyClaimRequestDesc;
+                    var messagemail = new Message(new string[] { approverMailAddress }, subject, content);
+
+                    await _emailSender.SendEmailAsync(messagemail);
+
+                    IsFirstEmail = false;
+                }
             }
             //_context.Entry(pettyCashRequest).State = EntityState.Modified;
 
@@ -332,7 +345,7 @@ namespace AtoCash.Controllers
                 throw;
             }
 
-            return Conflict(new RespStatus { Status = "Success", Message = "Request Updated!" });
+            return Ok(new RespStatus { Status = "Success", Message = "Request Updated!" });
         }
 
         // POST: api/PettyCashRequests
@@ -365,7 +378,7 @@ namespace AtoCash.Controllers
         // DELETE: api/PettyCashRequests/5
         [HttpDelete("{id}")]
         [ActionName("DeletePettyCashRequest")]
-        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
+
         public async Task<IActionResult> DeletePettyCashRequest(int id)
         {
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
@@ -392,9 +405,17 @@ namespace AtoCash.Controllers
 
             _context.PettyCashRequests.Remove(pettyCashRequest);
 
-            foreach(var item in ClmApprvStatusTrackers)
+            var ClaimApprStatusTrackers = _context.ClaimApprovalStatusTrackers.Where(c => c.PettyCashRequestId == pettyCashRequest.Id).ToList();
+
+            foreach (var claim in ClaimApprStatusTrackers)
             {
-                _context.ClaimApprovalStatusTrackers.Remove(item);
+                _context.ClaimApprovalStatusTrackers.Remove(claim);
+            }
+
+            var disburseAndClaims = _context.DisbursementsAndClaimsMasters.Where(d => d.PettyCashRequestId == pettyCashRequest.Id).ToList();
+            foreach (var disburse in disburseAndClaims)
+            {
+                _context.DisbursementsAndClaimsMasters.Remove(disburse);
             }
             await _context.SaveChangesAsync();
 

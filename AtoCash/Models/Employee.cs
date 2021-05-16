@@ -126,6 +126,8 @@ namespace AtoCash.Models
 
         public string LastName { get; set; }
 
+        public string FullName { get; set; }
+
         public string EmpCode { get; set; }
 
         public string BankAccount { get; set; }
@@ -164,14 +166,21 @@ namespace AtoCash.Models
 
         public int DepartmentId { get; set; }
 
+        public string Department { get; set; }
+
+
 
         public int RoleId { get; set; }
+        public string JobRole { get; set; }
 
 
         public int ApprovalGroupId { get; set; }
 
         public int CurrencyTypeId { get; set; }
         public int StatusTypeId { get; set; }
+        public string StatusType { get; set; }
+
+
 
     }
 

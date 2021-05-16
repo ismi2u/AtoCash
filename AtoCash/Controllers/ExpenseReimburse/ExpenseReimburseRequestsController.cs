@@ -181,7 +181,8 @@ namespace AtoCash.Controllers
                       t.ExpenseReimburseRequestId == expenseReimbRequest.Id).Select(s => s.ApprovalLevel.Level).FirstOrDefault();
 
                 //set the bookean flat to TRUE if No approver has yet approved the Request else FALSE
-                expenseReimburseRequestDTO.ShowEditDelete = reqEmpApprLevel + 1 == NextApproverInPending ? true : false;
+                //expenseReimburseRequestDTO.ShowEditDelete = reqEmpApprLevel + 1 == NextApproverInPending ? true : false;
+                expenseReimburseRequestDTO.ShowEditDelete = reqEmpApprLevel + 1 == NextApproverInPending ? false : false;
 
                 ListExpenseReimburseRequestDTO.Add(expenseReimburseRequestDTO);
 
