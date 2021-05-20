@@ -95,7 +95,7 @@ namespace AtoCash.Models
         public List<ExpenseSubClaimDTO> ExpenseSubClaims { get; set; }
 
 
-
+        public string Comments { get; set; }
 
 
 

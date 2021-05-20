@@ -9,4 +9,10 @@ namespace AtoCash.Authentication
     {
         public string RoleName { get; set; }
     }
+
+    public class RoleToUserSearch
+    {
+        public string RoleId { get; set; }
+    }
+
 }

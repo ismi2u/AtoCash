@@ -118,6 +118,8 @@ namespace AtoCash.Controllers
                 ApprovedDate = expenseReimbRequest.ApprovedDate,
                 ApprovalStatusTypeId = expenseReimbRequest.ApprovalStatusTypeId,
                 ApprovalStatusType = _context.ApprovalStatusTypes.Find(expenseReimbRequest.ApprovalStatusTypeId).Status,
+
+                Comments = expenseReimbRequest.Comments
             };
             return expenseReimburseRequestDTO;
         }
@@ -721,7 +723,7 @@ namespace AtoCash.Controllers
 
                 _context.ExpenseSubClaims.Add(expenseSubClaim);
                 await _context.SaveChangesAsync();
-                dblTotalClaimAmount = dblTotalClaimAmount + expenseSubClaimDto.ExpenseReimbClaimAmount;
+                dblTotalClaimAmount = dblTotalClaimAmount + expenseSubClaimDto.TaxAmount + expenseSubClaimDto.ExpenseReimbClaimAmount;
 
             }
 

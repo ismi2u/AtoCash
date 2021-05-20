@@ -146,7 +146,7 @@ namespace AtoCash.Controllers
                 //claimApprovalStatusTracker.ApprovalLevelId = claimApprovalStatusTrackerDto.ApprovalLevelId;
                 //claimApprovalStatusTracker.ReqDate = claimApprovalStatusTrackerDto.ReqDate;
                 claimApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
-                claimApprovalStatusTracker.Comments = claimApprovalStatusTrackerDto.Comments ?? "Approved";
+                claimApprovalStatusTracker.Comments = bRejectMessage ? claimApprovalStatusTrackerDto.Comments : "Approved";
 
                 ClaimApprovalStatusTracker claimitem;
                 if (claimApprovalStatusTrackerDto.DepartmentId != null)

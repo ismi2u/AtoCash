@@ -193,16 +193,19 @@ namespace AtoCash.Controllers
 
             if(employee.RoleId != employeeDto.RoleId)
             {
-            employee.RoleId = employeeDto.RoleId;
+           
                 double oldAmt = _context.JobRoles.Find(employee.RoleId).MaxPettyCashAllowed;
                 double newAmt = _context.JobRoles.Find(employeeDto.RoleId).MaxPettyCashAllowed;
                 EmpCurrentPettyCashBalance empCurrentPettyCashBalance = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == employee.Id).FirstOrDefault();
                 double empCurBal = empCurrentPettyCashBalance.CurBalance;
+                
+                //update the roleId to new RoleId
+                employee.RoleId = employeeDto.RoleId;
 
+                double usedAmount = oldAmt - empCurrentPettyCashBalance.CurBalance;
+                double NewUpdatedLimit = newAmt - usedAmount  ;
 
-                double diffAmt = newAmt - oldAmt;
-
-                empCurrentPettyCashBalance.CurBalance = empCurBal+ diffAmt;
+                empCurrentPettyCashBalance.CurBalance = NewUpdatedLimit;
                 _context.EmpCurrentPettyCashBalances.Update(empCurrentPettyCashBalance);
             }
 
@@ -217,7 +220,7 @@ namespace AtoCash.Controllers
             {
                 if (!EmployeeExists(id))
                 {
-                    return Conflict(new RespStatus { Status = "Failure", Message = "Employee Doesnt Exist!" });
+                    return Conflict(new RespStatus { Status = "Failure", Message = "Employee Doesn't Exist!" });
                 }
                 else
                 {
@@ -309,7 +312,25 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Employee Id invalid!" });
             }
 
+           if (_context.Users.Where(u => u.EmployeeId == id).Any())
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee is a User, cant delete!" });
+            }
+
+
+            bool blnUsedInTravelReq = _context.TravelApprovalRequests.Where(t => t.EmployeeId == id).Any();
+            bool blnUsedInCashAdvReq = _context.PettyCashRequests.Where(t => t.EmployeeId == id).Any();
+            bool blnUsedInExpeReimReq = _context.ExpenseReimburseRequests.Where(t => t.EmployeeId == id).Any();
+
+            if (blnUsedInTravelReq || blnUsedInCashAdvReq || blnUsedInExpeReimReq)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Employee in Use, Cant delete!" });
+            }
+
+
             _context.Employees.Remove(employee);
+            var empPettyCashBal = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == id).FirstOrDefault();
+            _context.EmpCurrentPettyCashBalances.Remove(empPettyCashBal);
             await _context.SaveChangesAsync();
 
             return Ok(new RespStatus { Status = "Success", Message = "Employee Deleted!" });

@@ -147,30 +147,30 @@ namespace AtoCash.Controllers
             return Ok(new RespStatus { Status = "Success", Message = "Expense Type Created!" });
         }
 
-        //// DELETE: api/ExpenseTypes/5
-        //[HttpDelete("{id}")]
-        //[Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
-        //public async Task<IActionResult> DeleteExpenseType(int id)
-        //{
+        // DELETE: api/ExpenseTypes/5
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
+        public async Task<IActionResult> DeleteExpenseType(int id)
+        {
 
-        //    var expReimburse = _context.ExpenseReimburseRequests.Where(d => d.ExpenseTypeId == id).FirstOrDefault();
+            var expenseType = await _context.ExpenseTypes.FindAsync(id);
+            if (expenseType == null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense-Type Id Invalid!" });
+            }
 
-        //    if (expReimburse != null)
-        //    {
-        //        return Conflict(new RespStatus { Status = "Failure", Message = "Expense-Type in use for Expense Reimburse!" });
-        //    }
+            var expReimburse = _context.ExpenseSubClaims.Where(d => d.ExpenseTypeId == id).FirstOrDefault();
 
-        //    var expenseType = await _context.ExpenseTypes.FindAsync(id);
-        //    if (expenseType == null)
-        //    {
-        //        return NoContent();
-        //    }
+            if (expReimburse != null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Expense-Type in use for Expense Reimburse!" });
+            }
 
-        //    _context.ExpenseTypes.Remove(expenseType);
-        //    await _context.SaveChangesAsync();
+            _context.ExpenseTypes.Remove(expenseType);
+            await _context.SaveChangesAsync();
 
-        //    return Ok(new RespStatus { Status = "Success", Message = "Expense-Type" });
-        //}
+            return Ok(new RespStatus { Status = "Success", Message = "Expense-Type Deleted!" });
+        }
 
         private bool ExpenseTypeExists(int id)
         {

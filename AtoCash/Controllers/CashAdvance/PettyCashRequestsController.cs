@@ -103,6 +103,8 @@ namespace AtoCash.Controllers
             pettyCashRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(pettyCashRequest.ApprovalStatusTypeId).Status;
             pettyCashRequestDTO.ApprovedDate = pettyCashRequest.ApprovedDate;
 
+            pettyCashRequestDTO.Comments = pettyCashRequest.Comments;
+
             return pettyCashRequestDTO;
         }
 
@@ -234,6 +236,13 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            Double empCurAvailBal = GetEmpCurrentAvailablePettyCashBalance(pettyCashRequestDto);
+
+            if (!(pettyCashRequestDto.PettyClaimAmount <= empCurAvailBal && pettyCashRequestDto.PettyClaimAmount > 0))
+            {
+                return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
+            }
+
             var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
 
    
@@ -257,9 +266,10 @@ namespace AtoCash.Controllers
                 pettyCashRequest.PettyClaimAmount = pettyCashRequestDto.PettyClaimAmount;
                 pettyCashRequest.PettyClaimRequestDesc = pettyCashRequestDto.PettyClaimRequestDesc;
 
-               
+
                 //check employee allowed limit to Cash Advance, if limit exceeded return with an conflict message.
-                if (_context.JobRoles.Find(_context.Employees.Find(pettyCashRequestDto.EmployeeId).RoleId).MaxPettyCashAllowed >= oldBal + prevAmt - NewAmt)
+                double maxAllowed = _context.JobRoles.Find(_context.Employees.Find(pettyCashRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
+                if (maxAllowed >= oldBal + prevAmt - NewAmt && oldBal + prevAmt - NewAmt > 0)
                 {
                     empPettyCashBal.CurBalance = oldBal + prevAmt - NewAmt;
                     empPettyCashBal.UpdatedOn = DateTime.Now;

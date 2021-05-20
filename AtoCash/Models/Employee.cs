@@ -163,6 +163,7 @@ namespace AtoCash.Models
 
         public int EmploymentTypeId { get; set; }
 
+        public string EmploymentType { get; set; }
 
         public int DepartmentId { get; set; }
 
@@ -175,6 +176,7 @@ namespace AtoCash.Models
 
 
         public int ApprovalGroupId { get; set; }
+        public string ApprovalGroup { get; set; }
 
         public int CurrencyTypeId { get; set; }
         public int StatusTypeId { get; set; }
@@ -190,5 +192,28 @@ namespace AtoCash.Models
         public string FullName { get; set; }
 
 
+    }
+
+
+    public class EmployeeSearchModel
+    {
+        public int? EmployeeId { get; set; }
+        public string EmployeeName { get; set; }
+        public string EmpCode { get; set; }
+        public string BankAccount { get; set; }
+        public string BankCardNo { get; set; }
+        public string NationalID { get; set; }
+        public string PassportNo { get; set; }
+        public string TaxNumber { get; set; }
+        public string Nationality { get; set; }
+        public string Gender { get; set; }
+        public string Email { get; set; }
+        public string MobileNumber { get; set; }
+        public int? EmploymentTypeId { get; set; }
+        public string EmploymentType { get; set; }
+        public int? DepartmentId { get; set; }
+        public int? JobRoleId { get; set; }
+        public int? ApprovalGroupId { get; set; }
+        public int? StatusTypeId { get; set; }
     }
 }

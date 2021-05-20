@@ -146,7 +146,7 @@ namespace AtoCash.Controllers
                 travelApprovalStatusTracker.ApprovalLevelId = travelApprovalStatusTrackerDTO.ApprovalLevelId;
                 travelApprovalStatusTracker.ReqDate = travelApprovalStatusTrackerDTO.ReqDate;
                 travelApprovalStatusTracker.FinalApprovedDate = DateTime.Now;
-                travelApprovalStatusTracker.Comments = travelApprovalStatusTrackerDTO.Comments ?? "In Process";
+                travelApprovalStatusTracker.Comments = bRejectMessage ? travelApprovalStatusTrackerDTO.Comments : "Approved";
 
                 TravelApprovalStatusTracker travelItem;
 

@@ -122,13 +122,18 @@ namespace AtoCash.Controllers
             var role = await _context.JobRoles.FindAsync(id);
             if (role == null)
             {
-                return Conflict(new RespStatus { Status = "Failure", Message = "Role Id is Invalid!" });
+                return Conflict(new RespStatus { Status = "Failure", Message = "JobRole Id is Invalid!" });
+            }
+
+            if(_context.Employees.Where(x=> x.RoleId == id).Any())
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "JobRole is in Use!" });
             }
 
             _context.JobRoles.Remove(role);
             await _context.SaveChangesAsync();
 
-            return Ok(new RespStatus { Status = "Success", Message = "Jobrole Deleted!" });
+            return Ok(new RespStatus { Status = "Success", Message = "JobRole Deleted!" });
         }
 
         private bool RoleExists(int id)

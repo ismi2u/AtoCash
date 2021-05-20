@@ -102,5 +102,6 @@ namespace AtoCash.Models
 
         public bool ShowEditDelete { get; set; }
 
+        public string Comments { get; set; }
     }
 }

@@ -24,6 +24,8 @@ namespace AtoCash.Authentication
         public string JobRole { get; set; }
         public string StatusType { get; set; }
 
+        public string AccessRole { get; set; }
+
     }
 
 

@@ -228,7 +228,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                 expenseReimburseStatusTracker.ExpReimReqDate = expenseReimburseStatusTrackerDto.ExpReimReqDate;
                 expenseReimburseStatusTracker.ApprovedDate = expenseReimburseStatusTrackerDto.ApprovedDate;
                 expenseReimburseStatusTracker.ApprovalStatusTypeId = expenseReimburseStatusTrackerDto.ApprovalStatusTypeId;
-                expenseReimburseStatusTracker.Comments = expenseReimburseStatusTrackerDto.Comments ?? "Approved";
+                expenseReimburseStatusTracker.Comments = bRejectMessage ? expenseReimburseStatusTrackerDto.Comments : "Approved";
 
 
 
@@ -393,12 +393,13 @@ namespace AtoCash.Controllers.ExpenseReimburse
 
 
 
-                        //update the Expense Reimburse request table to reflect the rejection
-                        if (bRejectMessage)
+                    //update the Expense Reimburse request table to reflect the rejection
+                    if (bRejectMessage)
                     {
                         var expReimbReq = _context.ExpenseReimburseRequests.Where(p => p.Id == expenseReimburseStatusTrackerDto.ExpenseReimburseRequestId).FirstOrDefault();
                         expReimbReq.ApprovalStatusTypeId = expenseReimburseStatusTrackerDto.ApprovalStatusTypeId;
                         expReimbReq.ApprovedDate = DateTime.Now;
+                        expReimbReq.Comments = expenseReimburseStatusTrackerDto.Comments;
                         _context.ExpenseReimburseRequests.Update(expReimbReq);
                         await _context.SaveChangesAsync();
                     }

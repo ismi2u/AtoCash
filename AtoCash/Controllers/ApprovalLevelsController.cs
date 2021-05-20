@@ -156,6 +156,11 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level Id invalid!" });
             }
 
+           if( _context.ApprovalRoleMaps.Where(a => a.ApprovalLevelId == id).Any())
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Level is in Use!" });
+            }
+
             _context.ApprovalLevels.Remove(approvalLevel);
             await _context.SaveChangesAsync();
 

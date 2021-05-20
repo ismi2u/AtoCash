@@ -125,6 +125,11 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Approval Group Id invalid!" });
             }
 
+            if (_context.ApprovalRoleMaps.Where(a => a.ApprovalGroupId == id).Any())
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Approval Group is in Use!" });
+            }
+
             _context.ApprovalGroups.Remove(approvalGroup);
             await _context.SaveChangesAsync();
 

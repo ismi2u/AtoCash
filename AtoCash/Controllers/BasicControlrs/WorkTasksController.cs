@@ -217,6 +217,15 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Work Task Id Invalid!" });
             }
 
+            bool blnUsedInTravelReq = _context.TravelApprovalRequests.Where(t => t.WorkTaskId == id).Any();
+            bool blnUsedInCashAdvReq = _context.PettyCashRequests.Where(t => t.WorkTaskId == id).Any();
+            bool blnUsedInExpeReimReq = _context.ExpenseReimburseRequests.Where(t => t.WorkTaskId == id).Any();
+
+            if (blnUsedInTravelReq || blnUsedInCashAdvReq || blnUsedInExpeReimReq)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "Work Task is in Use!" });
+            }
+
             _context.WorkTasks.Remove(workTask);
             await _context.SaveChangesAsync();
 

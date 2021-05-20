@@ -108,6 +108,8 @@ namespace AtoCash.Controllers
             travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
             travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
 
+            travelApprovalRequestDTO.Comments = travelApprovalRequest.Comments;
+
             return travelApprovalRequestDTO;
         }
 

@@ -43,45 +43,98 @@ namespace AtoCash.Controllers
 
 
 
-        [HttpGet("{id}")]
-        [ActionName("GetUsersAndRoles")]
-        public async Task<IActionResult> GetUsersByRoleId(string id)
+        [HttpPost]
+        [ActionName("GetUsersByRoleIdReport")]
+        public async Task<IActionResult> GetUsersByRoleIdReport(RoleToUserSearch searchmodel)
         {
-            string rolName = roleManager.Roles.Where(r => r.Id == id).FirstOrDefault().Name;
-
-            //  List<string> UserIds =  context.UserRoles.Where(r => r.RoleId == id).Select(b => b.UserId).Distinct().ToList();
-
             List<UserByRole> ListUserByRole = new();
 
-            var usersOfRole = await userManager.GetUsersInRoleAsync(rolName);
-
-            foreach (ApplicationUser user in usersOfRole)
+            if (!string.IsNullOrEmpty(searchmodel.RoleId))
             {
-                UserByRole userByRole = new();
+                string rolName = roleManager.Roles.Where(r => r.Id == searchmodel.RoleId).FirstOrDefault().Name;
 
-                var emp = await _context.Employees.FindAsync(user.EmployeeId);
-                userByRole.UserId = user.Id;
-                userByRole.Id = emp.Id;
-                userByRole.UserFullName = emp.GetFullName();
-                userByRole.Email = emp.Email;
-                userByRole.EmpCode = emp.EmpCode;
-                userByRole.DOB = emp.DOB;
-                userByRole.DOJ = emp.DOJ;
-                userByRole.Gender = emp.Gender;
-                userByRole.MobileNumber = emp.MobileNumber;
-                userByRole.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
-                userByRole.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
-                userByRole.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
-               
-                ListUserByRole.Add(userByRole);
+                //  List<string> UserIds =  context.UserRoles.Where(r => r.RoleId == id).Select(b => b.UserId).Distinct().ToList();
+
+                var AllRoles = roleManager.Roles.ToList();
+
+                var usersOfRole = await userManager.GetUsersInRoleAsync(rolName);
+
+                foreach (ApplicationUser user in usersOfRole)
+                {
+                    UserByRole userByRole = new();
+
+                    var emp = await _context.Employees.FindAsync(user.EmployeeId);
+                    userByRole.UserId = user.Id;
+                    userByRole.Id = emp.Id;
+                    userByRole.UserFullName = emp.GetFullName();
+                    userByRole.Email = emp.Email;
+                    userByRole.EmpCode = emp.EmpCode;
+                    userByRole.DOB = emp.DOB;
+                    userByRole.DOJ = emp.DOJ;
+                    userByRole.Gender = emp.Gender;
+                    userByRole.MobileNumber = emp.MobileNumber;
+                    userByRole.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
+                    userByRole.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
+                    userByRole.AccessRole = rolName;
+                    userByRole.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
+
+                    ListUserByRole.Add(userByRole);
+                }
+            }
+            else
+            {
+
+                var users = userManager.Users.ToList();
+                foreach (var user in users)
+                {
+                    UserByRole userByRole = new();
+                    var roles = await userManager.GetRolesAsync(user);
+
+
+                    if(user.EmployeeId== 0)
+                    {
+                        continue;
+                    }
+                    var emp = await _context.Employees.FindAsync(user.EmployeeId);
+
+                    userByRole.UserId = user.Id;
+                    userByRole.Id = emp.Id;
+                    userByRole.UserFullName = emp.GetFullName();
+                    userByRole.Email = emp.Email;
+                    userByRole.EmpCode = emp.EmpCode;
+                    userByRole.DOB = emp.DOB;
+                    userByRole.DOJ = emp.DOJ;
+                    userByRole.Gender = emp.Gender;
+                    userByRole.MobileNumber = emp.MobileNumber;
+                    userByRole.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
+                    userByRole.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
+                    userByRole.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
+                    foreach (var r in roles)
+                    {
+
+                        if(userByRole.AccessRole == null)
+                        {
+                            userByRole.AccessRole = "";
+                        }
+                        if (userByRole.AccessRole == "")
+                        {
+                            userByRole.AccessRole = r;
+                        }
+                        else
+                        {
+                            userByRole.AccessRole = userByRole.AccessRole + "," + r;
+                        }
+                    }
+                    ListUserByRole.Add(userByRole);
+                }
             }
 
 
             DataTable dt = new DataTable();
-            dt.Columns.AddRange(new DataColumn[12]
+            dt.Columns.AddRange(new DataColumn[13]
                 {
                     //new DataColumn("Id", typeof(int)),
-                    new DataColumn("UserId", typeof(int)),
+                    new DataColumn("UserId", typeof(string)),
                     new DataColumn("EmployeeId", typeof(int)),
                     new DataColumn("UserFullName", typeof(string)),
                     new DataColumn("Email",typeof(string)),
@@ -89,11 +142,12 @@ namespace AtoCash.Controllers
                     new DataColumn("DOB",typeof(DateTime)),
                     new DataColumn("DOJ", typeof(DateTime)),
                     new DataColumn("Gender",typeof(string)),
-                    new DataColumn("MobileNumber",typeof(DateTime)),
+                    new DataColumn("MobileNumber",typeof(string)),
                     new DataColumn("Department",typeof(string)),
                     new DataColumn("JobRole", typeof(string)),
-                    new DataColumn("StatusType", typeof(string))
-                   
+                    new DataColumn("StatusType", typeof(string)),
+                    new DataColumn("AccessRole", typeof(string))
+
                 });
 
             foreach (var usr in ListUserByRole)
@@ -110,64 +164,188 @@ namespace AtoCash.Controllers
                     usr.MobileNumber,
                     usr.Department,
                     usr.JobRole,
-                    usr.StatusType
+                    usr.StatusType,
+                    usr.AccessRole
                     );
             }
             // Creating the Excel workbook 
             // Add the datatable to the Excel workbook
 
-            List<string> docUrls = new();
             var docUrl = GetExcel("GetUsersByRoleId", dt);
 
-            docUrls.Add(docUrl);
+            return Ok(docUrl);
+        }
 
-            return Ok(docUrls);
+        [HttpPost]
+        [ActionName("GetUsersByRoleId")]
+        public async Task<IActionResult> GetUsersByRoleId(RoleToUserSearch searchmodel)
+        {
+            List<UserByRole> ListUserByRole = new();
+
+            if (!string.IsNullOrEmpty(searchmodel.RoleId))
+            {
+                string rolName = roleManager.Roles.Where(r => r.Id == searchmodel.RoleId).FirstOrDefault().Name;
+
+                //  List<string> UserIds =  context.UserRoles.Where(r => r.RoleId == id).Select(b => b.UserId).Distinct().ToList();
+
+                var AllRoles = roleManager.Roles.ToList();
+
+                var usersOfRole = await userManager.GetUsersInRoleAsync(rolName);
+
+                foreach (ApplicationUser user in usersOfRole)
+                {
+                    UserByRole userByRole = new();
+
+                    var emp = await _context.Employees.FindAsync(user.EmployeeId);
+                    userByRole.UserId = user.Id;
+                    userByRole.Id = emp.Id;
+                    userByRole.UserFullName = emp.GetFullName();
+                    userByRole.Email = emp.Email;
+                    userByRole.EmpCode = emp.EmpCode;
+                    userByRole.DOB = emp.DOB;
+                    userByRole.DOJ = emp.DOJ;
+                    userByRole.Gender = emp.Gender;
+                    userByRole.MobileNumber = emp.MobileNumber;
+                    userByRole.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
+                    userByRole.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
+                    userByRole.AccessRole = rolName;
+                    userByRole.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
+
+                    ListUserByRole.Add(userByRole);
+                }
+            }
+            else
+            {
+
+                var users = userManager.Users.ToList();
+                foreach (var user in users)
+                {
+                    UserByRole userByRole = new();
+                    var roles = await userManager.GetRolesAsync(user);
+
+
+                    if (user.EmployeeId == 0)
+                    {
+                        continue;
+                    }
+                    var emp = await _context.Employees.FindAsync(user.EmployeeId);
+
+                    userByRole.UserId = user.Id;
+                    userByRole.Id = emp.Id;
+                    userByRole.UserFullName = emp.GetFullName();
+                    userByRole.Email = emp.Email;
+                    userByRole.EmpCode = emp.EmpCode;
+                    userByRole.DOB = emp.DOB;
+                    userByRole.DOJ = emp.DOJ;
+                    userByRole.Gender = emp.Gender;
+                    userByRole.MobileNumber = emp.MobileNumber;
+                    userByRole.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
+                    userByRole.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
+                    userByRole.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
+                    foreach (var r in roles)
+                    {
+
+                        if (userByRole.AccessRole == null)
+                        {
+                            userByRole.AccessRole = "";
+                        }
+                        if (userByRole.AccessRole == "")
+                        {
+                            userByRole.AccessRole = r;
+                        }
+                        else
+                        {
+                            userByRole.AccessRole = userByRole.AccessRole + "," + r;
+                        }
+                    }
+                    ListUserByRole.Add(userByRole);
+                }
+            }
+
+            return Ok(ListUserByRole);
         }
 
 
-        [HttpPost]
-        [ActionName("GetAllEmployees")]
-        public async Task<IActionResult> GetAllEmployees()
+            [HttpPost]
+        [ActionName("GetEmployeesReport")]
+        public async Task<IActionResult> GetEmployeesReport(EmployeeSearchModel searchModel)
         {
-           
+
+
+            var result = _context.Employees.ToList().AsQueryable();
+
+            if (searchModel.EmployeeId != 0 && searchModel.EmployeeId != null)
+                result = result.Where(x => x.Id == searchModel.EmployeeId);
+            if (!string.IsNullOrEmpty(searchModel.EmployeeName))
+                result = result.Where(x => x.GetFullName().Contains(searchModel.EmployeeName));
+            if (!string.IsNullOrEmpty(searchModel.EmpCode))
+                result = result.Where(x => x.EmpCode.Contains(searchModel.EmpCode));
+            if (!string.IsNullOrEmpty(searchModel.Nationality))
+                result = result.Where(x => x.Nationality.Contains(searchModel.Nationality));
+            if (!string.IsNullOrEmpty(searchModel.Gender))
+                result = result.Where(x => x.Gender.Contains(searchModel.Gender));
+            if (searchModel.EmploymentTypeId != 0 && searchModel.EmploymentTypeId != null)
+                result = result.Where(x => x.EmploymentTypeId == searchModel.EmploymentTypeId);
+            if (searchModel.DepartmentId != 0 && searchModel.DepartmentId != null)
+                result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
+            if (searchModel.JobRoleId != 0 && searchModel.JobRoleId != null)
+                result = result.Where(x => x.RoleId == searchModel.JobRoleId);
+            if (searchModel.ApprovalGroupId != 0 && searchModel.ApprovalGroupId != null)
+                result = result.Where(x => x.ApprovalGroupId == searchModel.ApprovalGroupId);
+            if (searchModel.StatusTypeId != 0 && searchModel.StatusTypeId != null)
+                result = result.Where(x => x.StatusTypeId == searchModel.StatusTypeId);
+
+
             List<EmployeeDTO> ListEmployeeDto = new();
 
-            var employees =  _context.Employees.ToList();
-
-            foreach (Employee emp in employees)
+            foreach (Employee employee in result)
             {
                 EmployeeDTO employeeDTO = new();
 
-                employeeDTO.Id = emp.Id;
-                employeeDTO.FullName = emp.GetFullName();
-                employeeDTO.Email = emp.Email;
-                employeeDTO.EmpCode = emp.EmpCode;
-                employeeDTO.DOB = emp.DOB;
-                employeeDTO.DOJ = emp.DOJ;
-                employeeDTO.Gender = emp.Gender;
-                employeeDTO.MobileNumber = emp.MobileNumber;
-                employeeDTO.Department = _context.Departments.Find(emp.DepartmentId).DeptCode + ":" + _context.Departments.Find(emp.DepartmentId).DeptName;
-                employeeDTO.JobRole = _context.JobRoles.Find(emp.RoleId).RoleCode + ":" + _context.JobRoles.Find(emp.RoleId).RoleName;
-                employeeDTO.StatusType = _context.StatusTypes.Find(emp.StatusTypeId).Status;
+                employeeDTO.Id = employee.Id;
+                employeeDTO.FullName = employee.GetFullName();
+                employeeDTO.EmpCode = employee.EmpCode;
+                employeeDTO.BankAccount = employee.BankAccount;
+                employeeDTO.BankCardNo = employee.BankCardNo;
+                employeeDTO.PassportNo = employee.PassportNo;
+                employeeDTO.TaxNumber = employee.TaxNumber;
+                employeeDTO.Nationality = employee.Nationality;
+                employeeDTO.DOB = employee.DOB;
+                employeeDTO.DOJ = employee.DOJ;
+                employeeDTO.Gender = employee.Gender;
+                employeeDTO.Email = employee.Email;
+                employeeDTO.MobileNumber = employee.MobileNumber;
+                employeeDTO.EmploymentType = employee.EmploymentTypeId != 0 ? _context.EmploymentTypes.Find(employee.EmploymentTypeId).EmpJobTypeCode + ":" + _context.EmploymentTypes.Find(employee.EmploymentTypeId).EmpJobTypeDesc : string.Empty;
+                employeeDTO.Department = employee.DepartmentId !=0 ? _context.Departments.Find(employee.DepartmentId).DeptCode + ":" + _context.Departments.Find(employee.DepartmentId).DeptName : string.Empty;
+                employeeDTO.JobRole = employee.RoleId !=0 ?_context.JobRoles.Find(employee.RoleId).RoleCode + ":" + _context.JobRoles.Find(employee.RoleId).RoleName : string.Empty;
+                employeeDTO.ApprovalGroup = employeeDTO.ApprovalGroupId !=0 ? _context.ApprovalGroups.Find(employeeDTO.ApprovalGroupId).ApprovalGroupCode : string.Empty;
+                employeeDTO.StatusType = employeeDTO.StatusTypeId !=0 ? _context.StatusTypes.Find(employeeDTO.StatusTypeId).Status : string.Empty;
 
                 ListEmployeeDto.Add(employeeDTO);
             }
 
 
             DataTable dt = new DataTable();
-            dt.Columns.AddRange(new DataColumn[11]
+            dt.Columns.AddRange(new DataColumn[18]
                 {
                     //new DataColumn("Id", typeof(int)),
                     new DataColumn("EmployeeId", typeof(int)),
                     new DataColumn("EmployeeFullName", typeof(string)),
-                    new DataColumn("Email",typeof(string)),
                     new DataColumn("EmpCode",typeof(string)),
+                    new DataColumn("BankAccount",typeof(string)),
+                    new DataColumn("BankCardNo",typeof(string)),
+                    new DataColumn("PassportNo",typeof(string)),
+                    new DataColumn("TaxNumber",typeof(string)),
+                    new DataColumn("Nationality",typeof(string)),
                     new DataColumn("DOB",typeof(DateTime)),
                     new DataColumn("DOJ", typeof(DateTime)),
                     new DataColumn("Gender",typeof(string)),
-                    new DataColumn("MobileNumber",typeof(DateTime)),
+                    new DataColumn("Email",typeof(string)),
+                    new DataColumn("MobileNumber",typeof(string)),
+                    new DataColumn("EmploymentType",typeof(string)),
                     new DataColumn("Department",typeof(string)),
                     new DataColumn("JobRole", typeof(string)),
+                    new DataColumn("ApprovalGroup", typeof(string)),
                     new DataColumn("StatusType", typeof(string))
                 });
 
@@ -176,14 +354,21 @@ namespace AtoCash.Controllers
                 dt.Rows.Add(
                     emp.Id,
                     emp.FullName,
-                    emp.Email,
                     emp.EmpCode,
+                    emp.BankAccount,
+                    emp.BankCardNo,
+                    emp.PassportNo,
+                    emp.TaxNumber,
+                    emp.Nationality,
                     emp.DOB,
                     emp.DOJ,
                     emp.Gender,
+                    emp.Email,
                     emp.MobileNumber,
+                    emp.EmploymentType,
                     emp.Department,
                     emp.JobRole,
+                    emp.ApprovalGroup,
                     emp.StatusType
                     );
             }
@@ -198,7 +383,69 @@ namespace AtoCash.Controllers
             return Ok(docUrls);
         }
 
+        [HttpPost]
+        [ActionName("GetEmployeesData")]
+        public async Task<IActionResult> GetEmployeesData(EmployeeSearchModel searchModel)
+        {
 
+
+            var result = _context.Employees.ToList().AsQueryable();
+
+            if (searchModel.EmployeeId != 0 && searchModel.EmployeeId != null)
+                result = result.Where(x => x.Id == searchModel.EmployeeId);
+            if (!string.IsNullOrEmpty(searchModel.EmployeeName))
+                result = result.Where(x => x.GetFullName().Contains(searchModel.EmployeeName));
+            if (!string.IsNullOrEmpty(searchModel.EmpCode))
+                result = result.Where(x => x.EmpCode.Contains(searchModel.EmpCode));
+            if (!string.IsNullOrEmpty(searchModel.Nationality))
+                result = result.Where(x => x.Nationality.Contains(searchModel.Nationality));
+            if (!string.IsNullOrEmpty(searchModel.Gender))
+                result = result.Where(x => x.Gender.Contains(searchModel.Gender));
+            if (searchModel.EmploymentTypeId != 0 && searchModel.EmploymentTypeId != null)
+                result = result.Where(x => x.EmploymentTypeId == searchModel.EmploymentTypeId);
+            if (searchModel.DepartmentId != 0 && searchModel.DepartmentId != null)
+                result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
+            if (searchModel.JobRoleId != 0 && searchModel.JobRoleId != null)
+                result = result.Where(x => x.RoleId == searchModel.JobRoleId);
+            if (searchModel.ApprovalGroupId != 0 && searchModel.ApprovalGroupId != null)
+                result = result.Where(x => x.ApprovalGroupId == searchModel.ApprovalGroupId);
+            if (searchModel.StatusTypeId != 0 && searchModel.StatusTypeId != null)
+                result = result.Where(x => x.StatusTypeId == searchModel.StatusTypeId);
+
+
+            List<EmployeeDTO> ListEmployeeDto = new();
+
+            foreach (Employee employee in result)
+            {
+                EmployeeDTO employeeDTO = new();
+
+                employeeDTO.Id = employee.Id;
+                employeeDTO.FullName = employee.GetFullName();
+                employeeDTO.EmpCode = employee.EmpCode;
+                employeeDTO.BankAccount = employee.BankAccount;
+                employeeDTO.BankCardNo = employee.BankCardNo;
+                employeeDTO.PassportNo = employee.PassportNo;
+                employeeDTO.TaxNumber = employee.TaxNumber;
+                employeeDTO.Nationality = employee.Nationality;
+                employeeDTO.DOB = employee.DOB;
+                employeeDTO.DOJ = employee.DOJ;
+                employeeDTO.Gender = employee.Gender;
+                employeeDTO.Email = employee.Email;
+                employeeDTO.MobileNumber = employee.MobileNumber;
+                employeeDTO.EmploymentType = employee.EmploymentTypeId != 0 ? _context.EmploymentTypes.Find(employee.EmploymentTypeId).EmpJobTypeCode + ":" + _context.EmploymentTypes.Find(employee.EmploymentTypeId).EmpJobTypeDesc : string.Empty;
+                employeeDTO.Department = employee.DepartmentId != 0 ? _context.Departments.Find(employee.DepartmentId).DeptCode + ":" + _context.Departments.Find(employee.DepartmentId).DeptName : string.Empty;
+                employeeDTO.JobRole = employee.RoleId != 0 ? _context.JobRoles.Find(employee.RoleId).RoleCode + ":" + _context.JobRoles.Find(employee.RoleId).RoleName : string.Empty;
+                employeeDTO.ApprovalGroup = employeeDTO.ApprovalGroupId != 0 ? _context.ApprovalGroups.Find(employeeDTO.ApprovalGroupId).ApprovalGroupCode : string.Empty;
+                employeeDTO.StatusType = employeeDTO.StatusTypeId != 0 ? _context.StatusTypes.Find(employeeDTO.StatusTypeId).Status : string.Empty;
+
+
+                ListEmployeeDto.Add(employeeDTO);
+            }
+
+
+
+            return Ok(ListEmployeeDto);
+        }
 
 
         [HttpPost]
@@ -492,9 +739,9 @@ namespace AtoCash.Controllers
                     travelItemDTO.WorkTaskId = travel.WorkTaskId;
                     travelItemDTO.WorkTask = travel.WorkTaskId != null ? _context.WorkTasks.Find(travel.WorkTaskId).TaskName : null;
                     travelItemDTO.CostCenterId = travel.CostCenterId;
-                    travelItemDTO.CostCenter = travel.CostCenterId != null ? _context.CostCenters.Find(travel.CostCenterId).CostCenterCode : null;
+                    travelItemDTO.CostCenter = travel.CostCenterId != 0 ? _context.CostCenters.Find(travel.CostCenterId).CostCenterCode : null;
                     travelItemDTO.ApprovalStatusTypeId = travel.ApprovalStatusTypeId;
-                    travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != null ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status : null;
+                    travelItemDTO.ApprovalStatusType = travel.ApprovalStatusTypeId != 0 ? _context.ApprovalStatusTypes.Find(travel.ApprovalStatusTypeId).Status : null;
                     travelItemDTO.ReqRaisedDate = travel.ReqRaisedDate;
 
                     ListTravelItemsDTO.Add(travelItemDTO);
