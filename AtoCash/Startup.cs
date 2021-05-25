@@ -51,6 +51,10 @@ namespace AtoCash
             services.AddDbContextPool<AtoCashDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("WithinContainerSQLConnectionString")));
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AtoCashDbContext>();
+
+            services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+                .AddEntityFrameworkStores<AtoCashDbContext>()
+                .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
             //services.AddHttpsRedirection(options => options.HttpsPort = 443);
             services.AddAuthentication(options =>
             {

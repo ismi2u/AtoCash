@@ -149,6 +149,7 @@ namespace AtoCash.Controllers
                 claimApprovalStatusTracker.Comments = bRejectMessage ? claimApprovalStatusTrackerDto.Comments : "Approved";
 
                 ClaimApprovalStatusTracker claimitem;
+                //department based petty cash request
                 if (claimApprovalStatusTrackerDto.DepartmentId != null)
                 {
                     int empApprGroupId = _context.Employees.Find(claimApprovalStatusTracker.EmployeeId).ApprovalGroupId;
@@ -302,6 +303,8 @@ namespace AtoCash.Controllers
                     }
 
                 }
+
+                //Project based petty cash request
                 else
                 {
                     //final approver hence update PettyCashRequest

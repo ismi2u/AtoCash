@@ -170,10 +170,12 @@ namespace AtoCash.Controllers
             }
             // Creating the Excel workbook 
             // Add the datatable to the Excel workbook
-
+            List<string> docUrls = new();
             var docUrl = GetExcel("GetUsersByRoleId", dt);
 
-            return Ok(docUrl);
+            docUrls.Add(docUrl);
+
+            return Ok(docUrls);
         }
 
         [HttpPost]

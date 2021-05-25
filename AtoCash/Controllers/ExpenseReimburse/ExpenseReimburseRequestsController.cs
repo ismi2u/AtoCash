@@ -235,26 +235,26 @@ namespace AtoCash.Controllers
 
 
 
-                var expenseReimbRequest = await _context.ExpenseReimburseRequests.FindAsync(expenseReimbRequestDTO.Id);
+            var expenseReimbRequest = await _context.ExpenseReimburseRequests.FindAsync(expenseReimbRequestDTO.Id);
 
-                expenseReimbRequest.Id = expenseReimbRequestDTO.Id;
-                expenseReimbRequest.EmployeeId = expenseReimbRequestDTO.EmployeeId;
-                expenseReimbRequest.ExpenseReportTitle = expenseReimbRequestDTO.ExpenseReportTitle;
-                expenseReimbRequest.CurrencyTypeId = expenseReimbRequestDTO.CurrencyTypeId;
-                expenseReimbRequest.TotalClaimAmount = expenseReimbRequestDTO.TotalClaimAmount;
+            expenseReimbRequest.Id = expenseReimbRequestDTO.Id;
+            expenseReimbRequest.EmployeeId = expenseReimbRequestDTO.EmployeeId;
+            expenseReimbRequest.ExpenseReportTitle = expenseReimbRequestDTO.ExpenseReportTitle;
+            expenseReimbRequest.CurrencyTypeId = expenseReimbRequestDTO.CurrencyTypeId;
+            expenseReimbRequest.TotalClaimAmount = expenseReimbRequestDTO.TotalClaimAmount;
 
-                expenseReimbRequest.DepartmentId = expenseReimbRequestDTO.DepartmentId;
-                expenseReimbRequest.ProjectId = expenseReimbRequestDTO.ProjectId;
+            expenseReimbRequest.DepartmentId = expenseReimbRequestDTO.DepartmentId;
+            expenseReimbRequest.ProjectId = expenseReimbRequestDTO.ProjectId;
 
-                expenseReimbRequest.SubProjectId = expenseReimbRequestDTO.SubProjectId;
+            expenseReimbRequest.SubProjectId = expenseReimbRequestDTO.SubProjectId;
 
-                expenseReimbRequest.WorkTaskId = expenseReimbRequestDTO.WorkTaskId;
+            expenseReimbRequest.WorkTaskId = expenseReimbRequestDTO.WorkTaskId;
 
-                expenseReimbRequest.ExpReimReqDate = expenseReimbRequestDTO.ExpReimReqDate;
-                expenseReimbRequest.ApprovedDate = expenseReimbRequestDTO.ApprovedDate;
-                expenseReimbRequest.ApprovalStatusTypeId = expenseReimbRequestDTO.ApprovalStatusTypeId;
+            expenseReimbRequest.ExpReimReqDate = expenseReimbRequestDTO.ExpReimReqDate;
+            expenseReimbRequest.ApprovedDate = expenseReimbRequestDTO.ApprovedDate;
+            expenseReimbRequest.ApprovalStatusTypeId = expenseReimbRequestDTO.ApprovalStatusTypeId;
 
-                await Task.Run(() => _context.ExpenseReimburseRequests.Update(expenseReimbRequest));
+            await Task.Run(() => _context.ExpenseReimburseRequests.Update(expenseReimbRequest));
 
 
             try
@@ -288,27 +288,39 @@ namespace AtoCash.Controllers
                 string uploadsFolder = Path.Combine(hostingEnvironment.ContentRootPath, "Images");
                 uniqueFileName = Guid.NewGuid().ToString() + "_" + document.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await document.CopyToAsync(stream);
-                stream.Flush();
 
 
-                // Save it to the acutal FileDocuments table
-                FileDocument fileDocument = new();
-                fileDocument.ActualFileName = document.FileName;
-                fileDocument.UniqueFileName = uniqueFileName;
-                _context.FileDocuments.Add(fileDocument);
-                await _context.SaveChangesAsync();
-                //
+                try
+                {
+                    using var stream = new FileStream(filePath, FileMode.Create);
+                    await document.CopyToAsync(stream);
+                    stream.Flush();
 
-                // Populating the List of Document Id for FrontEnd consumption
-                FileDocumentDTO fileDocumentDTO = new();
-                fileDocumentDTO.Id = fileDocument.Id;
-                fileDocumentDTO.ActualFileName = document.FileName;
-                fileDocumentDTOs.Add(fileDocumentDTO);
-                //
 
-                //StrBuilderUploadedDocuments.Append(uniqueFileName + "^");
+                    // Save it to the acutal FileDocuments table
+                    FileDocument fileDocument = new();
+                    fileDocument.ActualFileName = document.FileName;
+                    fileDocument.UniqueFileName = uniqueFileName;
+                    _context.FileDocuments.Add(fileDocument);
+                    await _context.SaveChangesAsync();
+                    //
+
+                    // Populating the List of Document Id for FrontEnd consumption
+                    FileDocumentDTO fileDocumentDTO = new();
+                    fileDocumentDTO.Id = fileDocument.Id;
+                    fileDocumentDTO.ActualFileName = document.FileName;
+                    fileDocumentDTOs.Add(fileDocumentDTO);
+
+                    //StrBuilderUploadedDocuments.Append(uniqueFileName + "^");
+                    //
+                }
+                catch (Exception ex)
+                {
+                    return Conflict(new RespStatus { Status = "Failure", Message = "File not uploaded.. Please retry!" + ex.ToString() });
+
+                }
+
+
 
 
             }
@@ -449,13 +461,13 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "expense Reimburse Request Id Invalid!" });
             }
 
-            int ApprovedCount =   _context.ExpenseReimburseStatusTrackers.Where(e => e.ExpenseReimburseRequestId == expenseReimburseRequest.Id && e.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
+            int ApprovedCount = _context.ExpenseReimburseStatusTrackers.Where(e => e.ExpenseReimburseRequestId == expenseReimburseRequest.Id && e.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();
 
-            if(ApprovedCount !=0 )
+            if (ApprovedCount != 0)
             {
                 return Conflict(new RespStatus { Status = "Failure", Message = "Reimburse Request cant be Deleted after Approval!" });
             }
-            
+
 
             _context.ExpenseReimburseRequests.Remove(expenseReimburseRequest);
             await _context.SaveChangesAsync();
@@ -481,10 +493,10 @@ namespace AtoCash.Controllers
             int reqRoleId = reqEmp.RoleId;
 
             var approRolMapsList = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId).ToList();
-                int maxApprLevel = approRolMapsList.Select(x => x.ApprovalLevel).Max(a => a.Level);
-                int reqApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId && a.RoleId == reqRoleId).Select(x => x.ApprovalLevel).FirstOrDefault().Level;
+            int maxApprLevel = approRolMapsList.Select(x => x.ApprovalLevel).Max(a => a.Level);
+            int reqApprLevel = _context.ApprovalRoleMaps.Include("ApprovalLevel").Where(a => a.ApprovalGroupId == reqApprGroupId && a.RoleId == reqRoleId).Select(x => x.ApprovalLevel).FirstOrDefault().Level;
 
-           
+
             bool isSelfApprovedRequest = false;
             ////
 
@@ -527,7 +539,7 @@ namespace AtoCash.Controllers
 
                 _context.ExpenseSubClaims.Add(expenseSubClaim);
                 await _context.SaveChangesAsync();
-                dblTotalClaimAmount = dblTotalClaimAmount + expenseSubClaimDto.TaxAmount  + expenseSubClaimDto.ExpenseReimbClaimAmount;
+                dblTotalClaimAmount = dblTotalClaimAmount + expenseSubClaimDto.TaxAmount + expenseSubClaimDto.ExpenseReimbClaimAmount;
 
             }
 
@@ -776,7 +788,7 @@ namespace AtoCash.Controllers
                     EmployeeId = expenseReimburseRequestDto.EmployeeId,
                     ExpenseReimburseRequestId = expenseReimburseRequest.Id,
                     CurrencyTypeId = expenseReimburseRequestDto.CurrencyTypeId,
-                    TotalClaimAmount = expenseReimburseRequestDto.TotalClaimAmount,
+                    TotalClaimAmount = dblTotalClaimAmount,
                     ExpReimReqDate = DateTime.Now,
                     DepartmentId = null,
                     ProjManagerId = projManagerid,

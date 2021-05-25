@@ -165,12 +165,24 @@ namespace AtoCash.Controllers
                 travelApprovalRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(travelApprovalRequest.ApprovalStatusTypeId).Status;
                 travelApprovalRequestDTO.ApprovedDate = travelApprovalRequest.ApprovedDate;
 
-                int NextApproverInPending = _context.TravelApprovalStatusTrackers.Where(t =>
-                        t.ApprovalStatusTypeId == (int)EApprovalStatus.Pending &&
-                        t.TravelApprovalRequestId == travelApprovalRequest.Id).Select(s => s.ApprovalLevel.Level).FirstOrDefault();
 
-                //set the bookean flat to TRUE if No approver has yet approved the Request else FALSE
-                travelApprovalRequestDTO.ShowEditDelete = reqEmpApprLevel + 1 == NextApproverInPending ? true : false;
+
+
+                // set the bookean flat to TRUE if No approver has yet approved the Request else FALSE
+                bool ifAnyOfStatusRecordsApproved = _context.TravelApprovalStatusTrackers.Where(t =>
+                                                         (t.ApprovalStatusTypeId == (int)EApprovalStatus.Rejected ||
+                                                          t.ApprovalStatusTypeId == (int)EApprovalStatus.Approved) &&
+                                                          t.TravelApprovalRequestId == travelApprovalRequest.Id).Any();
+
+                if (ifAnyOfStatusRecordsApproved)
+                {
+                    travelApprovalRequestDTO.ShowEditDelete = false;
+                }
+                else
+                {
+                    travelApprovalRequestDTO.ShowEditDelete = true;
+                }
+
 
                 //;
 

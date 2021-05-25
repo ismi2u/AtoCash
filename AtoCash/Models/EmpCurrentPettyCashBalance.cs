@@ -37,4 +37,17 @@ namespace AtoCash.Models
         public DateTime UpdatedOn { get; set; }
 
     }
+
+
+
+    public class EmpAllCurBalStatusDTO
+    {
+
+        public Double MaxLimit { get; set; }
+        public Double CurBalance { get; set; }
+        public Double CashInHand { get; set; }
+
+        public DateTime UpdatedOn { get; set; }
+
+    }
 }

@@ -233,6 +233,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
 
 
                 ExpenseReimburseStatusTracker claimitem;
+                //Department based Expense Reimburse approval/rejection
                 if (expenseReimburseStatusTrackerDto.DepartmentId != null)
                 {
                     int empApprGroupId = _context.Employees.Find(expenseReimburseStatusTracker.EmployeeId).ApprovalGroupId;
@@ -405,6 +406,10 @@ namespace AtoCash.Controllers.ExpenseReimburse
                     }
 
                 }
+
+
+                //project based Expense Reimburse approval/rejection
+                //only one approver (Project manager)
                 else
                 {
                     //final approver hence update Expense Reimburse request claim

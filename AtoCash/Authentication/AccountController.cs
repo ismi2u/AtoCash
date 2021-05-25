@@ -1,5 +1,6 @@
 ﻿using AtoCash.Data;
 using AtoCash.Models;
+using EmailService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -23,14 +24,16 @@ namespace AtoCash.Authentication
 
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly IEmailSender _emailSender;
         private readonly AtoCashDbContext context;
 
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AtoCashDbContext context)
+        public AccountController(IEmailSender emailSender, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, AtoCashDbContext context)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.context = context;
+            _emailSender = emailSender;
         }
         // GET: api/<AccountController>
         [HttpPost]
@@ -199,21 +202,32 @@ namespace AtoCash.Authentication
         {
             //check if employee-id is already registered
 
+           
+
             if (ModelState.IsValid)
             {
                 var user = await userManager.FindByEmailAsync(model.email);
+                //bool isUserConfirmed = await userManager.IsEmailConfirmedAsync(user);
+                //if (user != null && isUserConfirmed)
 
-                if (user != null && await userManager.IsEmailConfirmedAsync(user))
+                    if (user != null )
                 {
                     var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
                     //var passwordResetlink= Url.Action("ResetPassword", "Account", new { email = model.email, token = token, Request.Scheme });
 
                     //return Ok(passwordResetLink);
+
+                    var receiverEmail = model.email;
+                    string subject = "Forgot Password";
+                    string content = "Password Reset Token:" + token + "Request:" + Request.Scheme;
+                    var messagemail = new Message(new string[] { receiverEmail }, subject, content);
+
+                    await _emailSender.SendEmailAsync(messagemail);
                     return Ok(new { model.email, token, Request.Scheme });
                 }
 
-                return Ok(new RespStatus { Status = "Success", Message = "Forgot Password Actioned!" });
+                return Ok(new RespStatus { Status = "Success", Message = "Forgot Password Email Sent!" });
             }
             return Conflict(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
         }
@@ -234,7 +248,15 @@ namespace AtoCash.Authentication
                     var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
                     if (result.Succeeded)
                     {
-                        return Ok(user);
+
+
+                        var receiverEmail = model.email;
+                        string subject = "Password Changed";
+                        string content = "Your new Password is:" + model.Password;
+                        var messagemail = new Message(new string[] { receiverEmail }, subject, content);
+
+                        await _emailSender.SendEmailAsync(messagemail);
+                        return Ok(new RespStatus { Status = "Success", Message = "Your Password has been reset!" });
                     }
 
                     List<object> errResp = new();

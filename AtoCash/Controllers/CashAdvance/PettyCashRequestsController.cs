@@ -160,12 +160,21 @@ namespace AtoCash.Controllers
                 pettyCashRequestDTO.ApprovalStatusType = _context.ApprovalStatusTypes.Find(pettyCashRequest.ApprovalStatusTypeId).Status;
                 pettyCashRequestDTO.ApprovedDate = pettyCashRequest.ApprovedDate;
 
-                int NextApproverInPending = _context.ClaimApprovalStatusTrackers.Where(t =>
-                        t.ApprovalStatusTypeId == (int)EApprovalStatus.Pending &&
-                        t.PettyCashRequestId == pettyCashRequest.Id).Select(s => s.ApprovalLevel.Level).FirstOrDefault();
+                // set the bookean flat to TRUE if No approver has yet approved the Request else FALSE
+                bool ifAnyOfStatusRecordsApproved = _context.ClaimApprovalStatusTrackers.Where(t =>
+                                                           ( t.ApprovalStatusTypeId == (int)EApprovalStatus.Rejected ||
+                                                          t.ApprovalStatusTypeId == (int)EApprovalStatus.Approved) &&
+                                                          t.PettyCashRequestId == pettyCashRequest.Id).Any();
 
-                //set the bookean flat to TRUE if No approver has yet approved the Request else FALSE
-                pettyCashRequestDTO.ShowEditDelete = reqEmpApprLevel + 1 == NextApproverInPending ? true : false;
+                if(ifAnyOfStatusRecordsApproved)
+                {
+                    pettyCashRequestDTO.ShowEditDelete = false;
+                }
+                else
+                {
+                    pettyCashRequestDTO.ShowEditDelete = true;
+                }
+
 
                 ///
                 PettyCashRequestDTOs.Add(pettyCashRequestDTO);
@@ -236,6 +245,9 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus { Status = "Failure", Message = "Id is invalid" });
             }
 
+            var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
+            pettyCashRequestDto.EmployeeId = pettyCashRequest.EmployeeId;
+
             Double empCurAvailBal = GetEmpCurrentAvailablePettyCashBalance(pettyCashRequestDto);
 
             if (!(pettyCashRequestDto.PettyClaimAmount <= empCurAvailBal && pettyCashRequestDto.PettyClaimAmount > 0))
@@ -243,7 +255,7 @@ namespace AtoCash.Controllers
                 return Conflict(new RespStatus() { Status = "Failure", Message = "Invalid Cash Request Amount Or Limit Exceeded" });
             }
 
-            var pettyCashRequest = await _context.PettyCashRequests.FindAsync(id);
+           
 
    
             int ApprovedCount = _context.ExpenseReimburseStatusTrackers.Where(e => e.ExpenseReimburseRequestId == pettyCashRequest.Id && e.ApprovalStatusTypeId == (int)EApprovalStatus.Approved).Count();

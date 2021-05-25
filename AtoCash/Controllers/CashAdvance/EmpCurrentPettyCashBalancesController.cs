@@ -71,6 +71,28 @@ namespace AtoCash.Controllers
             return empCurrentPettyCashBalanceDTO;
         }
 
+
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<EmpAllCurBalStatusDTO>> GetEmpMaxlimitCurBalAndCashInHandStatus(int id)
+        {
+            EmpAllCurBalStatusDTO empAllCurBalStatusDTO = new();
+
+            var empCurrentPettyCashBalance = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == id).FirstOrDefault();
+
+            if (empCurrentPettyCashBalance == null)
+            {
+                empAllCurBalStatusDTO.CurBalance = 0;
+            }
+
+            empAllCurBalStatusDTO.CurBalance = empCurrentPettyCashBalance.CurBalance;
+            empAllCurBalStatusDTO.MaxLimit = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed;
+            empAllCurBalStatusDTO.CashInHand = empAllCurBalStatusDTO.MaxLimit - empAllCurBalStatusDTO.CurBalance;
+            empAllCurBalStatusDTO.UpdatedOn = empCurrentPettyCashBalance.UpdatedOn;
+
+            return empAllCurBalStatusDTO;
+        }
+
         // PUT: api/EmpCurrentPettyCashBalances/5
         [HttpPut("{id}")]
         [Authorize(Roles = "AtominosAdmin, Admin, Manager, Finmgr")]
