@@ -295,7 +295,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                             var expenseReimburseRequest = _context.ExpenseReimburseRequests.Find(qExpReimRequestId);
                             expenseReimburseRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
                             expenseReimburseRequest.ApprovedDate = DateTime.Now;
-                            expenseReimburseRequest.Comments = expenseReimburseStatusTrackerDto.Comments;
+                            expenseReimburseRequest.Comments = bRejectMessage ? expenseReimburseStatusTrackerDto.Comments : "Approved";
                             _context.Update(expenseReimburseRequest);
 
 
@@ -325,6 +325,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                                 disbAndClaimItem.AmountToCredit = 0;
                             }
 
+                            
                             disbAndClaimItem.ApprovalStatusId = (int)EApprovalStatus.Approved;
                             _context.Update(disbAndClaimItem);
 
@@ -387,7 +388,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                         var expReimbReq = _context.ExpenseReimburseRequests.Where(p => p.Id == expenseReimburseStatusTrackerDto.ExpenseReimburseRequestId).FirstOrDefault();
                         expReimbReq.ApprovalStatusTypeId = expenseReimburseStatusTrackerDto.ApprovalStatusTypeId;
                         expReimbReq.ApprovedDate = DateTime.Now;
-                        expReimbReq.Comments = expenseReimburseStatusTrackerDto.Comments;
+                        expReimbReq.Comments = bRejectMessage ? expenseReimburseStatusTrackerDto.Comments : "Approved";
                         _context.ExpenseReimburseRequests.Update(expReimbReq);
                         await _context.SaveChangesAsync();
                     }
@@ -442,6 +443,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                         disbAndClaimItem.AmountToCredit = 0;
                     }
 
+                    
                     disbAndClaimItem.ApprovalStatusId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     _context.Update(disbAndClaimItem);
 
@@ -459,6 +461,7 @@ namespace AtoCash.Controllers.ExpenseReimburse
                     var expenseReimReq = await _context.ExpenseReimburseRequests.FindAsync(expenseReimReqId);
 
                     expenseReimReq.ApprovalStatusTypeId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
+                    expenseReimReq.Comments =  bRejectMessage? expenseReimburseStatusTrackerDto.Comments: "Approved";
                     expenseReimReq.ApprovedDate = DateTime.Now;
                     _context.Update(expenseReimReq);
 

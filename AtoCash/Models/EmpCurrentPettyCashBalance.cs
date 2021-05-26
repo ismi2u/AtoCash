@@ -47,6 +47,7 @@ namespace AtoCash.Models
         public Double CurBalance { get; set; }
         public Double CashInHand { get; set; }
 
+        public Double ExpReimburseExpectedAmount { get; set; }
         public DateTime UpdatedOn { get; set; }
 
     }

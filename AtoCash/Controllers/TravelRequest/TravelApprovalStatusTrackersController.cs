@@ -218,7 +218,7 @@ namespace AtoCash.Controllers
                             //final Approver hence updating TravelApprovalRequest
                             var travelApprovalRequest = _context.TravelApprovalRequests.Find(qTravelApprovalRequestId);
                             travelApprovalRequest.ApprovalStatusTypeId = (int)EApprovalStatus.Approved;
-                            travelApprovalRequest.Comments = travelApprovalStatusTrackerDTO.Comments;
+                            travelApprovalRequest.Comments = bRejectMessage ? travelApprovalStatusTrackerDTO.Comments : "Approved";
                             travelApprovalRequest.ApprovedDate = DateTime.Now;
                             _context.Update(travelApprovalRequest);
                         }
@@ -301,7 +301,7 @@ namespace AtoCash.Controllers
 
                     travelApprovalrequest.ApprovalStatusTypeId = bRejectMessage ? (int)EApprovalStatus.Rejected : (int)EApprovalStatus.Approved;
                     travelApprovalrequest.ApprovedDate = DateTime.Now;
-                    travelApprovalrequest.Comments = travelApprovalStatusTrackerDTO.Comments;
+                    travelApprovalrequest.Comments = bRejectMessage ? travelApprovalStatusTrackerDTO.Comments : "Approved";
                     _context.Update(travelApprovalrequest);
 
 

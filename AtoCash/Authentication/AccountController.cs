@@ -210,7 +210,7 @@ namespace AtoCash.Authentication
                 //bool isUserConfirmed = await userManager.IsEmailConfirmedAsync(user);
                 //if (user != null && isUserConfirmed)
 
-                    if (user != null )
+                if (user != null)
                 {
                     var token = await userManager.GeneratePasswordResetTokenAsync(user);
 
@@ -219,17 +219,18 @@ namespace AtoCash.Authentication
                     //return Ok(passwordResetLink);
 
                     var receiverEmail = model.email;
-                    string subject = "Forgot Password";
-                    string content = "Password Reset Token:" + token + "Request:" + Request.Scheme;
+                    string subject = "Password Reset Link";
+                    string content = "Please click the below Password Reset Link to reset your password:"  + Environment.NewLine + 
+                                        "https://atocash.netlify.app/change-password?token=" + token +"&email=" + model.email;
                     var messagemail = new Message(new string[] { receiverEmail }, subject, content);
 
                     await _emailSender.SendEmailAsync(messagemail);
-                    return Ok(new { model.email, token, Request.Scheme });
+
                 }
 
-                return Ok(new RespStatus { Status = "Success", Message = "Forgot Password Email Sent!" });
+                return Ok(new RespStatus { Status = "Success", Message = "Password Reset Email Sent!" });
             }
-            return Conflict(new RespStatus { Status = "Failure", Message = "Model state is invalid" });
+            return Conflict(new RespStatus { Status = "Failure", Message = "Input params invalid" });
         }
 
 
@@ -245,11 +246,10 @@ namespace AtoCash.Authentication
 
                 if (user != null)
                 {
+
                     var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
                     if (result.Succeeded)
                     {
-
-
                         var receiverEmail = model.email;
                         string subject = "Password Changed";
                         string content = "Your new Password is:" + model.Password;

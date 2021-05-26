@@ -71,6 +71,18 @@ namespace AtoCash.Models
 
         public Double? AmountToCredit { get; set; }
 
+        public bool? IsSettledAmountCredited { get; set; }
+        public DateTime? SettledDate { get; set; }
+
+        [Column(TypeName = "nvarchar(150)")]
+        public string SettlementComment { get; set; }
+        [Column(TypeName = "nvarchar(150)")]
+        public string SettlementAccount { get; set; }
+        [Column(TypeName = "nvarchar(150)")]
+        public string SettlementBankCard { get; set; }
+        [Column(TypeName = "nvarchar(150)")]
+        public string AdditionalData { get; set; }
+
 
         [Required]
         [ForeignKey("CostCenterId")]
@@ -116,13 +128,25 @@ namespace AtoCash.Models
         public Double ClaimAmount { get; set; }
         public Double? AmountToWallet { get; set; }
         public Double? AmountToCredit { get; set; }
+
+
+
+        public bool IsSettledAmountCredited { get; set; }
+        public DateTime? SettledDate { get; set; }
+        public string SettlementComment { get; set; }
+
+        public string SettlementAccount { get; set; }
+
+        public string SettlementBankCard { get; set; }
+
+        public string AdditionalData { get; set; }
+
+
         public int CostCenterId { get; set; }
         public string CostCenter { get; set; }
         public int ApprovalStatusId { get; set; }
 
         public string ApprovalStatusType { get; set; }
-
-
 
     }
 }

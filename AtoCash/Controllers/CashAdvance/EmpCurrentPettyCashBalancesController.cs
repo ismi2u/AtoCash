@@ -90,6 +90,9 @@ namespace AtoCash.Controllers
             empAllCurBalStatusDTO.CashInHand = empAllCurBalStatusDTO.MaxLimit - empAllCurBalStatusDTO.CurBalance;
             empAllCurBalStatusDTO.UpdatedOn = empCurrentPettyCashBalance.UpdatedOn;
 
+            //from Disbursements and Claims table
+            empAllCurBalStatusDTO.ExpReimburseExpectedAmount = _context.DisbursementsAndClaimsMasters.Where(d => d.EmployeeId == id && (d.IsSettledAmountCredited == null || d.IsSettledAmountCredited == false)).Select(s => s.AmountToCredit ?? 0).Sum();
+
             return empAllCurBalStatusDTO;
         }
 

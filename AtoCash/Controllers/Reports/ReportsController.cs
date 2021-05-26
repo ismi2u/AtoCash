@@ -526,6 +526,9 @@ namespace AtoCash.Controllers
                         disbursementsAndClaimsMasterDTO.ApprovalStatusId = disb.ApprovalStatusId;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusType = disb.ApprovalStatusId != null ? _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status : null;
                         disbursementsAndClaimsMasterDTO.RecordDate = disb.RecordDate;
+                        disbursementsAndClaimsMasterDTO.IsSettledAmountCredited = (disb.IsSettledAmountCredited ?? false) ? true : false;
+                        disbursementsAndClaimsMasterDTO.SettledDate = disb.SettledDate;
+                        disbursementsAndClaimsMasterDTO.SettlementComment = disb.SettlementComment;
                         ListDisbItemsDTO.Add(disbursementsAndClaimsMasterDTO);
                     }
 
@@ -613,6 +616,9 @@ namespace AtoCash.Controllers
                         disbursementsAndClaimsMasterDTO.ApprovalStatusId = disb.ApprovalStatusId;
                         disbursementsAndClaimsMasterDTO.ApprovalStatusType = disb.ApprovalStatusId != null ? _context.ApprovalStatusTypes.Find(disb.ApprovalStatusId).Status : null;
                         disbursementsAndClaimsMasterDTO.RecordDate = disb.RecordDate;
+                        disbursementsAndClaimsMasterDTO.IsSettledAmountCredited = (disb.IsSettledAmountCredited ?? false) ? true : false;
+                        disbursementsAndClaimsMasterDTO.SettledDate = disb.SettledDate;
+                        disbursementsAndClaimsMasterDTO.SettlementComment = disb.SettlementComment;
                         ListDisbItemsDTO.Add(disbursementsAndClaimsMasterDTO);
                     }
 
@@ -620,7 +626,7 @@ namespace AtoCash.Controllers
 
 
                     DataTable dt = new DataTable();
-                    dt.Columns.AddRange(new DataColumn[15]
+                    dt.Columns.AddRange(new DataColumn[18]
                         {
                     //new DataColumn("Id", typeof(int)),
                     new DataColumn("EmployeeName", typeof(string)),
@@ -637,7 +643,10 @@ namespace AtoCash.Controllers
                     new DataColumn("AmountToWallet", typeof(Double)),
                     new DataColumn("AmountToCredit", typeof(Double)),
                     new DataColumn("CostCenter", typeof(string)),
-                    new DataColumn("ApprovalStatus", typeof(string))
+                    new DataColumn("ApprovalStatus", typeof(string)),
+                    new DataColumn("IsSettledAmountCredited", typeof(bool)),
+                    new DataColumn("SettledDate", typeof(DateTime)),
+                    new DataColumn("SettlementComment", typeof(string))
                         });
 
                     foreach (var disbItem in ListDisbItemsDTO)
@@ -657,7 +666,11 @@ namespace AtoCash.Controllers
                             disbItem.AmountToWallet,
                             disbItem.AmountToCredit,
                             disbItem.CostCenter,
-                            disbItem.ApprovalStatusType
+                            disbItem.ApprovalStatusType,
+                            disbItem.IsSettledAmountCredited,
+                            disbItem.SettledDate,
+                            disbItem.SettlementComment
+
                             );
                     }
                     // Creating the Excel workbook 

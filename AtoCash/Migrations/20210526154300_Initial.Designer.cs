@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AtoCash.Migrations
 {
     [DbContext(typeof(AtoCashDbContext))]
-    [Migration("20210509183700_Initial")]
+    [Migration("20210526154300_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -339,6 +339,9 @@ namespace AtoCash.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("AdditionalData")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<double?>("AmountToCredit")
                         .HasColumnType("float");
 
@@ -366,6 +369,9 @@ namespace AtoCash.Migrations
                     b.Property<int?>("ExpenseReimburseReqId")
                         .HasColumnType("int");
 
+                    b.Property<bool?>("IsSettledAmountCredited")
+                        .HasColumnType("bit");
+
                     b.Property<int?>("PettyCashRequestId")
                         .HasColumnType("int");
 
@@ -377,6 +383,18 @@ namespace AtoCash.Migrations
 
                     b.Property<int>("RequestTypeId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("SettledDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SettlementAccount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SettlementBankCard")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SettlementComment")
+                        .HasColumnType("nvarchar(150)");
 
                     b.Property<int?>("SubProjectId")
                         .HasColumnType("int");

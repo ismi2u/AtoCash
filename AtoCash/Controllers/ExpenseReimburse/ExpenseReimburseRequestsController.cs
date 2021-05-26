@@ -665,6 +665,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.ClaimAmount = dblTotalClaimAmount;
             disbursementsAndClaimsMaster.CostCenterId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCenterId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
+            disbursementsAndClaimsMaster.IsSettledAmountCredited = false;
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();
             #endregion
@@ -838,6 +839,7 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.ClaimAmount = dblTotalClaimAmount;
             disbursementsAndClaimsMaster.CostCenterId = costCenterId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
+            disbursementsAndClaimsMaster.IsSettledAmountCredited = false;
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();
             #endregion

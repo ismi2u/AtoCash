@@ -1016,6 +1016,12 @@ namespace AtoCash.Migrations
                     ClaimAmount = table.Column<double>(type: "float", nullable: false),
                     AmountToWallet = table.Column<double>(type: "float", nullable: true),
                     AmountToCredit = table.Column<double>(type: "float", nullable: true),
+                    IsSettledAmountCredited = table.Column<bool>(type: "bit", nullable: true),
+                    SettledDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    SettlementComment = table.Column<string>(type: "nvarchar(150)", nullable: true),
+                    SettlementAccount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SettlementBankCard = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AdditionalData = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CostCenterId = table.Column<int>(type: "int", nullable: false),
                     ApprovalStatusId = table.Column<int>(type: "int", nullable: false)
                 },
