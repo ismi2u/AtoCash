@@ -35,6 +35,36 @@ namespace AtoCash.Authentication
             this.context = context;
             _emailSender = emailSender;
         }
+
+        [HttpGet]
+        [ActionName("ConfirmEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userid, string token)
+        {
+            if (userid == null  || token == null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "userid or token is invalid" });
+            }
+
+            var user = await userManager.FindByIdAsync(userid);
+
+            if (user == null)
+            {
+                return Conflict(new RespStatus { Status = "Failure", Message = "User not found!" });
+            }
+
+            var result = await userManager.ConfirmEmailAsync(user, token);
+
+            if (result.Succeeded)
+            {
+                return Ok(new RespStatus { Status = "Success", Message = "Thank you for confirming Email!" });
+            }
+
+            return Conflict(new RespStatus { Status = "Failure", Message = "Email nor confirmed!" });
+        
+    }
+
+
         // GET: api/<AccountController>
         [HttpPost]
         [ActionName("Register")]
@@ -80,7 +110,9 @@ namespace AtoCash.Authentication
 
             if (result.Succeeded)
             {
-                return Ok(new RespStatus { Status = "Success", Message = "User Registered Successfully" });
+                //var roleResult =   await userManager.AddToRoleAsync(user, "User");
+
+                return Ok(new RespStatus { Status = "Success", Message = "User Registered Successfully! Please assign a User Role to Use App!" });
             }
 
             RespStatus respStatus = new();
@@ -207,21 +239,24 @@ namespace AtoCash.Authentication
             if (ModelState.IsValid)
             {
                 var user = await userManager.FindByEmailAsync(model.email);
+
                 //bool isUserConfirmed = await userManager.IsEmailConfirmedAsync(user);
                 //if (user != null && isUserConfirmed)
 
                 if (user != null)
                 {
                     var token = await userManager.GeneratePasswordResetTokenAsync(user);
-
+                    //var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     //var passwordResetlink= Url.Action("ResetPassword", "Account", new { email = model.email, token = token, Request.Scheme });
 
                     //return Ok(passwordResetLink);
-
+                    token = token.Replace("+", "^^^");
                     var receiverEmail = model.email;
                     string subject = "Password Reset Link";
                     string content = "Please click the below Password Reset Link to reset your password:"  + Environment.NewLine + 
                                         "https://atocash.netlify.app/change-password?token=" + token +"&email=" + model.email;
+
+                    //"<a href=\"https://atocash.netlify.app/change-password?token=" + token + "&email=" + model.email + "\">";
                     var messagemail = new Message(new string[] { receiverEmail }, subject, content);
 
                     await _emailSender.SendEmailAsync(messagemail);
@@ -247,6 +282,7 @@ namespace AtoCash.Authentication
                 if (user != null)
                 {
 
+                    model.Token = model.Token.Replace("^^^", "+");
                     var result = await userManager.ResetPasswordAsync(user, model.Token, model.Password);
                     if (result.Succeeded)
                     {

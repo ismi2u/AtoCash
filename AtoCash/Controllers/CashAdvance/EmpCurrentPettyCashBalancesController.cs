@@ -88,10 +88,11 @@ namespace AtoCash.Controllers
             empAllCurBalStatusDTO.CurBalance = empCurrentPettyCashBalance.CurBalance;
             empAllCurBalStatusDTO.MaxLimit = _context.JobRoles.Find(_context.Employees.Find(id).RoleId).MaxPettyCashAllowed;
             empAllCurBalStatusDTO.CashInHand = empAllCurBalStatusDTO.MaxLimit - empAllCurBalStatusDTO.CurBalance;
-            empAllCurBalStatusDTO.UpdatedOn = empCurrentPettyCashBalance.UpdatedOn;
+            empAllCurBalStatusDTO.WalletBalLastUpdated = empCurrentPettyCashBalance.UpdatedOn;
 
             //from Disbursements and Claims table
-            empAllCurBalStatusDTO.ExpReimburseExpectedAmount = _context.DisbursementsAndClaimsMasters.Where(d => d.EmployeeId == id && (d.IsSettledAmountCredited == null || d.IsSettledAmountCredited == false)).Select(s => s.AmountToCredit ?? 0).Sum();
+            empAllCurBalStatusDTO.TotalAmountToCredit = _context.DisbursementsAndClaimsMasters.Where(d => d.EmployeeId == id && (d.IsSettledAmountCredited == null || d.IsSettledAmountCredited == false) && d.AmountToCredit > 0).Select(s => s.AmountToCredit ?? 0).Sum();
+            empAllCurBalStatusDTO.TotalAmountToWallet = _context.DisbursementsAndClaimsMasters.Where(d => d.EmployeeId == id && (d.IsSettledAmountCredited == null || d.IsSettledAmountCredited == false) && d.AmountToWallet > 0).Select(s => s.AmountToWallet ?? 0).Sum();
 
             return empAllCurBalStatusDTO;
         }
