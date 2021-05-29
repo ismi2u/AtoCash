@@ -666,9 +666,53 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.CostCenterId = _context.Departments.Find(_context.Employees.Find(expenseReimburseRequestDto.EmployeeId).DepartmentId).CostCenterId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
             disbursementsAndClaimsMaster.IsSettledAmountCredited = false;
+            //save at the end of the code. not here!
+            #endregion
+
+
+            /// #############################
+            //   Crediting back to the wallet (for self approvedRequest Only)
+            /// #############################
+            /// 
+            if (isSelfApprovedRequest)
+            {
+                double expenseReimAmt = expenseReimburseRequest.TotalClaimAmount;
+                double RoleLimitAmt = _context.JobRoles.Find(_context.Employees.Find(expenseReimburseRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
+                EmpCurrentPettyCashBalance empCurrentPettyCashBalance = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == expenseReimburseRequest.EmployeeId).FirstOrDefault();
+                double empCurPettyBal = empCurrentPettyCashBalance.CurBalance;
+
+                //logic goes here
+
+                if (expenseReimAmt + empCurPettyBal >= RoleLimitAmt) // claiming amount is greater than replishable amount
+                {
+                    disbursementsAndClaimsMaster.AmountToWallet = RoleLimitAmt - empCurPettyBal;
+                    disbursementsAndClaimsMaster.AmountToCredit = expenseReimAmt - (RoleLimitAmt - empCurPettyBal);
+                }
+                else
+                {
+                    //fully credit to Wallet - Zero amount to bank amount
+                    disbursementsAndClaimsMaster.AmountToWallet = expenseReimAmt;
+                    disbursementsAndClaimsMaster.AmountToCredit = 0;
+                }
+
+
+                disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Approved;
+                _context.Update(disbursementsAndClaimsMaster);
+
+
+                //Final Approveer hence update the EmpCurrentPettyCashBalance table for the employee to reflect the credit
+                empCurrentPettyCashBalance.CurBalance = empCurPettyBal + disbursementsAndClaimsMaster.AmountToWallet ?? 0;
+                empCurrentPettyCashBalance.UpdatedOn = DateTime.Now;
+                _context.EmpCurrentPettyCashBalances.Update(empCurrentPettyCashBalance);
+
+                await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
+                await _context.SaveChangesAsync();
+                return Ok(new RespStatus { Status = "Success", Message = "Self approved Expense Claim Submitted Successfully!" });
+            }
+            ///
+
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();
-            #endregion
 
             return Ok(new RespStatus { Status = "Success", Message = "Expense Claim Submitted Successfully!" });
 
@@ -840,9 +884,55 @@ namespace AtoCash.Controllers
             disbursementsAndClaimsMaster.CostCenterId = costCenterId;
             disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Pending; //1-Initiating; 2-Pending; 3-InReview; 4-Approved; 5-Rejected
             disbursementsAndClaimsMaster.IsSettledAmountCredited = false;
+            //save at the end of the code. not here!
+            #endregion
+
+
+            /// #############################
+            //   Crediting back to the wallet (for self approvedRequest Only)
+            /// #############################
+            /// 
+            if (isSelfApprovedRequest)
+            {
+                double expenseReimAmt = expenseReimburseRequest.TotalClaimAmount;
+                double RoleLimitAmt = _context.JobRoles.Find(_context.Employees.Find(expenseReimburseRequest.EmployeeId).RoleId).MaxPettyCashAllowed;
+                EmpCurrentPettyCashBalance empCurrentPettyCashBalance = _context.EmpCurrentPettyCashBalances.Where(e => e.EmployeeId == expenseReimburseRequest.EmployeeId).FirstOrDefault();
+                double empCurPettyBal = empCurrentPettyCashBalance.CurBalance;
+
+                //logic goes here
+
+                if (expenseReimAmt + empCurPettyBal >= RoleLimitAmt) // claiming amount is greater than replishable amount
+                {
+                    disbursementsAndClaimsMaster.AmountToWallet = RoleLimitAmt - empCurPettyBal;
+                    disbursementsAndClaimsMaster.AmountToCredit = expenseReimAmt - (RoleLimitAmt - empCurPettyBal);
+                }
+                else
+                {
+                    //fully credit to Wallet - Zero amount to bank amount
+                    disbursementsAndClaimsMaster.AmountToWallet = expenseReimAmt;
+                    disbursementsAndClaimsMaster.AmountToCredit = 0;
+                }
+
+
+                disbursementsAndClaimsMaster.ApprovalStatusId = (int)EApprovalStatus.Approved;
+                _context.Update(disbursementsAndClaimsMaster);
+
+
+                //Final Approveer hence update the EmpCurrentPettyCashBalance table for the employee to reflect the credit
+                empCurrentPettyCashBalance.CurBalance = empCurPettyBal + disbursementsAndClaimsMaster.AmountToWallet ?? 0;
+                empCurrentPettyCashBalance.UpdatedOn = DateTime.Now;
+                _context.EmpCurrentPettyCashBalances.Update(empCurrentPettyCashBalance);
+
+                await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
+                await _context.SaveChangesAsync();
+                return Ok(new RespStatus { Status = "Success", Message = "Self approved Expense Claim Submitted Successfully!" });
+            }
+            ///
+
+
+
             await _context.DisbursementsAndClaimsMasters.AddAsync(disbursementsAndClaimsMaster);
             await _context.SaveChangesAsync();
-            #endregion
 
             return Ok(new RespStatus { Status = "Success", Message = "Expense Claim Submitted Successfully!" });
         }

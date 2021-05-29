@@ -91,7 +91,7 @@ namespace AtoCash.Controllers
                     var roles = await userManager.GetRolesAsync(user);
 
 
-                    if(user.EmployeeId== 0)
+                    if (user.EmployeeId == 0)
                     {
                         continue;
                     }
@@ -112,7 +112,7 @@ namespace AtoCash.Controllers
                     foreach (var r in roles)
                     {
 
-                        if(userByRole.AccessRole == null)
+                        if (userByRole.AccessRole == null)
                         {
                             userByRole.AccessRole = "";
                         }
@@ -268,7 +268,7 @@ namespace AtoCash.Controllers
         }
 
 
-            [HttpPost]
+        [HttpPost]
         [ActionName("GetEmployeesReport")]
         public async Task<IActionResult> GetEmployeesReport(EmployeeSearchModel searchModel)
         {
@@ -318,10 +318,10 @@ namespace AtoCash.Controllers
                 employeeDTO.Email = employee.Email;
                 employeeDTO.MobileNumber = employee.MobileNumber;
                 employeeDTO.EmploymentType = employee.EmploymentTypeId != 0 ? _context.EmploymentTypes.Find(employee.EmploymentTypeId).EmpJobTypeCode + ":" + _context.EmploymentTypes.Find(employee.EmploymentTypeId).EmpJobTypeDesc : string.Empty;
-                employeeDTO.Department = employee.DepartmentId !=0 ? _context.Departments.Find(employee.DepartmentId).DeptCode + ":" + _context.Departments.Find(employee.DepartmentId).DeptName : string.Empty;
-                employeeDTO.JobRole = employee.RoleId !=0 ?_context.JobRoles.Find(employee.RoleId).RoleCode + ":" + _context.JobRoles.Find(employee.RoleId).RoleName : string.Empty;
-                employeeDTO.ApprovalGroup = employeeDTO.ApprovalGroupId !=0 ? _context.ApprovalGroups.Find(employeeDTO.ApprovalGroupId).ApprovalGroupCode : string.Empty;
-                employeeDTO.StatusType = employeeDTO.StatusTypeId !=0 ? _context.StatusTypes.Find(employeeDTO.StatusTypeId).Status : string.Empty;
+                employeeDTO.Department = employee.DepartmentId != 0 ? _context.Departments.Find(employee.DepartmentId).DeptCode + ":" + _context.Departments.Find(employee.DepartmentId).DeptName : string.Empty;
+                employeeDTO.JobRole = employee.RoleId != 0 ? _context.JobRoles.Find(employee.RoleId).RoleCode + ":" + _context.JobRoles.Find(employee.RoleId).RoleName : string.Empty;
+                employeeDTO.ApprovalGroup = employeeDTO.ApprovalGroupId != 0 ? _context.ApprovalGroups.Find(employeeDTO.ApprovalGroupId).ApprovalGroupCode : string.Empty;
+                employeeDTO.StatusType = employeeDTO.StatusTypeId != 0 ? _context.StatusTypes.Find(employeeDTO.StatusTypeId).Status : string.Empty;
 
                 ListEmployeeDto.Add(employeeDTO);
             }
@@ -475,13 +475,13 @@ namespace AtoCash.Controllers
                     //if (!string.IsNullOrEmpty(searchModel.Name))
                     //    result = result.Where(x => x.Name.Contains(searchModel.Name));
 
-                    if (searchModel.RequestTypeId.HasValue)
+                    if (searchModel.RequestTypeId != 0 && searchModel.RequestTypeId != null)
                         result = result.Where(x => x.RequestTypeId == searchModel.RequestTypeId);
-                    if (searchModel.DepartmentId.HasValue)
+                    if (searchModel.DepartmentId != 0 && searchModel.DepartmentId != null)
                         result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
-                    if (searchModel.ProjectId.HasValue)
+                    if (searchModel.ProjectId != 0 && searchModel.ProjectId != null)
                         result = result.Where(x => x.ProjectId == searchModel.ProjectId);
-                    if (searchModel.SubProjectId.HasValue)
+                    if (searchModel.SubProjectId != 0 && searchModel.SubProjectId != null)
                         result = result.Where(x => x.SubProjectId == searchModel.SubProjectId);
                     if (searchModel.RecordDateFrom.HasValue)
                         result = result.Where(x => x.RecordDate >= searchModel.RecordDateFrom);
@@ -491,9 +491,9 @@ namespace AtoCash.Controllers
                         result = result.Where(x => x.ClaimAmount >= searchModel.AmountFrom);
                     if (searchModel.AmountTo > 0)
                         result = result.Where(x => x.ClaimAmount <= searchModel.AmountTo);
-                    if (searchModel.CostCenterId.HasValue)
+                    if (searchModel.CostCenterId != 0 && searchModel.CostCenterId != null)
                         result = result.Where(x => x.CostCenterId == searchModel.CostCenterId);
-                    if (searchModel.ApprovalStatusId.HasValue)
+                    if (searchModel.ApprovalStatusId != 0 && searchModel.ApprovalStatusId != null)
                         result = result.Where(x => x.ApprovalStatusId == searchModel.ApprovalStatusId);
 
                     List<DisbursementsAndClaimsMasterDTO> ListDisbItemsDTO = new();
@@ -715,7 +715,7 @@ namespace AtoCash.Controllers
                 //restrict employees to generate only their content not of other employees
                 var result = _context.TravelApprovalRequests.Where(x => x.EmployeeId == empid).AsQueryable();
 
-                if (searchModel.TravelApprovalRequestId.HasValue)
+                if (searchModel.TravelApprovalRequestId != 0 && searchModel.TravelApprovalRequestId != null)
                     result = result.Where(x => x.Id == searchModel.TravelApprovalRequestId);
                 if (searchModel.TravelStartDate.HasValue)
                     result = result.Where(x => x.TravelStartDate >= searchModel.TravelStartDate);
@@ -723,18 +723,21 @@ namespace AtoCash.Controllers
                     result = result.Where(x => x.TravelEndDate <= searchModel.TravelEndDate);
                 if (!string.IsNullOrEmpty(searchModel.TravelPurpose))
                     result = result.Where(x => x.TravelPurpose.Contains(searchModel.TravelPurpose));
-                if (searchModel.DepartmentId.HasValue)
+                if (searchModel.DepartmentId != 0 && searchModel.DepartmentId != null)
                     result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
-                if (searchModel.ProjectId.HasValue)
+                if (searchModel.ProjectId != 0 && searchModel.ProjectId != null)
                     result = result.Where(x => x.ProjectId == searchModel.ProjectId);
-                if (searchModel.TravelApprovalRequestId.HasValue)
-                    result = result.Where(x => x.Id == searchModel.TravelApprovalRequestId);
                 if (searchModel.ReqRaisedDate.HasValue)
                     result = result.Where(x => x.ReqRaisedDate >= searchModel.ReqRaisedDate);
                 if (searchModel.ReqRaisedDate.HasValue)
                     result = result.Where(x => x.ReqRaisedDate <= searchModel.ReqRaisedDate);
-                if (searchModel.ApprovalStatusTypeId.HasValue)
+                if (searchModel.ApprovalStatusTypeId != 0 && searchModel.ApprovalStatusTypeId != null)
                     result = result.Where(x => x.ApprovalStatusTypeId == searchModel.ApprovalStatusTypeId);
+
+
+
+
+
 
                 List<TravelApprovalRequestDTO> ListTravelItemsDTO = new();
 
@@ -793,7 +796,7 @@ namespace AtoCash.Controllers
                 //restrict employees to generate only their content not of other employees
                 var result = _context.TravelApprovalRequests.Where(x => x.EmployeeId == empid).AsQueryable();
 
-                if (searchModel.TravelApprovalRequestId.HasValue)
+                if (searchModel.TravelApprovalRequestId != 0 && searchModel.TravelApprovalRequestId != null)
                     result = result.Where(x => x.Id == searchModel.TravelApprovalRequestId);
                 if (searchModel.TravelStartDate.HasValue)
                     result = result.Where(x => x.TravelStartDate >= searchModel.TravelStartDate);
@@ -801,18 +804,19 @@ namespace AtoCash.Controllers
                     result = result.Where(x => x.TravelEndDate <= searchModel.TravelEndDate);
                 if (!string.IsNullOrEmpty(searchModel.TravelPurpose))
                     result = result.Where(x => x.TravelPurpose.Contains(searchModel.TravelPurpose));
-                if (searchModel.DepartmentId.HasValue)
+                if (searchModel.DepartmentId != 0 && searchModel.DepartmentId != null)
                     result = result.Where(x => x.DepartmentId == searchModel.DepartmentId);
-                if (searchModel.ProjectId.HasValue)
+                if (searchModel.ProjectId != 0 && searchModel.ProjectId != null)
                     result = result.Where(x => x.ProjectId == searchModel.ProjectId);
-                if (searchModel.TravelApprovalRequestId.HasValue)
-                    result = result.Where(x => x.Id == searchModel.TravelApprovalRequestId);
                 if (searchModel.ReqRaisedDate.HasValue)
                     result = result.Where(x => x.ReqRaisedDate >= searchModel.ReqRaisedDate);
                 if (searchModel.ReqRaisedDate.HasValue)
                     result = result.Where(x => x.ReqRaisedDate <= searchModel.ReqRaisedDate);
-                if (searchModel.ApprovalStatusTypeId.HasValue)
+                if (searchModel.ApprovalStatusTypeId != 0 && searchModel.ApprovalStatusTypeId != null)
                     result = result.Where(x => x.ApprovalStatusTypeId == searchModel.ApprovalStatusTypeId);
+
+
+
 
                 List<TravelApprovalRequestDTO> ListTravelItemsDTO = new();
 
